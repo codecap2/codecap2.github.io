@@ -396,3 +396,62 @@ body.atardecer .vuelvan, body.noche .vuelvan { color: #ff6b5e; text-shadow: 0 1p
 .dios.fenix .em .ala-i, .dios.fenix .em .ala-d { transform-box: view-box; animation: .8s ease-in-out infinite alternate; }
 .dios.fenix .em .ala-i { transform-origin: 44px 52px; animation-name: aleteoI; }
 .dios.fenix .em .ala-d { transform-origin: 56px 52px; animation-name: aleteoD; }
+
+/* ===================== Las fiestas invaden el Olimpo ===================== */
+#escenaFiesta { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+html.en-templo #escenaFiesta { visibility: hidden; }
+.escena { position: absolute; background: none; border: 0; padding: 0; cursor: pointer; pointer-events: auto; }
+.escena svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.escena:focus-visible { outline: 2px solid var(--oro2); outline-offset: 4px; border-radius: 8px; }
+/* Accesorios junto al logo */
+.logo { position: relative; }
+.accesorio { position: absolute; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,.55)); line-height: 0; }
+.accesorio svg { width: 100%; height: auto; display: block; }
+.acc-navidad { width: 24px; left: -5px; top: -13px; transform: rotate(-20deg); }
+.acc-reyes { width: 22px; left: 5px; top: -15px; }
+.acc-sanvalentin { width: 15px; left: 25px; top: -5px; }
+.acc-muertos, .acc-feria, .acc-patrias { width: 22px; right: -30px; top: 50%; margin-top: -11px; }
+.acc-halloween { width: 22px; right: -56px; top: 50%; margin-top: -11px; }
+body.fiesta-pico .accesorio { animation: accPico 1.8s ease-in-out infinite; }
+@keyframes accPico { 50% { transform: translateY(-2px) scale(1.12); filter: drop-shadow(0 0 8px rgba(241,212,138,.8)); } }
+.acc-navidad { animation: none; }
+/* Papel picado colgando en la portada */
+.papel-picado { position: absolute; left: 0; right: 0; top: 0; height: clamp(46px, 7vw, 70px); pointer-events: none; z-index: 0; }
+.papel-picado svg { width: 100%; height: 100%; display: block; animation: papelViento 4s ease-in-out infinite alternate; transform-origin: 50% 0; }
+@keyframes papelViento { to { transform: skewX(1.5deg) scaleY(1.03); } }
+/* Camino de cempasúchil: discreto en modo claro, brilla en modo oscuro (aunque sea de día de verdad) */
+.cempasuchil { position: absolute; left: 0; right: 0; bottom: 0; height: 34vh; }
+.cempasuchil svg { width: 100%; height: 100%; display: block; transition: filter 1.5s; }
+.cempasuchil circle { opacity: .55; transition: opacity 1.5s; }
+body.noche .cempasuchil circle { opacity: 1; }
+body.noche .cempasuchil svg { filter: drop-shadow(0 0 5px #ff9f1c) drop-shadow(0 0 14px rgba(255,140,20,.65)); animation: cempaLatido 3s ease-in-out infinite alternate; }
+body.noche.fiesta-pico .cempasuchil svg { filter: drop-shadow(0 0 7px #ffb02e) drop-shadow(0 0 24px rgba(255,150,30,.95)); }
+@keyframes cempaLatido { to { opacity: .82; } }
+/* Altar de muertos */
+.altar { left: 3vw; bottom: 6vh; width: clamp(104px, 15vw, 190px); aspect-ratio: 160 / 150; }
+.altar .llamita { transform-box: fill-box; transform-origin: 50% 100%; animation: llamaVela .9s ease-in-out infinite alternate; }
+body.noche .altar .velas { filter: drop-shadow(0 0 4px #ffd34d) drop-shadow(0 0 10px rgba(255,180,60,.7)); }
+@keyframes llamaVela { to { transform: scale(.85, 1.15); } }
+.altar.vivo { animation: altarVivo 2.4s ease; }
+@keyframes altarVivo { 30% { filter: drop-shadow(0 0 18px #ffb02e) brightness(1.2); } }
+/* Feria: rueda de la fortuna gigante a lo lejos, detrás de la duna del frente */
+.rueda { left: 9vw; bottom: 14vh; width: clamp(150px, 22vw, 320px); aspect-ratio: 200 / 220; }
+.giro-rueda { transform-box: view-box; transform-origin: 100px 100px; animation: girarRueda 40s linear infinite; }
+.rueda.rapida .giro-rueda { animation-duration: 3.5s; }
+body.noche .giro-rueda { filter: drop-shadow(0 0 5px rgba(255,211,77,.9)); }
+body.noche .foquito { animation: foquito 1.2s steps(2) infinite; }
+@keyframes girarRueda { to { transform: rotate(360deg); } }
+@keyframes foquito { 50% { opacity: .35; } }
+/* Navidad: el trineo cruza el cielo */
+.trineo { left: -32vw; top: 9vh; width: clamp(170px, 26vw, 320px); aspect-ratio: 260 / 70; opacity: 0; }
+.trineo.vuela-trineo { animation: trineo 9s linear; }
+@keyframes trineo { 0% { transform: translate(0, 0); opacity: 1; } 50% { transform: translate(70vw, -3vh); opacity: 1; } 100% { transform: translate(150vw, 2vh); opacity: 1; } }
+/* Reyes: la caravana camina sobre las dunas */
+.caravana { left: -26vw; bottom: 18vh; width: clamp(150px, 22vw, 260px); aspect-ratio: 200 / 60; animation: caravana 80s linear infinite; }
+@keyframes caravana { from { transform: translateX(0); } to { transform: translateX(150vw); } }
+body.dia .caravana svg g { fill: #6b3d18; }
+@media (prefers-reduced-motion: reduce) { .trineo { opacity: 1; left: 60vw; } .caravana { left: 40vw; } }
+/* El enlace del aviso solo se puede tocar mientras el aviso se ve (antes quedaba invisible y "pegado" sobre la lira) */
+#aviso:not(.visible) .ver { pointer-events: none; visibility: hidden; }
+/* Al cargar, el cielo aparece directo en su fase (sin pasar por la noche unos segundos) */
+html.arranque *, html.arranque *::before, html.arranque *::after { transition: none !important; }

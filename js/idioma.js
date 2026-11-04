@@ -47,13 +47,13 @@
   };
 
   I.saludos = {
-    muertos: '🌼 Day of the Dead: Olympus also remembers those who are gone.',
-    navidad: '🎄 Merry Christmas from Olympus!',
-    anonuevo: '🎆 Happy New Year! May this be the year your business becomes a legend.',
-    reyes: '👑 The Three Kings are on their way, following their star…',
-    sanvalentin: '💘 Aphrodite is on the loose: happy Valentine’s Day.',
-    feria: '🎡 It’s San Marcos National Fair season in Aguascalientes!',
-    patrias: '🇲🇽 ¡Viva México! Independence Day on Olympus.'
+    muertos: '🌼 Day of the Dead season: Olympus also remembers those who are gone. Follow the marigold path… it glows brighter at night.',
+    navidad: '🎄 Christmas on Olympus! Keep an eye on the sky: someone is flying by delivering gifts.',
+    anonuevo: '🎆 New Year on Olympus! Tap the sky to launch your own fireworks.',
+    reyes: '👑 The Three Kings cross the dunes, following their star…',
+    sanvalentin: '💘 Aphrodite is on the loose: Olympus is in love.',
+    feria: '🎡 It’s San Marcos National Fair season! Tap the sky to launch fireworks.',
+    patrias: '🇲🇽 ¡Viva México! Tap the sky to launch red, white and green fireworks.'
   };
   I.estaciones = { primavera: 'spring', verano: 'summer', otono: 'autumn', invierno: 'winter' };
 

@@ -3,6 +3,7 @@
    ?fiesta=navidad|anonuevo|reyes|muertos|patrias|sanvalentin|feria|ninguna  ?estacion=primavera|verano|otono|invierno */
 (function () {
   var q = new URLSearchParams(location.search);
+  document.documentElement.classList.add('arranque');   // sin transiciones en el primer cuadro
   var calma = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var body = document.body, hoy = new Date();
   var C = window.Cielo = { modo: 'noche', clima: 'despejado', estacion: '', fiesta: '', temp: null };
@@ -11,24 +12,35 @@
   var m = hoy.getMonth() + 1, d = hoy.getDate(), md = m * 100 + d;
   function enRango(a, b) { return a <= b ? (md >= a && md <= b) : (md >= a || md <= b); }
   C.estacion = q.get('estacion') || (enRango(320, 620) ? 'primavera' : enRango(621, 922) ? 'verano' : enRango(923, 1220) ? 'otono' : 'invierno');
+  // Cada fiesta dura alrededor de su gran día (más o menos una semana antes y una después),
+  // y en el gran día (el "pico") todo resalta todavía más. ?fiesta=X&pico=1 para probar.
   var fiestas = [
-    ['muertos', 1028, 1102], ['navidad', 1201, 1226], ['anonuevo', 1231, 102], ['reyes', 105, 107],
-    ['sanvalentin', 213, 215], ['feria', 415, 510], ['patrias', 913, 916]
+    // nombre, inicio, fin, días pico
+    ['muertos', 1024, 1109, [1031, 1101, 1102]],   // Halloween + Día de Muertos, fusionados
+    ['navidad', 1217, 1229, [1224, 1225]],
+    ['anonuevo', 1230, 104, [1231, 101]],
+    ['reyes', 105, 113, [106]],
+    ['sanvalentin', 207, 221, [214]],
+    ['feria', 411, 509, [425]],                      // Feria Nacional de San Marcos (día de San Marcos: 25 de abril)
+    ['patrias', 908, 923, [915, 916]]
   ];
-  C.fiesta = q.get('fiesta') || '';
-  if (!C.fiesta) fiestas.forEach(function (f) { if (enRango(f[1], f[2])) C.fiesta = f[0]; });
+  C.fiesta = q.get('fiesta') || ''; C.pico = q.get('pico') === '1';
+  if (!C.fiesta) fiestas.forEach(function (f) { if (enRango(f[1], f[2])) { C.fiesta = f[0]; C.pico = f[3].indexOf(md) >= 0; } });
   if (C.fiesta === 'ninguna') C.fiesta = '';
+  C.halloween = C.fiesta === 'muertos' && (q.get('halloween') === '1' || (!q.get('fiesta') && md >= 1024 && md <= 1031));
   body.classList.add(C.estacion);
-  if (C.fiesta) body.classList.add(C.fiesta);
+  if (C.fiesta) body.classList.add(C.fiesta, 'en-fiesta');
+  if (C.pico) body.classList.add('fiesta-pico');
+  if (C.halloween) body.classList.add('halloween');
 
   C.saludos = {
-    muertos: '🌼 Día de Muertos: el Olimpo también recuerda a los que se fueron.',
-    navidad: '🎄 ¡Feliz Navidad desde el Olimpo!',
-    anonuevo: '🎆 ¡Feliz Año Nuevo! Que este año tu negocio sea leyenda.',
-    reyes: '👑 Los Reyes Magos ya vienen siguiendo su estrella…',
-    sanvalentin: '💘 Afrodita anda suelta: feliz 14 de febrero.',
-    feria: '🎡 ¡Temporada de la Feria Nacional de San Marcos!',
-    patrias: '🇲🇽 ¡Viva México! Fiestas patrias en el Olimpo.'
+    muertos: '🌼 Temporada de Día de Muertos: el Olimpo también recuerda a los que se fueron. Sigue el camino de cempasúchil… brilla más de noche.',
+    navidad: '🎄 ¡Navidad en el Olimpo! Atento al cielo: alguien pasa repartiendo regalos.',
+    anonuevo: '🎆 ¡Año Nuevo en el Olimpo! Toca el cielo y lanza tus propios fuegos artificiales.',
+    reyes: '👑 Los Reyes Magos cruzan las dunas siguiendo su estrella…',
+    sanvalentin: '💘 Afrodita anda suelta: el Olimpo está enamorado.',
+    feria: '🎡 ¡Temporada de la Feria Nacional de San Marcos! Toca el cielo y lanza fuegos artificiales.',
+    patrias: '🇲🇽 ¡Viva México! Toca el cielo y lanza fuegos artificiales tricolor.'
   };
   C.iconoEstacion = { primavera: '🌸', verano: '☀️', otono: '🍂', invierno: '❄️' }[C.estacion];
   C.nombreEstacion = { primavera: 'Primavera', verano: 'Verano', otono: 'Otoño', invierno: 'Invierno' }[C.estacion];
@@ -65,6 +77,7 @@
   }
   C.manual = !!q.get('hora');
   C.ponerModo(q.get('hora') || faseAhora()); primera = false;
+  setTimeout(function () { document.documentElement.classList.remove('arranque'); }, 120);
   setInterval(function () { if (!C.manual) { var f = faseAhora(); if (f !== C.fase) C.ponerModo(f); } }, 60000);
 
   // ---------- Clima ----------
@@ -160,6 +173,23 @@
       agregar({ f: 1, t: 'chispa', x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, vida: azar(50, 90), c: colores[i % colores.length] });
     }
   };
+  // Cohete: sale de detrás de las dunas, sube silbando y revienta en el cielo (en el lienzo del fondo)
+  C.paletaFuegos = function () {
+    return C.fiesta === 'patrias' ? ['#0b8a3e', '#ffffff', '#ce1126'] : C.fiesta === 'feria' ? ['#ff4fa3', '#ffd34d', '#4fd1ff', '#9bff6a', '#ff7a3d'] : ['#f1d48a', '#ff5a4a', '#ffffff', '#ffb347', '#8fd3ff'];
+  };
+  C.cohete = function (x, ty, colores) {
+    var dist = Math.max(80, H - ty), v = Math.sqrt(2 * .05 * dist);
+    agregar({ t: 'cohete', x: x, y: H + 10, vx: azar(-.4, .4), vy: -v, ty: ty, vida: 400, c: colores || C.paletaFuegos() });
+    if (window.Sonido) Sonido.play('cohete');
+  };
+  function estallar(x, y, cols) {
+    var n = Math.round(80 * F), forma = Math.random();
+    for (var i = 0; i < n; i++) {
+      var a = i / n * 6.28 + Math.random() * .1, s = forma < .5 ? azar(2.5, 4.2) : azar(.8, 4.5);
+      agregar({ t: 'chispa', g: .035, tam: 2.2, x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, vida: azar(60, 100), c: cols[i % cols.length] });
+    }
+    if (window.Sonido) Sonido.play('estallido');
+  }
   C.brasas = function (x, y, n, colores) {
     colores = colores || ['#ffcf5a', '#ff8a2a', '#ff4a1f'];
     for (var i = 0; i < (n || 6); i++) agregar({ f: 1, t: 'brasa', x: x + azar(-8, 8), y: y + azar(-8, 8), vx: azar(-1.2, 1.2), vy: azar(-2.6, -.6), vida: azar(30, 60), c: colores[i % colores.length], r: azar(1.2, 3.2) });
@@ -182,15 +212,18 @@
     if (C.clima === 'arena') for (var i = 0; i < 7 * F; i++) agregar({ t: 'arena', x: azar(-50, W * .3), y: azar(0, H), vx: azar(7, 16), vy: azar(-.6, .8), vida: 300, r: azar(.6, 2.2) });
     if (C.clima === 'lluvia' || C.clima === 'tormenta') for (var j = 0; j < 5; j++) agregar({ t: 'gota', x: azar(0, W + 100), y: -20, vx: -2, vy: azar(12, 18), vida: 200 });
     if (C.fiesta === 'navidad' && Math.random() < .8) agregar({ t: 'copo', x: azar(0, W), y: -6, vx: azar(-.4, .4), vy: azar(.6, 1.6), vida: 1500, r: azar(1, 3) });
-    if (C.fiesta === 'muertos' && Math.random() < .12) agregar({ t: 'petalo', x: azar(0, W), y: -10, vx: azar(-.6, .6), vy: azar(.6, 1.4), rot: azar(0, 6), vida: 1500, c: Math.random() < .8 ? '#ff9f1c' : '#c2185b' });
-    if (C.fiesta === 'sanvalentin' && Math.random() < .05) agregar({ t: 'emoji', x: azar(0, W), y: H + 20, vx: azar(-.3, .3), vy: azar(-1.4, -.7), rot: 0, e: '💗', s: azar(14, 24), vida: 900 });
-    if ((C.fiesta === 'feria' || C.fiesta === 'patrias') && Math.random() < .35) {
+    var pico = C.pico ? 2.2 : 1;   // en el gran día, todo se multiplica
+    if (C.fiesta === 'muertos' && Math.random() < .12 * pico * F) agregar({ t: 'petalo', x: azar(0, W), y: -10, vx: azar(-.6, .6), vy: azar(.6, 1.4), rot: azar(0, 6), vida: 1500, c: Math.random() < .8 ? '#ff9f1c' : '#c2185b' });
+    if (C.halloween && C.modo === 'noche' && Math.random() < .006 * pico) agregar({ t: 'emoji', x: -20, y: azar(H * .1, H * .45), vx: azar(2, 4), vy: azar(-.6, .6), rot: 0, e: '🦇', s: 22, vida: 900 });
+    if (C.fiesta === 'sanvalentin' && Math.random() < .05 * pico) agregar({ t: 'emoji', x: azar(0, W), y: H + 20, vx: azar(-.3, .3), vy: azar(-1.4, -.7), rot: 0, e: '💗', s: azar(14, 24), vida: 900 });
+    if ((C.fiesta === 'feria' || C.fiesta === 'patrias') && Math.random() < .2 * pico * F) {
       var cols = C.fiesta === 'patrias' ? ['#0b8a3e', '#ffffff', '#ce1126'] : ['#e91e63', '#ffc107', '#00bcd4', '#8bc34a', '#ff5722'];
       agregar({ t: 'confeti', x: azar(0, W), y: -10, vx: azar(-.8, .8), vy: azar(1, 2.2), rot: azar(0, 6), vida: 1200, c: cols[Math.floor(Math.random() * cols.length)] });
     }
-    var ahora = performance.now();
-    if ((C.fiesta === 'anonuevo' || C.fiesta === 'patrias') && ahora - ultimoFuego > 1400) {
-      ultimoFuego = ahora; C.fuegos(null, null, C.fiesta === 'patrias' ? ['#0b8a3e', '#ffffff', '#ce1126'] : null);
+    // Fuegos artificiales que salen de detrás de las dunas (de noche, o todo el día en el gran día)
+    var ahora = performance.now(), cada = C.pico ? 1300 : 3200;
+    if ((C.fiesta === 'anonuevo' || C.fiesta === 'patrias' || C.fiesta === 'feria') && (C.modo === 'noche' || C.pico) && ahora - ultimoFuego > cada) {
+      ultimoFuego = ahora; C.cohete(azar(W * .1, W * .9), azar(H * .12, H * .4));
     }
     if (C.modo === 'noche' && !fugaz && Math.random() < .002) C.fugaz();
   }
@@ -222,6 +255,12 @@
       var a = parts[p]; a.x += a.vx; a.y += a.vy; a.vida--;
       if (a.t === 'chispa') { a.vy += a.g || .06; a.vx *= .985; }
       if (a.t === 'brasa') { a.vy -= .02; a.vx *= .97; }
+      if (a.t === 'cohete') {
+        a.vy += .05;
+        if (a.vy >= -.4 || a.y <= a.ty) { estallar(a.x, a.y, a.c); parts.splice(p, 1); continue; }
+        if (!pausa) { ctx.globalAlpha = 1; ctx.fillStyle = '#fff6d0'; ctx.fillRect(a.x - 1.2, a.y - 1.2, 2.4, 2.4); ctx.globalAlpha = .45; ctx.fillStyle = '#ffd27a'; ctx.fillRect(a.x - .6, a.y, 1.2, 14); }
+        continue;
+      }
       if (a.rot !== undefined) a.rot += .03;
       if (a.vida <= 0 || a.y > H + 40 || a.x > W + 60 || a.y < -H) { parts.splice(p, 1); continue; }
       if (pausa && !a.f) continue;

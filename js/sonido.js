@@ -181,6 +181,18 @@
       fl.type = 'bandpass'; fl.frequency.value = 1800; fl.Q.value = 5; env(g, t, .05, .1, .8); o.connect(fl); fl.connect(g); salida(g); o.start(t); o.stop(t + .9);
       [1568, 2093, 2637].forEach(function (f, i) { tono(f, 'sine', .04, 1.5, 1.2 + i * .15, 0, .01); });
     },
+    // ---- Fiestas ----
+    // Cohete: silbido que sube; estallido: golpe grave lejano y chisporroteo que cae
+    cohete: function () { var t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(900, t); o.frequency.exponentialRampToValueAtTime(2600, t + 1.1); env(g, t, .05, .04, 1.2); o.connect(g); salida(g); o.start(t); o.stop(t + 1.25); siseo(3000, 6000, .05, 1.1, 0, 1.2, .2); },
+    estallido: function () { enElCielo = true; try { soplo('lowpass', 900, 120, .9, 1.4, 0, .6, .004); tono(55, 'sine', .7, 1, 0, 32, .004); crujido(30, 1.6, .15, .22); } finally { enElCielo = false; } },
+    // Cascabeles del trineo: muchos metalitos agudos sacudidos en ritmo
+    cascabeles: function () { for (var k = 0; k < 14; k++) { var r = k * .16; for (var j = 0; j < 3; j++) metal(2600 + Math.random() * 1400, .05, .25, r + j * .02 + Math.random() * .02); } },
+    // Muertos: una guitarra suave en tono menor y una campana lejana
+    muertos: function () { [220, 262, 330, 392, 330, 262].forEach(function (f, i) { cuerda(f, .4, i * .22, .4); }); campana(440, .12, 3, 1.4); },
+    // Feria: un organillo de feria en vals, alegre y lejano
+    feria: function () { var notas = [392, 494, 587, 494, 440, 523, 659, 523, 392, 494, 587, 784]; notas.forEach(function (f, i) { var r = i * .22, acento = i % 3 === 0; tono(f, 'triangle', acento ? .1 : .07, .2, r); tono(f * 2, 'square', .015, .15, r); if (acento) tono(f / 4, 'triangle', .1, .3, r); }); },
+    // Reyes: campanas suaves y brillo de estrella
+    reyes: function () { campana(523, .14, 3); campana(659, .1, 3, .35); campana(784, .09, 3, .7); },
     victoria: function () { campana(220, .45, 5); campana(330, .25, 4.5, .9); [392, 494, 587, 784, 988].forEach(function (f, i) { cuerda(f, .4, 1.4 + i * .1, .6); }); }
   };
   S.nota = function (f) { if (!S.on || !iniciar()) return false; lira(f, .42, 0); return true; };
