@@ -465,3 +465,29 @@ html.arranque *, html.arranque *::before, html.arranque *::after { transition: n
 /* X pequeñita para cerrar el códice, siempre a la mano en la esquina */
 #codice .cerrar { position: fixed; top: 12px; right: 12px; width: 30px; height: 30px; font-size: .85rem; line-height: 1; background: rgba(18,16,13,.92); border: 1px solid var(--oro); color: var(--oro2); z-index: 72; }
 #codice .cerrar:hover { background: var(--sangre); color: #fff; }
+/* --- Calidad a full en las fiestas --- */
+/* Los accesorios del logo se pueden tocar */
+button.accesorio { pointer-events: auto; background: none; border: 0; padding: 0; cursor: pointer; }
+button.accesorio:focus-visible { outline: 2px solid var(--oro2); outline-offset: 3px; border-radius: 6px; }
+.accesorio.baila { animation: baila .9s ease; }
+@keyframes baila { 15% { transform: rotate(-18deg) scale(1.25); } 35% { transform: rotate(16deg) scale(1.25); } 55% { transform: rotate(-10deg) scale(1.15); } 75% { transform: rotate(6deg); } }
+/* Altar pequeño, a lo lejos sobre las dunas, del que sale el camino */
+.altar { left: 4vw; bottom: 9vh; width: clamp(84px, 11vw, 150px); aspect-ratio: 200 / 175; }
+.altar .copal { animation: copal 3.5s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes copal { 0%, 100% { opacity: .15; transform: translateY(4px) scaleY(.8); } 50% { opacity: .5; transform: translateY(-4px) scaleY(1.1); } }
+/* Cada pétalo del camino titila un poquito de noche */
+body.noche .cempasuchil .petalo-c:nth-child(3n) { animation: titila 2.4s ease-in-out infinite; }
+body.noche .cempasuchil .petalo-c:nth-child(3n+1) { animation: titila 3.1s ease-in-out infinite .6s; }
+@keyframes titila { 50% { opacity: .55; } }
+/* La foto de Sobre mí, vestida para la fiesta */
+.ropa-fiesta { position: absolute; inset: -22px; pointer-events: none; z-index: 1; }
+.ropa-fiesta .corona-flores { width: 100%; height: 100%; animation: girarRueda 90s linear infinite; filter: drop-shadow(0 0 8px rgba(255,159,28,.5)); }
+.ropa-fiesta .pin-foto { position: absolute; left: 14%; bottom: 8%; width: 46px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.6)); }
+.ropa-fiesta .pin-foto svg, .ropa-fiesta .gorro-foto svg { width: 100%; height: auto; display: block; }
+.ropa-fiesta .gorro-foto { position: absolute; right: 12%; top: 0; width: 82px; transform: rotate(18deg); filter: drop-shadow(0 4px 6px rgba(0,0,0,.6)); }
+.ropa-fiesta .corona-foto { right: auto; left: 50%; top: -6px; width: 70px; transform: translateX(-50%); }
+/* Más contraste de día (y menos letras delgadas sobre el cielo claro) */
+body.dia .antetitulo { color: #3a1d08; font-weight: 700; text-shadow: 0 1px 0 rgba(255,240,210,.7); }
+body.dia main .sub, body.dia .vidrio p, body.dia .portada p { color: #2a170b; }
+body.dia .nota { color: #5a140c; font-weight: 600; }
+body.dia .reto { background: rgba(20,12,6,.78); }

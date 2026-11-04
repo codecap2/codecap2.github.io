@@ -132,7 +132,7 @@
   var F = (innerWidth < 760 || (navigator.hardwareConcurrency || 8) <= 4) ? .5 : 1;
   var cf = document.getElementById('frente'), fx = cf.getContext('2d'), pausa = false;
   C.pausar = function (si) { pausa = si; };
-  var W, H, estrellas = [], parts = [], reyesX = -0.2, fugaz = null, ultimoFuego = 0;
+  var W, H, estrellas = [], parts = [], reyesX = .2 + Math.random() * .45, fugaz = null, ultimoFuego = 0;
   // El sol y la luna se esconden DETRÁS de las dunas: se recorta su capa con la forma de la duna del frente
   function recortarAstros() {
     var duna = document.querySelector('.dunas .d1'), capa = document.getElementById('astros');
@@ -239,10 +239,14 @@
     }
     if (C.fiesta === 'reyes') {
       reyesX += calma ? 0 : .0004; if (reyesX > 1.2) reyesX = -0.2;
+      // Las tres estrellas de los Reyes: grandes, con su destello en cruz que late
       for (var k = 0; k < 3; k++) {
-        var rx = (reyesX - k * .05) * W, ry = H * (.12 + k * .03);
-        ctx.globalAlpha = 1; ctx.fillStyle = k === 0 ? '#fff6c8' : '#f1d48a';
-        ctx.shadowColor = '#ffe08a'; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(rx, ry, k === 0 ? 4 : 2.6, 0, 6.28); ctx.fill(); ctx.shadowBlur = 0;
+        var rx = (reyesX - k * .06) * W, ry = H * (.13 + k * .035), late = calma ? 1 : .85 + .15 * Math.sin(t / 300 + k), tam = (k === 0 ? 9 : 6.5) * late;
+        ctx.globalAlpha = .35; ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.arc(rx, ry, tam * 3.2, 0, 6.28); ctx.fill();
+        ctx.globalAlpha = 1; ctx.fillStyle = k === 0 ? '#fffbe6' : '#f6dc95';
+        ctx.beginPath(); ctx.moveTo(rx, ry - tam * 3); ctx.lineTo(rx + tam * .35, ry - tam * .35); ctx.lineTo(rx + tam * 3, ry); ctx.lineTo(rx + tam * .35, ry + tam * .35);
+        ctx.lineTo(rx, ry + tam * 3); ctx.lineTo(rx - tam * .35, ry + tam * .35); ctx.lineTo(rx - tam * 3, ry); ctx.lineTo(rx - tam * .35, ry - tam * .35); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.arc(rx, ry, tam * .7, 0, 6.28); ctx.fill();
       }
     }
     if (fugaz) {

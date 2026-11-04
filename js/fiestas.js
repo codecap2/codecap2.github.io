@@ -21,21 +21,52 @@
     feria: '<svg viewBox="0 0 40 40"><circle cx="20" cy="18" r="13" fill="none" stroke="#f1d48a" stroke-width="2"/><g stroke="#f1d48a" stroke-width="1.2"><path d="M20 5 V31 M7 18 H33 M11 9 L29 27 M29 9 L11 27"/></g><g fill="#ff4fa3"><circle cx="20" cy="5" r="2.4"/><circle cx="33" cy="18" r="2.4" fill="#ffd34d"/><circle cx="20" cy="31" r="2.4" fill="#4fd1ff"/><circle cx="7" cy="18" r="2.4" fill="#9bff6a"/></g><path d="M14 38 L20 18 L26 38" stroke="#c8963c" stroke-width="2" fill="none"/></svg>',
     patrias: '<svg viewBox="0 0 42 30"><rect x="1" y="3" width="13" height="24" fill="#0b8a3e"/><rect x="14" y="3" width="14" height="24" fill="#ffffff"/><rect x="28" y="3" width="13" height="24" fill="#ce1126"/><circle cx="21" cy="15" r="4" fill="#9c6b2e"/></svg>'
   };
+  // Cada accesorio hace algo al tocarlo (sin saturar: una reacción corta y un mensaje)
+  var CALAVERITAS = [
+    T('💀 «La Catrina llegó al Olimpo buscando a quién llevarse, vio páginas tan bonitas que prefirió quedarse.»', '💀 “The Catrina climbed Olympus looking for someone to take, but she saw such lovely websites she stayed for beauty’s sake.”'),
+    T('💀 «Hades salió del abismo con su casco invisible, pero al ver tanto detalle irse se le hizo imposible.»', '💀 “Hades rose up from the abyss in his helmet, out of sight, but he saw so many details that he stayed here overnight.”'),
+    T('💀 «Dicen que la Calaca no perdona a ningún mortal, pero a los negocios con página los deja en paz, ¡qué tal!»', '💀 “They say Death spares no mortal, no matter where they’re from, but businesses with websites? She says: those are too much fun!”')
+  ];
+  var nCal = 0;
+  var REACCION = {
+    muertos: function (el) { el.classList.add('baila'); setTimeout(function () { el.classList.remove('baila'); }, 900); var r = el.getBoundingClientRect(); C.brasas(r.left + r.width / 2, r.top + r.height / 2, 14, ['#ff9f1c', '#ffd34d', '#ff4fa3']); S.play('muertos'); avisar(CALAVERITAS[nCal++ % CALAVERITAS.length] + T('  (Una calaverita literaria, tradición de Día de Muertos.)', '  (A “calaverita”: a playful Day of the Dead rhyme.)')); },
+    halloween: function (el) { el.classList.add('baila'); setTimeout(function () { el.classList.remove('baila'); }, 900); for (var b = 0; b < 6; b++) C.subir(['🦇'], innerWidth * Math.random(), innerHeight * .6, 1); S.play('hades'); avisar(T('🎃 ¡Dulce o truco! El Olimpo prefiere los dulces… y las páginas con sorpresas.', '🎃 Trick or treat! Olympus prefers treats… and websites full of surprises.')); },
+    navidad: function (el) { C.lluviaDe(['❄️', '⭐', '🎁'], 24); S.play('cascabeles'); avisar(T('🎅 El gorrito de Santa le queda bien al Olimpo, ¿no crees?', '🎅 Santa’s hat suits Olympus, doesn’t it?')); },
+    reyes: function (el) { var r = el.getBoundingClientRect(); C.brasas(r.left + r.width / 2, r.top, 18, ['#fff6c8', '#f1d48a']); S.play('reyes'); avisar(T('👑 Una corona digna de un rey… o de tu negocio.', '👑 A crown fit for a king… or for your business.')); },
+    sanvalentin: function (el) { C.subir(['💗', '💘', '🌹'], innerWidth / 2, innerHeight * .7, 16); S.play('arpa'); avisar(T('💘 Afrodita aprueba este amor por los detalles.', '💘 Aphrodite approves of this love for details.')); },
+    feria: function (el) { for (var n = 0; n < 3; n++) setTimeout(function () { C.cohete(innerWidth * (.2 + Math.random() * .6), innerHeight * (.12 + Math.random() * .2)); }, n * 260); S.play('feria'); avisar(T('🎡 ¡Que viva la Feria de San Marcos!', '🎡 Long live the San Marcos Fair!')); },
+    patrias: function (el) { for (var n = 0; n < 3; n++) setTimeout(function () { C.cohete(innerWidth * (.2 + Math.random() * .6), innerHeight * (.12 + Math.random() * .2)); }, n * 260); avisar(T('🇲🇽 ¡Viva México!', '🇲🇽 ¡Viva México!')); }
+  };
   var logo = $('.logo');
-  if (logo && ACC[f]) {
-    var acc = document.createElement('span'); acc.className = 'accesorio acc-' + f; acc.setAttribute('aria-hidden', 'true'); acc.innerHTML = ACC[f];
-    logo.appendChild(acc);
-    if (C.halloween) { var cal = document.createElement('span'); cal.className = 'accesorio acc-halloween'; cal.setAttribute('aria-hidden', 'true'); cal.innerHTML = ACC.halloween; logo.appendChild(cal); }
+  function ponerAccesorio(tipo) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'accesorio acc-' + tipo; b.innerHTML = ACC[tipo];
+    b.setAttribute('aria-label', { muertos: T('Una calaverita de azúcar', 'A sugar skull'), halloween: T('Una calabaza', 'A pumpkin'), navidad: T('El gorrito de Santa', 'Santa’s hat'), reyes: T('Una corona', 'A crown'), sanvalentin: T('Un corazón', 'A heart'), feria: T('Una rueda de la fortuna', 'A Ferris wheel'), patrias: T('La bandera de México', 'The flag of Mexico') }[tipo]);
+    b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); REACCION[tipo](b); });
+    logo.appendChild(b);
   }
+  if (logo && ACC[f]) { ponerAccesorio(f); if (C.halloween) ponerAccesorio('halloween'); }
 
   // ---------- Papel picado bajo la portada (Muertos, Feria y Patrias) ----------
   var COL_PAPEL = { muertos: ['#ff4fa3', '#ff8a1f', '#9b5cff', '#ffd34d', '#2fc58a'], feria: ['#ff4fa3', '#ffd34d', '#4fd1ff', '#9bff6a', '#ff7a3d'], patrias: ['#0b8a3e', '#ffffff', '#ce1126'] };
   if (COL_PAPEL[f] && $('.portada')) {
     var tira = document.createElement('div'); tira.className = 'papel-picado'; tira.setAttribute('aria-hidden', 'true');
+    // Cada banderita trae su propio calado, como el papel picado de verdad: calavera, flor, corazón, estrella, rayo…
+    var H = 'fill="#0b0d12" fill-opacity=".62"';   // el "hueco" recortado
+    var CALADOS = {
+      calavera: function (c) { return '<path d="M28 9 C20 9 16 14 16 20 C16 24 18 26 20 27 L20 31 L36 31 L36 27 C38 26 40 24 40 20 C40 14 36 9 28 9 Z" ' + H + '/><circle cx="23" cy="20" r="3" fill="' + c + '"/><circle cx="33" cy="20" r="3" fill="' + c + '"/><path d="M28 23 L26.5 26 L29.5 26 Z" fill="' + c + '"/><path d="M23 29 H33" stroke="' + c + '" stroke-width="1.2"/>'; },
+      flor: function () { var p = ''; for (var k = 0; k < 8; k++) p += '<ellipse cx="28" cy="13" rx="2.6" ry="6" transform="rotate(' + k * 45 + ' 28 20)" ' + H + '/>'; return p + '<circle cx="28" cy="20" r="3.2" ' + H + '/>'; },
+      corazon: function () { return '<path d="M28 32 C18 25 15 20 15 16 C15 12 18 10 21 10 C24 10 26 12 28 14 C30 12 32 10 35 10 C38 10 41 12 41 16 C41 20 38 25 28 32 Z" ' + H + '/>'; },
+      estrella: function () { return '<path d="M28 7 L31.5 16 L41 16.5 L33.5 22.5 L36 32 L28 26.5 L20 32 L22.5 22.5 L15 16.5 L24.5 16 Z" ' + H + '/>'; },
+      rayo: function () { return '<path d="M31 7 L20 22 H27 L24 33 L36 17 H29 Z" ' + H + '/>'; },
+      pajaro: function () { return '<path d="M14 22 C18 14 24 14 28 19 C32 14 38 14 42 22 C38 19 34 19 28 24 C22 19 18 19 14 22 Z" ' + H + '/><circle cx="28" cy="27" r="2" ' + H + '/>'; }
+    };
+    var orden = f === 'muertos' ? ['calavera', 'flor', 'pajaro', 'corazon', 'calavera', 'estrella', 'rayo'] : f === 'patrias' ? ['estrella', 'flor', 'pajaro', 'corazon', 'rayo'] : ['estrella', 'flor', 'corazon', 'pajaro', 'rayo'];
     var s = '<svg viewBox="0 0 1200 70" preserveAspectRatio="none"><path d="M0 4 Q600 26 1200 4" stroke="#c9b48a" stroke-width="2" fill="none"/>';
     for (var i = 0; i < 16; i++) {
-      var x = 20 + i * 74, y = 5 + Math.sin(i / 15 * Math.PI) * 11, c = COL_PAPEL[f][i % COL_PAPEL[f].length];
-      s += '<g transform="translate(' + x + ' ' + y + ')"><path d="M0 0 H56 V40 L48 48 L40 40 L32 48 L24 40 L16 48 L8 40 L0 48 Z" fill="' + c + '" opacity=".92"/><circle cx="28" cy="18" r="7" fill="#0b0d12" opacity=".55"/><path d="M10 10 h8 v8 h-8z M38 10 h8 v8 h-8z M14 30 h28 v4 h-28z" fill="#0b0d12" opacity=".45"/></g>';
+      var x = 20 + i * 74, y = 5 + Math.sin(i / 15 * Math.PI) * 11, c = COL_PAPEL[f][i % COL_PAPEL[f].length], celo = '';
+      for (var e2 = 0; e2 < 6; e2++) celo += '<path d="M' + (6 + e2 * 9) + ' 3.5 l2.5 2.5 l-2.5 2.5 l-2.5 -2.5 Z" ' + H + '/>';   // greca de rombitos arriba
+      s += '<g transform="translate(' + x + ' ' + y + ')"><path d="M0 0 H56 V40 L48 48 L40 40 L32 48 L24 40 L16 48 L8 40 L0 48 Z" fill="' + c + '" opacity=".94"/>' + celo + CALADOS[orden[i % orden.length]](c) +
+        '<path d="M4 37 H52" stroke="#0b0d12" stroke-opacity=".4" stroke-width="1.4" stroke-dasharray="3 3"/></g>';
     }
     tira.innerHTML = s + '</svg>'; $('.portada').appendChild(tira);
   }
@@ -43,17 +74,29 @@
   // ---------- Día de Muertos: altar y camino de cempasúchil que brilla en modo oscuro ----------
   if (f === 'muertos') {
     var camino = document.createElement('div'); camino.className = 'cempasuchil'; camino.setAttribute('aria-hidden', 'true');
+    // Camino en perspectiva: nace cerca (pétalos grandes) y se pierde en el horizonte (pétalos diminutos)
     var c2 = '<svg viewBox="0 0 1440 320" preserveAspectRatio="none">';
-    for (var k = 0; k < 70; k++) { var t = k / 69, px = 180 + t * 1180, py = 300 - t * 90 + Math.sin(t * 9) * 12 + (Math.random() - .5) * 8; c2 += '<circle cx="' + px.toFixed(0) + '" cy="' + py.toFixed(0) + '" r="' + (5 + Math.random() * 4).toFixed(1) + '" fill="' + (k % 5 ? '#ff9f1c' : '#ffc23a') + '"/>'; }
+    for (var k = 0; k < 90; k++) {
+      var t = k / 89, lejos = Math.pow(t, .8), px = 260 + Math.sin(t * 3.2) * 160 + t * 760, py = 318 - lejos * 150, r = 6.5 - lejos * 5;
+      for (var lado = -1; lado <= 1; lado += 2) c2 += '<circle class="petalo-c" cx="' + (px + lado * (14 - lejos * 11)).toFixed(0) + '" cy="' + py.toFixed(0) + '" r="' + Math.max(.9, r).toFixed(1) + '" fill="' + ((k + lado) % 4 ? '#ff9f1c' : '#ffc23a') + '"/>';
+    }
     camino.innerHTML = c2 + '</svg>'; escena.appendChild(camino);
-    var altar = boton('<svg viewBox="0 0 160 150">' +
-      '<path d="M10 40 Q80 4 150 40" stroke="#ff8a1f" stroke-width="8" fill="none" stroke-dasharray="2 6" stroke-linecap="round"/>' +
-      '<rect x="20" y="96" width="120" height="16" fill="#7a3b1c"/><rect x="34" y="74" width="92" height="22" fill="#8c4a24"/><rect x="50" y="54" width="60" height="20" fill="#9e5a2e"/>' +
-      '<rect x="66" y="26" width="28" height="28" rx="2" fill="#2a1a10" stroke="#f1d48a" stroke-width="2"/><circle cx="80" cy="38" r="6" fill="#5a4030"/><path d="M71 52 Q80 42 89 52" fill="#5a4030"/>' +
-      '<g class="velas"><rect x="40" y="62" width="5" height="12" fill="#fbf4e6"/><rect x="115" y="62" width="5" height="12" fill="#fbf4e6"/><rect x="28" y="84" width="5" height="12" fill="#fbf4e6"/><rect x="127" y="84" width="5" height="12" fill="#fbf4e6"/>' +
-      '<ellipse class="llamita" cx="42.5" cy="59" rx="2.4" ry="4" fill="#ffd34d"/><ellipse class="llamita" cx="117.5" cy="59" rx="2.4" ry="4" fill="#ffd34d"/><ellipse class="llamita" cx="30.5" cy="81" rx="2.4" ry="4" fill="#ffd34d"/><ellipse class="llamita" cx="129.5" cy="81" rx="2.4" ry="4" fill="#ffd34d"/></g>' +
-      '<circle cx="58" cy="90" r="6" fill="#d9a85a"/><circle cx="102" cy="90" r="6" fill="#d9a85a"/><g fill="#ff9f1c"><circle cx="24" cy="108" r="6"/><circle cx="136" cy="108" r="6"/><circle cx="52" cy="70" r="4"/><circle cx="108" cy="70" r="4"/><circle cx="80" cy="92" r="5"/></g>' +
-      '<rect x="12" y="112" width="136" height="10" fill="#5a2a12"/></svg>', 'altar', T('Un altar de muertos', 'A Day of the Dead altar'));
+    // Altar de tres niveles, pequeño y a lo lejos sobre las dunas, lleno de detalles
+    var cempa = function (x, y, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#ff9f1c"/><circle cx="' + x + '" cy="' + y + '" r="' + (r * .55) + '" fill="#ffc23a"/>'; };
+    var arco = ''; for (var a1 = 0; a1 <= 18; a1++) { var an = Math.PI - a1 / 18 * Math.PI; arco += cempa((100 + Math.cos(an) * 84).toFixed(1), (112 - Math.sin(an) * 92).toFixed(1), a1 % 2 ? 5 : 6); }
+    var calavera = function (x, y, c1, c2b) { return '<g transform="translate(' + x + ' ' + y + ')"><path d="M0 -7 C-5 -7 -7 -3 -7 0 C-7 3 -5 4 -4 5 L-4 7 L4 7 L4 5 C5 4 7 3 7 0 C7 -3 5 -7 0 -7 Z" fill="#fbf4e6"/><circle cx="-2.6" cy="0" r="1.8" fill="' + c1 + '"/><circle cx="2.6" cy="0" r="1.8" fill="' + c2b + '"/><path d="M-2 5 H2" stroke="#1d1a17" stroke-width=".8"/></g>'; };
+    var vela = function (x, y, h) { return '<rect x="' + (x - 2.5) + '" y="' + (y - h) + '" width="5" height="' + h + '" rx="1" fill="#fbf4e6"/><ellipse class="llamita" cx="' + x + '" cy="' + (y - h - 4) + '" rx="2.4" ry="4.2" fill="#ffd34d"/><ellipse cx="' + x + '" cy="' + (y - h - 3) + '" rx="1" ry="2" fill="#fff"/>'; };
+    var papelAltar = ''; ['#ff4fa3', '#ff8a1f', '#9b5cff', '#ffd34d', '#2fc58a', '#ff4fa3', '#9b5cff'].forEach(function (cc, i) { papelAltar += '<path d="M' + (44 + i * 16) + ' 58 h14 v10 l-3.5 3 l-3.5 -3 l-3.5 3 l-3.5 -3 Z" fill="' + cc + '"/>'; });
+    var altar = boton('<svg viewBox="0 0 200 175">' + arco +
+      '<rect x="22" y="132" width="156" height="18" fill="#6a2f8a"/><path d="M22 150 h156 l-6 8 h-144 Z" fill="#4a1f63"/>' +
+      '<rect x="40" y="108" width="120" height="24" fill="#c2185b"/><rect x="58" y="86" width="84" height="22" fill="#ff8a1f"/><rect x="58" y="86" width="84" height="3" fill="#ffd34d"/>' +
+      papelAltar + '<rect x="86" y="58" width="28" height="28" rx="2" fill="#2a1a10" stroke="#f1d48a" stroke-width="2"/><circle cx="100" cy="69" r="5.5" fill="#6a5040"/><path d="M91 84 Q100 74 109 84" fill="#6a5040"/>' +
+      '<g class="velas">' + vela(50, 108, 12) + vela(150, 108, 12) + vela(34, 132, 14) + vela(166, 132, 14) + vela(68, 86, 10) + vela(132, 86, 10) + '</g>' +
+      calavera(74, 124, '#ff4fa3', '#4fd1ff') + calavera(126, 124, '#9bff6a', '#ff8a1f') + calavera(100, 146, '#ffd34d', '#9b5cff') +
+      '<ellipse cx="100" cy="128" rx="11" ry="6" fill="#c98a3c"/><path d="M93 126 h14 M96 123 v6 M104 123 v6" stroke="#f1d48a" stroke-width="1.6" stroke-linecap="round"/>' +
+      cempa(28, 128, 7) + cempa(172, 128, 7) + cempa(46, 104, 5) + cempa(154, 104, 5) +
+      '<path class="copal" d="M100 50 C96 42 104 38 100 30 C96 22 104 18 100 10" stroke="#e8e0d0" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/>' +
+      '</svg>', 'altar', T('Un altar de muertos', 'A Day of the Dead altar'));
     altar.addEventListener('click', function () {
       altar.classList.add('vivo'); setTimeout(function () { altar.classList.remove('vivo'); }, 2400);
       var r = altar.getBoundingClientRect(); for (var n = 0; n < 4; n++) C.brasas(r.left + r.width * (.2 + n * .2), r.top + r.height * .45, 6, ['#ffd34d', '#ff9f1c', '#ffffff']);
@@ -61,6 +104,18 @@
       avisar(T('🕯️ El altar guía a las almas de regreso a casa con la luz de las velas y el aroma del cempasúchil. El Olimpo también recuerda.', '🕯️ The altar guides souls back home with candlelight and the scent of marigolds. Olympus remembers too.'));
     });
   }
+
+  // ---------- Tu foto también se viste para la fiesta ----------
+  var med = $('.medallon');
+  var ROPA = {
+    muertos: function () { var s = '<svg viewBox="0 0 260 260" class="corona-flores">'; for (var i = 0; i < 26; i++) { var a = i / 26 * Math.PI * 2, x = 130 + Math.cos(a) * 118, y = 130 + Math.sin(a) * 118, r = i % 2 ? 9 : 11; s += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r + '" fill="#ff9f1c"/><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + (r * .5) + '" fill="#ffc23a"/>'; } return s + '</svg><span class="pin-foto">' + ACC.muertos + '</span>'; },
+    navidad: function () { return '<span class="gorro-foto">' + ACC.navidad + '</span>'; },
+    reyes: function () { return '<span class="gorro-foto corona-foto">' + ACC.reyes + '</span>'; },
+    sanvalentin: function () { return '<span class="pin-foto">' + ACC.sanvalentin + '</span>'; },
+    patrias: function () { return '<span class="pin-foto">' + ACC.patrias + '</span>'; },
+    feria: function () { return '<span class="pin-foto">' + ACC.feria + '</span>'; }
+  };
+  if (med && ROPA[f]) { var ropa = document.createElement('div'); ropa.className = 'ropa-fiesta'; ropa.setAttribute('aria-hidden', 'true'); ropa.innerHTML = ROPA[f](); med.appendChild(ropa); }
 
   // ---------- Feria de San Marcos: rueda de la fortuna gigante detrás de las dunas ----------
   if (f === 'feria') {
