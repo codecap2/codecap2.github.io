@@ -115,6 +115,8 @@
 
   // ---------- Partículas ----------
   var cv = document.getElementById('particulas'), ctx = cv.getContext('2d');
+  // En celulares y equipos modestos se dibuja la mitad de partículas, para que todo vaya fluido
+  var F = (innerWidth < 760 || (navigator.hardwareConcurrency || 8) <= 4) ? .5 : 1;
   var cf = document.getElementById('frente'), fx = cf.getContext('2d'), pausa = false;
   C.pausar = function (si) { pausa = si; };
   var W, H, estrellas = [], parts = [], reyesX = -0.2, fugaz = null, ultimoFuego = 0;
@@ -132,12 +134,12 @@
   function medir() {
     W = cv.width = cf.width = innerWidth; H = cv.height = cf.height = innerHeight; estrellas = [];
     recortarAstros();
-    var n = Math.round(W * H / 8000);
+    var n = Math.round(W * H / 8000 * F);
     for (var i = 0; i < n; i++) estrellas.push({ x: Math.random() * W, y: Math.random() * H * .75, r: Math.random() * 1.3 + .2, f: Math.random() * 6.28, oro: i % 9 === 0 });
   }
   addEventListener('resize', medir); medir();
 
-  function agregar(p) { if (parts.length < 700) { if (p.s) p.s = Math.round(p.s / 4) * 4; parts.push(p); } }
+  function agregar(p) { if (parts.length < 700 * F) { if (p.s) p.s = Math.round(p.s / 4) * 4; parts.push(p); } }
   // Los emojis se dibujan una sola vez en una "calcomanía" y luego solo se pegan: así caen fluidos, sin trabarse
   var calcas = {};
   function sprite(e, s) {
@@ -152,7 +154,7 @@
   C.fuegos = function (x, y, colores) {
     colores = colores || ['#f1d48a', '#ff5a4a', '#ffffff', '#ffb347'];
     x = x || azar(W * .15, W * .85); y = y || azar(H * .12, H * .4);
-    for (var i = 0; i < 70; i++) {
+    for (var i = 0; i < 70 * F; i++) {
       var a = Math.random() * 6.28, s = azar(1.5, 5.5);
       agregar({ f: 1, t: 'chispa', x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, vida: azar(50, 90), c: colores[i % colores.length] });
     }
@@ -175,8 +177,8 @@
 
   function generar() {
     var dia = C.modo === 'dia';
-    if (dia && Math.random() < .35) agregar({ t: 'arena', x: -5, y: azar(H * .45, H), vx: azar(1, 3), vy: azar(-.2, .2), vida: 900, r: azar(.6, 1.6) });
-    if (C.clima === 'arena') for (var i = 0; i < 7; i++) agregar({ t: 'arena', x: azar(-50, W * .3), y: azar(0, H), vx: azar(7, 16), vy: azar(-.6, .8), vida: 300, r: azar(.6, 2.2) });
+    if (dia && Math.random() < .35 * F) agregar({ t: 'arena', x: -5, y: azar(H * .45, H), vx: azar(1, 3), vy: azar(-.2, .2), vida: 900, r: azar(.6, 1.6) });
+    if (C.clima === 'arena') for (var i = 0; i < 7 * F; i++) agregar({ t: 'arena', x: azar(-50, W * .3), y: azar(0, H), vx: azar(7, 16), vy: azar(-.6, .8), vida: 300, r: azar(.6, 2.2) });
     if (C.clima === 'lluvia' || C.clima === 'tormenta') for (var j = 0; j < 5; j++) agregar({ t: 'gota', x: azar(0, W + 100), y: -20, vx: -2, vy: azar(12, 18), vida: 200 });
     if (C.fiesta === 'navidad' && Math.random() < .8) agregar({ t: 'copo', x: azar(0, W), y: -6, vx: azar(-.4, .4), vy: azar(.6, 1.6), vida: 1500, r: azar(1, 3) });
     if (C.fiesta === 'muertos' && Math.random() < .12) agregar({ t: 'petalo', x: azar(0, W), y: -10, vx: azar(-.6, .6), vy: azar(.6, 1.4), rot: azar(0, 6), vida: 1500, c: Math.random() < .8 ? '#ff9f1c' : '#c2185b' });

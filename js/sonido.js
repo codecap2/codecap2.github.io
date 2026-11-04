@@ -222,7 +222,7 @@
   // así que el ambiente arranca con su primer clic, toque o tecla. El botón 🔊 lo apaga.
   var btn = document.getElementById('btnSonido');
   S.on = true;
-  function pintarBoton() { if (!btn) return; btn.textContent = S.on ? '🔊' : '🔇'; btn.setAttribute('aria-label', S.on ? 'Apagar sonido' : 'Encender sonido'); }
+  function pintarBoton() { if (!btn) return; btn.textContent = S.on ? '🔊' : '🔇'; var en = window.Idioma && Idioma.lang === 'en'; btn.setAttribute('aria-label', S.on ? (en ? 'Turn sound off' : 'Apagar sonido') : (en ? 'Turn sound on' : 'Encender sonido')); }
   pintarBoton();
   var despertado = false;
   function despertar(e) {

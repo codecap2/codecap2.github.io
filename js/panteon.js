@@ -1,6 +1,8 @@
 /* Olimpo · el panteón: 15 dioses escondidos, el códice, los templos y los guiños. */
 (function () {
-  var C = window.Cielo, S = window.Sonido, body = document.body;
+  var C = window.Cielo, S = window.Sonido, I = window.Idioma, T = I.t, body = document.body;
+  // Texto de un dios en el idioma actual (el español vive en DIOSES; el inglés, en Idioma.dioses)
+  function campo(g, k) { var en = I.lang === 'en' && I.dioses[g.id]; return en && en[k] ? en[k] : g[k]; }
   var $ = function (s) { return document.querySelector(s); };
   var suave = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var NS = 'http://www.w3.org/2000/svg';
@@ -33,7 +35,7 @@
   function decir(txt, ms, idDios, link, mito) {
     aviso.textContent = txt;
     if (idDios) {
-      link = link || [' · 📜 ', 'Ver en el códice', ''];
+      link = link || [' · 📜 ', T('Ver en el códice', 'See it in the codex'), ''];
       var b = document.createElement('button'); b.type = 'button'; b.className = 'ver'; b.textContent = link[1];
       b.onclick = function () { abrirCodice(idDios); };
       var grupo = document.createElement('span'); grupo.className = 'grupo';   // "📜 Ares entra a tu códice (7/15)" nunca se parte
@@ -51,17 +53,23 @@
     if (nuevo) hallados[id] = true;
     pintarCodice();
     document.querySelectorAll('[data-dios="' + id + '"]').forEach(function (b) { b.classList.add('hallado'); });
-    decir(frase, 0, id, nuevo ? ['  ·  📜 ' + g.n + ' ', 'entra a tu códice', ' (' + total() + '/' + N + ')'] : ['  ·  📜 ', 'Ver a ' + g.n + ' en tu códice', ''], nuevo ? g.m : '');
+    if (I.lang === 'en') {
+      if (id === 'demeter') frase = C.iconoEstacion + ' Demeter brings ' + I.estaciones[C.estacion] + ' and its harvest. The sky follows the real weather in Aguascalientes.' + (I.saludos[C.fiesta] ? '  ' + I.saludos[C.fiesta] : '');
+      else if (I.frases[id]) frase = I.frases[id];
+    }
+    var nom = campo(g, 'n');
+    decir(frase, 0, id, nuevo ? ['  ·  📜 ' + nom + ' ', T('entra a tu códice', 'enters your codex'), ' (' + total() + '/' + N + ')'] : ['  ·  📜 ', T('Ver a ' + nom + ' en tu códice', 'See ' + nom + ' in your codex'), ''], nuevo ? campo(g, 'm') : '');
     if (nuevo) setTimeout(function () { S.play('logro'); }, 1100);
     if (nuevo && total() === N) setTimeout(victoria, 3200);
   }
 
   // La carta 16: el Fénix, que solo aparece cuando conquistas el Olimpo (no cuenta en los 15)
   function cartaSecreta() {
-    if (total() < N) return '<div class="dios bloqueado especial"><div class="giro"><div class="cara frente"><div class="em">🔒</div><h3>Carta secreta</h3><div class="dom">Sin revelar</div><p>Se revela cuando conquistas el Olimpo.</p></div></div></div>';
-    return '<div class="dios hallada especial fenix" data-carta="fenix" tabindex="0" role="button" aria-label="Voltear la tarjeta del Fénix"><div class="giro">' +
-      '<div class="cara frente"><div class="em">🐦‍🔥</div><h3>El Fénix</h3><div class="dom">Criatura legendaria · carta secreta</div><p>Los griegos lo conocían por el historiador Heródoto: un ave sagrada que aparecía cada 500 años. Relatos posteriores cuentan que al morir arde en llamas y renace de sus propias cenizas.</p><div class="voltear">↻ Voltéala para un dato curioso</div></div>' +
-      '<div class="cara reverso"><h4>✨ Dato curioso</h4><p>En griego se llamaba phoínix, una palabra que también nombraba al rojo púrpura, el color de su plumaje… o sea, un rojo intenso 😉.</p><div class="voltear">↻ Volver</div></div></div></div>';
+    if (total() < N) return '<div class="dios bloqueado especial"><div class="giro"><div class="cara frente"><div class="em">🔒</div><h3>' + T('Carta secreta', 'Secret card') + '</h3><div class="dom">' + T('Sin revelar', 'Not revealed') + '</div><p>' + T('Se revela cuando conquistas el Olimpo.', 'Revealed when you conquer Olympus.') + '</p></div></div></div>';
+    var en = I.lang === 'en';
+    return '<div class="dios hallada especial fenix" data-carta="fenix" tabindex="0" role="button" aria-label="' + T('Voltear la tarjeta del Fénix', 'Flip the Phoenix card') + '"><div class="giro">' +
+      '<div class="cara frente"><div class="em">🐦‍🔥</div><h3>' + T('El Fénix', 'The Phoenix') + '</h3><div class="dom">' + T('Criatura legendaria · carta secreta', 'Legendary creature · secret card') + '</div><p>' + T('Los griegos lo conocían por el historiador Heródoto: un ave sagrada que aparecía cada 500 años. Relatos posteriores cuentan que al morir arde en llamas y renace de sus propias cenizas.', 'The Greeks knew it from the historian Herodotus: a sacred bird that appeared every 500 years. Later tales say that when it dies it bursts into flames and is reborn from its own ashes.') + '</p><div class="voltear">' + T('↻ Voltéala para un dato curioso', '↻ Flip it for a fun fact') + '</div></div>' +
+      '<div class="cara reverso"><h4>' + T('✨ Dato curioso', '✨ Fun fact') + '</h4><p>' + T('En griego se llamaba phoínix, una palabra que también nombraba al rojo púrpura, el color de su plumaje… o sea, un rojo intenso 😉.', 'In Greek it was called phoínix, a word that also named purple-red, the color of its feathers… an intense red 😉.') + '</p><div class="voltear">' + T('↻ Volver', '↻ Back') + '</div></div></div></div>';
   }
   // El vuelo del fénix: cruza la pantalla dejando una estela de fuego
   function vueloFenix() {
@@ -78,18 +86,18 @@
     $('#cuenta').textContent = total();
     $('#progreso').style.width = (total() / N * 100) + '%';
     $('#listaDioses').innerHTML = DIOSES.map(function (g) {
-      if (!hallados[g.id]) return '<div class="dios bloqueado" data-carta="' + g.id + '"><div class="giro"><div class="cara frente"><div class="em">' + g.e + '</div><h3>???</h3><div class="dom">Sin descubrir</div><p>Pista: ' + g.p + '</p></div></div></div>';
-      return '<div class="dios hallada" data-carta="' + g.id + '" tabindex="0" role="button" aria-label="Voltear la tarjeta de ' + g.n + '"><div class="giro">' +
-        '<div class="cara frente"><div class="em">' + g.e + '</div><h3>' + g.n + '</h3><div class="dom">' + g.d + '</div><p>' + g.m + '</p><div class="voltear">↻ Voltéala para un dato curioso</div></div>' +
-        '<div class="cara reverso"><h4>✨ Dato curioso</h4><p>' + g.f + '</p><div class="voltear">↻ Volver</div></div></div></div>';
+      if (!hallados[g.id]) return '<div class="dios bloqueado" data-carta="' + g.id + '"><div class="giro"><div class="cara frente"><div class="em">' + g.e + '</div><h3>???</h3><div class="dom">' + T('Sin descubrir', 'Undiscovered') + '</div><p>' + T('Pista: ', 'Hint: ') + campo(g, 'p') + '</p></div></div></div>';
+      return '<div class="dios hallada" data-carta="' + g.id + '" tabindex="0" role="button" aria-label="' + T('Voltear la tarjeta de ', 'Flip the card of ') + campo(g, 'n') + '"><div class="giro">' +
+        '<div class="cara frente"><div class="em">' + g.e + '</div><h3>' + campo(g, 'n') + '</h3><div class="dom">' + campo(g, 'd') + '</div><p>' + campo(g, 'm') + '</p><div class="voltear">' + T('↻ Voltéala para un dato curioso', '↻ Flip it for a fun fact') + '</div></div>' +
+        '<div class="cara reverso"><h4>' + T('✨ Dato curioso', '✨ Fun fact') + '</h4><p>' + campo(g, 'f') + '</p><div class="voltear">' + T('↻ Volver', '↻ Back') + '</div></div></div></div>';
     }).join('') + cartaSecreta();
     document.querySelectorAll('.dios.hallada').forEach(function (d) {
       var voltear = function () { d.classList.toggle('volteada'); S.play('hoja'); };
       d.onclick = voltear; d.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); voltear(); } };
     });
     var r = '';
-    if (hallados.atenea) r += '<p>🦉 <b>Regalo de Atenea:</b> <a href="cv/CV_IECS_2026.pdf" target="_blank" rel="noopener">el pergamino de Isaac (su CV)</a></p>';
-    if (total() === N) r += '<p class="gloria">🏛️ Conquistaste el Olimpo.<br>Si quieres una página así de viva para tu negocio,<br><a href="#contacto" id="irContacto">ya sabes dónde encontrarme</a>.</p>';
+    if (hallados.atenea) r += T('<p>🦉 <b>Regalo de Atenea:</b> <a href="cv/CV_IECS_2026.pdf" target="_blank" rel="noopener">el pergamino de Isaac (su CV)</a></p>', '<p>🦉 <b>Athena’s gift:</b> <a href="cv/CV_IECS_2026.pdf" target="_blank" rel="noopener">Isaac’s scroll (his résumé, in Spanish)</a></p>');
+    if (total() === N) r += T('<p class="gloria">🏛️ Conquistaste el Olimpo.<br>Si quieres una página así de viva para tu negocio,<br><a href="#contacto" id="irContacto">ya sabes dónde encontrarme</a>.</p>', '<p class="gloria">🏛️ You conquered Olympus.<br>If you want a website this alive for your business,<br><a href="#contacto" id="irContacto">you know where to find me</a>.</p>');
     $('#recompensa').innerHTML = r;
     var ir = $('#irContacto'); if (ir) ir.onclick = cerrarCodice;
   }
@@ -104,23 +112,31 @@
   $('#abrirReto').onclick = function () { abrirCodice(); };
   $('#cerrarCodice').onclick = cerrarCodice;
   $('#codice').addEventListener('click', function (e) { if (e.target.id === 'codice') cerrarCodice(); });
-  addEventListener('keydown', function (e) { if (e.key === 'Escape') cerrarCodice(); });
+  // Escape cierra lo que esté encima: primero el códice, luego el templo
+  addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if ($('#codice').classList.contains('abierto')) cerrarCodice();
+    else if (abierto) location.hash = '#servicios';
+  });
 
   function victoria() {
     body.classList.add('conquistado');
     S.play('victoria'); C.fuegos(); setTimeout(function () { C.fuegos(); }, 400); setTimeout(function () { C.fuegos(); }, 900);
     setTimeout(vueloFenix, 1400);
-    decir('🏛️ ¡Encontraste a los ' + N + ' dioses! Eres oficialmente parte del Olimpo. Todas las tarjetas brillan en oro… y algo renació de las cenizas.', 0, 'fenix', [' · 📜 ', 'Abre tu códice', '']);
+    decir(T('🏛️ ¡Encontraste a los ' + N + ' dioses! Eres oficialmente parte del Olimpo. Todas las tarjetas brillan en oro… y algo renació de las cenizas.', '🏛️ You found all ' + N + ' gods! You are officially part of Olympus. Every card shines in gold… and something rose from the ashes.'), 0, 'fenix', [' · 📜 ', T('Abre tu códice', 'Open your codex'), '']);
   }
 
   // ---------- Templos con puertas de piedra ----------
-  var templos = { 'trabajos': $('#templo-trabajos'), 'sobre-mi': $('#templo-sobre-mi') }, abierto = null, moviendo = false;
+  var templos = { 'trabajos': $('#templo-trabajos'), 'sobre-mi': $('#templo-sobre-mi') }, abierto = null, moviendo = false, focoPrevio = null;
   function mostrarTemplo(nombre, conPuertas) {
     var cambiar = function () {
       Object.keys(templos).forEach(function (k) { templos[k].classList.toggle('abierto', k === nombre); });
       document.querySelectorAll('nav ul a').forEach(function (a) { a.classList.toggle('activo', a.dataset.templo === nombre); });
       if (nombre) templos[nombre].scrollTop = 0;
       document.documentElement.classList.toggle('en-templo', !!nombre); C.pausar(!!nombre);   // el templo es otra página: el resto se apaga
+      // Accesibilidad: el foco del teclado entra al templo, y al salir regresa a donde estaba
+      if (nombre) { focoPrevio = document.activeElement; templos[nombre].focus({ preventScroll: true }); }
+      else if (focoPrevio && focoPrevio.focus && document.contains(focoPrevio)) { focoPrevio.focus({ preventScroll: true }); focoPrevio = null; }
       abierto = nombre;
       if (!nombre) {   // al salir hacia una sección (Servicios, Contacto), que quede bien acomodada
         var sec = location.hash && document.getElementById(location.hash.slice(1));
@@ -157,7 +173,7 @@
   $('#reiniciarAventura').onclick = function () {
     hallados = {}; body.classList.remove('conquistado');
     document.querySelectorAll('.secreto.hallado').forEach(function (b) { b.classList.remove('hallado'); });
-    pintarCodice(); cerrarCodice(); decir('🔄 Los dioses volvieron a esconderse… ¡a buscarlos otra vez!');
+    pintarCodice(); cerrarCodice(); decir(T('🔄 Los dioses volvieron a esconderse… ¡a buscarlos otra vez!', '🔄 The gods went back into hiding… time to find them again!'));
   };
 
   // ---------- Ayudantes de efectos ----------
@@ -191,8 +207,8 @@
   var clics = 0, tRayo;
   $('#rayo').addEventListener('click', function () {
     clics++; clearTimeout(tRayo); tRayo = setTimeout(function () { clics = 0; }, 1500);
-    if (clics === 1) decir('⚡ Mmm… el rayo se siente cargado.');
-    if (clics === 2) decir('⚡⚡ Una vez más y Zeus se entera…');
+    if (clics === 1) decir(T('⚡ Mmm… el rayo se siente cargado.', '⚡ Hmm… the bolt feels charged.'));
+    if (clics === 2) decir(T('⚡⚡ Una vez más y Zeus se entera…', '⚡⚡ One more time and Zeus will notice…'));
     if (clics >= 3) {
       clics = 0; if (!suave) rayoVisual(); C.destello(true);
       reiniciar(body, 'sacudir'); quitarLuego(body, 'sacudir', 900);
@@ -242,7 +258,7 @@
   document.querySelectorAll('.columnas span').forEach(function (s, i) {
     s.addEventListener('click', function () {
       reiniciar(s, 'vibra');
-      if (!S.nota(notas[i]) && !avisoLira) { avisoLira = true; decir('🎶 Algo vibra… enciende el sonido 🔇 de la barra para escucharlo.'); }
+      if (!S.nota(notas[i]) && !avisoLira) { avisoLira = true; decir(T('🎶 Algo vibra… enciende el sonido 🔇 de la barra para escucharlo.', '🎶 Something is vibrating… turn on the sound 🔇 in the top bar to hear it.')); }
       tocadas[i] = true;
       if (Object.keys(tocadas).length === 5) {
         tocadas = {}; var r = $('.columnas').getBoundingClientRect();
@@ -300,7 +316,7 @@
     var h = document.createElement('div'); h.innerHTML = '<svg width="64" height="64"><use href="#iHacha"/></svg>';
     h.style.cssText = 'position:fixed;z-index:56;pointer-events:none;left:' + (r.left - 16) + 'px;top:' + (r.top - 16) + 'px;filter:drop-shadow(0 0 12px #8fd3ff)';
     body.appendChild(h); S.play('zumbido'); setTimeout(function () { S.play('zumbido'); }, 950);
-    decir('🪓❄️ Lánzala sin miedo… siempre regresa a tu mano.', 3400);
+    decir(T('🪓❄️ Lánzala sin miedo… siempre regresa a tu mano.', '🪓❄️ Throw it without fear… it always comes back to your hand.'), 3400);
     var fin = function () {
       h.remove(); b.style.visibility = ''; S.play('impacto'); setTimeout(function () { S.play('hielo'); }, 120);
       reiniciar($('#tarjetaExtras'), 'sacude');
@@ -319,7 +335,7 @@
   };
   // Las cadenas caen en U, sueltan chispas y se encienden en llamas
   $('#cadenas').onclick = function () {
-    S.play('cadena'); decir('⛓️ Unas cadenas viejas caen… y empiezan a arder.', 3600);
+    S.play('cadena'); decir(T('⛓️ Unas cadenas viejas caen… y empiezan a arder.', '⛓️ Some old chains fall… and start to burn.'), 3600);
     if (suave) return;
     var W = innerWidth, H = innerHeight, svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('class', 'capa-cadena'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
@@ -376,10 +392,10 @@
 
   // ---------- Contacto protegido (el número no está escrito en la página) ----------
   var n = ['52', '449', '125', '98', '64'].join(''), c = ['olimpo.web.ags', 'gmail.com'].join('@');
-  $('#btnWhats').addEventListener('click', function () { this.href = 'https://wa.me/' + n + '?text=' + encodeURIComponent('Hola Isaac, vi tu portafolio de Olimpo y me interesa una página'); });
+  $('#btnWhats').addEventListener('click', function () { this.href = 'https://wa.me/' + n + '?text=' + encodeURIComponent(T('Hola Isaac, vi tu portafolio de Olimpo y me interesa una página', 'Hi Isaac, I saw your Olimpo portfolio and I’m interested in a website')); });
   $('#btnCorreo').addEventListener('click', function () {
-    this.href = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + c + '&su=' + encodeURIComponent('Quiero una página web');
-    try { navigator.clipboard.writeText(c); decir('📋 Te abrí Gmail y además copié el correo: ' + c); } catch (e) {}
+    this.href = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + c + '&su=' + encodeURIComponent(T('Quiero una página web', 'I want a website'));
+    try { navigator.clipboard.writeText(c); decir(T('📋 Te abrí Gmail y además copié el correo: ', '📋 I opened Gmail for you and also copied the email: ') + c); } catch (e) {}
   });
 
   // ---------- Aparecer al bajar ----------
@@ -390,7 +406,8 @@
 
   // ---------- Bienvenida de temporada y mensaje para curiosos del código ----------
   pintarCodice();
-  if (C.saludos[C.fiesta]) setTimeout(function () { decir(C.saludos[C.fiesta], 4500); }, 1800);
+  if (C.saludos[C.fiesta]) setTimeout(function () { decir(T(C.saludos[C.fiesta], I.saludos[C.fiesta]), 4500); }, 1800);
+  I.alCambiar.push(function () { pintarCodice(); });
   console.log('%c⚡ Olimpo', 'font: 700 22px Georgia; color: #d4af5a');
   console.log('¿Revisando el código? Ya somos dos curiosos. Escríbeme: ' + c + '\nPista: en esta página se esconden ' + N + ' dioses. 🏛️');
 })();

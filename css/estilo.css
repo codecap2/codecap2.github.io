@@ -5,7 +5,7 @@
   --greca: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cpath d='M0 18h8V4h20v10H16V8h6' fill='none' stroke='%23d4af5a' stroke-width='2' opacity='.7'/%3E%3C/svg%3E");
   --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-@media (max-width: 900px) { :root { --nav: 82px; } }
+@media (max-width: 1080px) { :root { --nav: 86px; } }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scrollbar-width: none; }
 html::-webkit-scrollbar, .templo::-webkit-scrollbar, .pergamino::-webkit-scrollbar { display: none; }
@@ -73,14 +73,17 @@ nav .barra-nav { display: grid; grid-template-columns: minmax(0, 1fr) auto minma
 .lado { display: flex; align-items: center; gap: 10px; }
 .lado.izq { justify-self: start; } .lado.der { justify-self: end; }
 .logo { font-size: 1.35rem; font-weight: 700; color: var(--marmol); text-decoration: none; display: flex; align-items: center; gap: .35rem; }
-#rayo { font-size: 1.25rem; opacity: 1; filter: none; }
+#rayo { font-size: 1.25rem; opacity: 1; filter: none; padding: 2px; }
+.marca { width: 32px; height: 32px; display: block; filter: drop-shadow(0 0 6px rgba(216,52,44,.35)); }
+.tarjeta .caso { color: var(--gris); font-size: .92rem; margin: .8rem 0 0; }
+.tarjeta .caso b { color: var(--oro2); }
 nav ul { list-style: none; display: flex; gap: 1.6rem; margin: 0; padding: 0; justify-self: center; }
 nav ul a { color: var(--gris); text-decoration: none; font-size: .95rem; }
 nav ul a:hover, nav ul a.activo { color: var(--oro2); }
 .chip { display: inline-flex; align-items: center; gap: .35rem; background: rgba(212,175,90,.1); border: 1px solid var(--linea); color: var(--marmol); border-radius: 999px; padding: .28rem .75rem; font-size: .82rem; cursor: pointer; white-space: nowrap; height: 32px; }
 .chip:hover { border-color: var(--oro); }
 #btnCodice b { color: var(--oro2); }
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   nav .barra-nav { grid-template-columns: 1fr 1fr; height: auto; padding: 10px 14px 8px; row-gap: 6px; }
   nav ul { grid-column: 1 / -1; grid-row: 2; gap: 1.2rem; }
   nav ul a { font-size: .86rem; }

@@ -9,7 +9,7 @@
 <meta property="og:url" content="https://codecap2.github.io/">
 <meta property="og:title" content="Olimpo · Para negocios que no quieren ser uno más">
 <meta property="og:description" content="Páginas web hechas en Aguascalientes, con detalles, animaciones y secretos para los curiosos. ¿Te atreves a explorar el Olimpo?">
-<meta property="og:image" content="https://codecap2.github.io/img/vista-previa.png?v=2">
+<meta property="og:image" content="https://codecap2.github.io/img/vista-previa.png?v=3">
 <meta property="og:image:alt" content="Olimpo · Para negocios que no quieren ser uno más · Diseño web en Aguascalientes">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -65,18 +65,19 @@
 <nav>
   <div class="barra-nav">
     <div class="lado izq">
-      <span class="logo"><button id="rayo" class="secreto" type="button" aria-label="Rayo">⚡</button><a id="irInicio" href="#" style="color:inherit;text-decoration:none">Olimpo</a></span>
+      <span class="logo"><button id="rayo" class="secreto" type="button" aria-label="El templo del rayo" data-en-aria="The temple of the thunderbolt"><img class="marca" src="img/logo.svg" alt="" width="32" height="32"></button><a id="irInicio" href="#" style="color:inherit;text-decoration:none">Olimpo</a></span>
     </div>
     <ul>
-      <li><a href="#trabajos" data-templo="trabajos">Trabajos</a></li>
-      <li><a href="#servicios">Servicios</a></li>
-      <li><a href="#sobre-mi" data-templo="sobre-mi">Sobre mí</a></li>
-      <li><a href="#contacto">Contacto</a></li>
+      <li><a href="#trabajos" data-templo="trabajos" data-en="Work">Trabajos</a></li>
+      <li><a href="#servicios" data-en="Services">Servicios</a></li>
+      <li><a href="#sobre-mi" data-templo="sobre-mi" data-en="About">Sobre mí</a></li>
+      <li><a href="#contacto" data-en="Contact">Contacto</a></li>
     </ul>
     <div class="lado der">
-      <button id="chipClima" class="chip" type="button" title="El clima de Aguascalientes, en vivo"><span class="ico">🍂</span><span class="txt">Ags</span></button>
-      <button id="btnSonido" class="chip" type="button" aria-label="Encender sonido" title="Sonido">🔇</button>
-      <button id="btnCodice" class="chip" type="button" title="Códice del Olimpo">📜 <b><span id="cuenta">0</span>/15</b></button>
+      <button id="chipClima" class="chip" type="button" title="El clima de Aguascalientes, en vivo" data-en-title="Live weather in Aguascalientes, Mexico"><span class="ico">🍂</span><span class="txt">Ags</span></button>
+      <button id="btnSonido" class="chip" type="button" aria-label="Encender sonido" title="Sonido" data-en-title="Sound">🔇</button>
+      <button id="btnIdioma" class="chip" type="button" aria-label="Read in English">EN</button>
+      <button id="btnCodice" class="chip" type="button" title="Códice del Olimpo" data-en-title="Codex of Olympus">📜 <b><span id="cuenta">0</span>/15</b></button>
     </div>
   </div>
 </nav>
@@ -84,52 +85,52 @@
 <header class="portada" id="inicio">
   <div class="envoltura">
     <div class="columnas" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-    <div class="antetitulo">Olimpo · Diseño web en Aguascalientes</div>
-    <h1>Para negocios<em>que no quieren ser uno&nbsp;más</em></h1>
-    <p>Páginas web hechas en Aguascalientes, con detalles, animaciones y secretos que hacen que tus clientes <strong class="vuelvan">vuelvan</strong>.</p>
+    <div class="antetitulo" data-en="Olimpo · Web design from Aguascalientes, Mexico">Olimpo · Diseño web en Aguascalientes</div>
+    <h1 data-en="For businesses<em>that refuse to blend&nbsp;in</em>">Para negocios<em>que no quieren ser uno&nbsp;más</em></h1>
+    <p data-en="Websites with details, animations and secrets that make people remember you, trust you and <strong class=&quot;vuelvan&quot;>come back</strong>.">Páginas web con detalles, animaciones y secretos que hacen que te recuerden, te escriban y <strong class="vuelvan">vuelvan</strong>.</p>
     <div class="botones">
-      <a class="boton oro" href="#trabajos" data-templo="trabajos">Ver mis trabajos</a>
-      <a class="boton linea" href="#contacto">Platiquemos</a>
+      <a class="boton oro" href="#trabajos" data-templo="trabajos" data-en="See my work">Ver mis trabajos</a>
+      <a class="boton linea" href="#contacto" data-en="Let’s talk">Platiquemos</a>
     </div>
-    <div class="reto">🏛️ Este sitio esconde <b>15 dioses</b>. ¿Cuántos encuentras? <button type="button" id="abrirReto">Abre el códice</button></div>
+    <div class="reto"><span data-en="🏛️ This site hides <b>15 gods</b>. How many can you find?">🏛️ Este sitio esconde <b>15 dioses</b>. ¿Cuántos encuentras?</span> <button type="button" id="abrirReto" data-en="Open the codex">Abre el códice</button></div>
   </div>
 </header>
 
 <main>
 <section id="servicios">
   <div class="envoltura">
-    <div class="titulo-fila aparece"><h2>Servicios</h2><button class="secreto" data-dios="hera" type="button" aria-label="Pluma de pavo real">🦚</button></div>
-    <p class="sub aparece">Desde una tarjeta digital sencilla hasta una página llena de vida.</p>
+    <div class="titulo-fila aparece"><h2 data-en="Services">Servicios</h2><button class="secreto" data-dios="hera" type="button" aria-label="Pluma de pavo real" data-en-aria="Peacock feather">🦚</button></div>
+    <p class="sub aparece" data-en="From a simple digital card to a website full of life. Olimpo is my personal style (I love Greek mythology and the little details); your website will have its own, made to fit your business.">Desde una tarjeta digital sencilla hasta una página llena de vida. Olimpo es mi estilo personal (me encantan la mitología griega y los detalles); tu página tendrá el suyo, hecho a la medida de tu negocio.</p>
     <div class="servicios">
-      <div class="servicio vidrio aparece"><div class="icono">📇</div><h3>Página sencilla</h3><p>Una sola página con quién eres, tus servicios, fotos, mapa, horario y botón de WhatsApp.</p></div>
-      <div class="servicio vidrio aparece"><div class="icono">✨</div><h3>Página completa con magia</h3><p>Varias secciones, animaciones, galería y un secreto escondido pensado solo para tu negocio.</p></div>
-      <div class="servicio vidrio aparece"><div class="icono">🛠️</div><h3>Mantenimiento mensual</h3><p>Cambio tus precios, fotos u horarios y reviso que todo siga funcionando.</p></div>
-      <div class="servicio vidrio aparece" id="tarjetaExtras"><div class="icono">📍</div><h3>Extras</h3><p>Ficha de Google Maps, códigos QR, tarjetas de presentación y dominio propio (tunegocio.com).</p><button class="secreto esquina" id="hacha" type="button" aria-label="Un hacha de hielo"><svg><use href="#iHacha"/></svg></button></div>
+      <div class="servicio vidrio aparece"><div class="icono">📇</div><h3 data-en="Simple page">Página sencilla</h3><p data-en="One page with who you are, your services, photos, map, hours and a WhatsApp button, so customers find you and message you.">Una sola página con quién eres, tus servicios, fotos, mapa, horario y botón de WhatsApp, para que te encuentren y te escriban.</p></div>
+      <div class="servicio vidrio aparece"><div class="icono">✨</div><h3 data-en="Full site with magic">Página completa con magia</h3><p data-en="Several sections, animations, a gallery and a hidden secret designed just for your business, so people talk about it.">Varias secciones, animaciones, galería y un secreto escondido pensado solo para tu negocio, para que la gente hable de él.</p></div>
+      <div class="servicio vidrio aparece"><div class="icono">🛠️</div><h3 data-en="Monthly care">Mantenimiento mensual</h3><p data-en="I update your prices, photos or hours and make sure everything keeps working, so you don’t have to worry.">Cambio tus precios, fotos u horarios y reviso que todo siga funcionando, para que tú no te preocupes.</p></div>
+      <div class="servicio vidrio aparece" id="tarjetaExtras"><div class="icono">📍</div><h3 data-en="Extras">Extras</h3><p data-en="Google Maps listing, QR codes, business cards and your own domain (yourbusiness.com).">Ficha de Google Maps, códigos QR, tarjetas de presentación y dominio propio (tunegocio.com).</p><button class="secreto esquina" id="hacha" type="button" aria-label="Un hacha de hielo" data-en-aria="An ice axe"><svg><use href="#iHacha"/></svg></button></div>
     </div>
-    <p class="nota aparece">Cotización sin costo y por escrito, para que sepas exactamente qué incluye.</p>
+    <p class="nota aparece" data-en="Free written quote, so you know exactly what’s included.">Cotización sin costo y por escrito, para que sepas exactamente qué incluye.</p>
   </div>
 </section>
 
 <section id="como-trabajo">
   <div class="envoltura">
-    <div class="titulo-fila aparece"><h2>Cómo trabajamos</h2><button class="secreto" data-dios="ares" type="button" aria-label="Espadas cruzadas">⚔️</button></div>
-    <p class="sub aparece">Sin sorpresas feas; solo las bonitas que van dentro de tu página.</p>
+    <div class="titulo-fila aparece"><h2 data-en="How we work">Cómo trabajamos</h2><button class="secreto" data-dios="ares" type="button" aria-label="Espadas cruzadas" data-en-aria="Crossed swords">⚔️</button></div>
+    <p class="sub aparece" data-en="No bad surprises; only the good ones that go inside your website.">Sin sorpresas feas; solo las bonitas que van dentro de tu página.</p>
     <div class="pasos">
-      <div class="paso vidrio aparece"><h3>Platicamos</h3><p>Me cuentas de tu negocio y de lo que quieres lograr.</p></div>
-      <div class="paso vidrio aparece"><h3>Propuesta por escrito</h3><p>Qué incluye, cuánto cuesta y cuándo queda.</p></div>
-      <div class="paso vidrio aparece"><h3>Diseño y cambios</h3><p>Ves tu página antes de publicarla y la ajustamos juntos.</p></div>
-      <div class="paso vidrio aparece"><h3>Entrega</h3><p>La publicamos y te explico todo lo que tiene, con calma.</p><button class="secreto esquina" data-dios="artemisa" type="button" aria-label="Un arco">🏹</button></div>
+      <div class="paso vidrio aparece"><h3 data-en="We talk">Platicamos</h3><p data-en="You tell me about your business and what you want to achieve.">Me cuentas de tu negocio y de lo que quieres lograr.</p></div>
+      <div class="paso vidrio aparece"><h3 data-en="Written proposal">Propuesta por escrito</h3><p data-en="What’s included, how much it costs and when it’s ready.">Qué incluye, cuánto cuesta y cuándo queda.</p></div>
+      <div class="paso vidrio aparece"><h3 data-en="Design and changes">Diseño y cambios</h3><p data-en="You see your site before it goes live and we fine-tune it together.">Ves tu página antes de publicarla y la ajustamos juntos.</p></div>
+      <div class="paso vidrio aparece"><h3 data-en="Launch">Entrega</h3><p data-en="We publish it and I walk you through everything it has, calmly.">La publicamos y te explico todo lo que tiene, con calma.</p><button class="secreto esquina" data-dios="artemisa" type="button" aria-label="Un arco" data-en-aria="A bow">🏹</button></div>
     </div>
   </div>
 </section>
 
 <section id="contacto" class="contacto">
   <div class="envoltura">
-    <div class="titulo-fila aparece"><h2>¿Subimos tu negocio al Olimpo?</h2><button class="secreto" data-dios="afrodita" type="button" aria-label="Una rosa">🌹</button></div>
-    <p class="sub aparece">Escríbeme y platicamos sin compromiso.</p>
+    <div class="titulo-fila aparece"><h2 data-en="Shall we take your business to Olympus?">¿Subimos tu negocio al Olimpo?</h2><button class="secreto" data-dios="afrodita" type="button" aria-label="Una rosa" data-en-aria="A rose">🌹</button></div>
+    <p class="sub aparece" data-en="Write to me and let’s talk, no strings attached. I answer in Spanish or English.">Escríbeme y platicamos sin compromiso.</p>
     <div class="botones aparece">
       <a class="boton oro" id="btnWhats" href="#contacto" target="_blank" rel="noopener">WhatsApp</a>
-      <a class="boton linea" id="btnCorreo" href="#contacto" target="_blank" rel="noopener">Correo</a>
+      <a class="boton linea" id="btnCorreo" href="#contacto" target="_blank" rel="noopener" data-en="Email">Correo</a>
     </div>
   </div>
 </section>
@@ -137,42 +138,44 @@
 
 <footer>
   <div class="envoltura">
-    <div class="fila-pie"><span>Olimpo · Isaac Cifuentes · Hecho en Aguascalientes · 2026</span><button class="secreto" data-dios="dioniso" type="button" aria-label="Unas uvas">🍇</button></div>
-    <button id="sandalia" class="secreto" type="button" aria-label="Sandalia alada">🪽</button>
-    <div class="pista">Los dioses dejan pistas para los curiosos…</div>
+    <div class="fila-pie"><span data-en="Olimpo · Isaac Cifuentes · Made in Aguascalientes, Mexico · 2026">Olimpo · Isaac Cifuentes · Hecho en Aguascalientes · 2026</span><button class="secreto" data-dios="dioniso" type="button" aria-label="Unas uvas" data-en-aria="Some grapes">🍇</button></div>
+    <button id="sandalia" class="secreto" type="button" aria-label="Sandalia alada" data-en-aria="Winged sandal">🪽</button>
+    <div class="pista" data-en="The gods leave clues for the curious…">Los dioses dejan pistas para los curiosos…</div>
   </div>
-  <div class="abismo"><button id="llama" class="secreto" type="button" aria-label="Una llama en el abismo">🔥</button></div>
+  <div class="abismo"><button id="llama" class="secreto" type="button" aria-label="Una llama en el abismo" data-en-aria="A flame in the abyss">🔥</button></div>
 </footer>
 
 <!-- ===== Templo de los trabajos ===== -->
-<div class="templo" id="templo-trabajos" role="region" aria-label="Templo de los trabajos">
+<div class="templo" id="templo-trabajos" role="region" aria-label="Templo de los trabajos" data-en-aria="Temple of work" tabindex="-1">
   <div class="interior">
-    <button class="salir" type="button">← Salir del templo</button>
+    <button class="salir" type="button" data-en="← Leave the temple">← Salir del templo</button>
     <div class="friso"></div>
-    <div class="titulo-fila"><h2>Trabajos</h2><button class="secreto" data-dios="poseidon" type="button" aria-label="Tridente">🔱</button></div>
-    <p class="sub">Cada página es distinta, pero todas tienen algo en común: un detalle que hace sonreír.</p>
+    <div class="titulo-fila"><h2 data-en="Work">Trabajos</h2><button class="secreto" data-dios="poseidon" type="button" aria-label="Tridente" data-en-aria="Trident">🔱</button></div>
+    <p class="sub" data-en="Every website is different, but they all share one thing: a detail that makes people smile. Each one has its own identity, made for its business.">Cada página es distinta, pero todas tienen algo en común: un detalle que hace sonreír. Cada una tiene su propia identidad, hecha para su negocio.</p>
     <div class="trabajos">
       <article class="tarjeta">
-        <a href="https://codecap2.github.io/mantenimiento-integral/" target="_blank" rel="noopener"><img src="img/mantenimiento-integral.png?v=2" alt="Vista previa de la página de Mantenimiento Integral" loading="lazy"></a>
+        <a href="https://codecap2.github.io/mantenimiento-integral/" target="_blank" rel="noopener"><img src="img/mantenimiento-integral.png?v=2" alt="Vista previa de la página de Mantenimiento Integral" data-en-aria="Preview of the Mantenimiento Integral website" loading="lazy"></a>
         <div class="cuerpo">
-          <span class="etiqueta">Página completa · 2026</span>
+          <span class="etiqueta" data-en="Full website · 2026 · in Spanish">Página completa · 2026</span>
           <h3>Mantenimiento Integral</h3>
-          <p style="color:var(--gris);margin:0">Fontanería, electricidad y pintura, con más de 20 años de experiencia en pintura y decoración.</p>
+          <p style="color:var(--gris);margin:0" data-en="Plumbing, electrical work and painting, by a painter and decorator with more than 20 years of experience.">Fontanería, electricidad y pintura, de un pintor y decorador con más de 20 años de experiencia.</p>
+          <p class="caso" data-en="<b>The challenge:</b> a local trade business with no online presence, whose customers only found it by word of mouth.<br><b>The solution:</b> a site that shows its specialties clearly, puts WhatsApp one tap away and is memorable thanks to its details:">
+            <b>El reto:</b> un negocio de oficios local sin presencia en internet, al que solo llegaban por recomendación.<br><b>La solución:</b> una página que muestra sus especialidades con claridad, pone el WhatsApp a un toque y se recuerda por sus detalles:</p>
           <ul>
-            <li>Agua que va llenando la página al bajar 💧</li>
-            <li>Patitos de hule con consejos 🦆</li>
-            <li>Un foco con apagón y un rodillo que cambia de color 💡🎨</li>
-            <li>Códigos QR personalizados y vista previa para WhatsApp</li>
+            <li data-en="Water that fills the page as you scroll 💧">Agua que va llenando la página al bajar 💧</li>
+            <li data-en="Rubber ducks with home tips 🦆">Patitos de hule con consejos 🦆</li>
+            <li data-en="A light bulb with a blackout and a paint roller that changes color 💡🎨">Un foco con apagón y un rodillo que cambia de color 💡🎨</li>
+            <li data-en="Custom QR codes and a WhatsApp link preview">Códigos QR personalizados y vista previa para WhatsApp</li>
           </ul>
-          <a class="boton oro" href="https://codecap2.github.io/mantenimiento-integral/" target="_blank" rel="noopener">Visitar la página ↗</a>
+          <a class="boton oro" href="https://codecap2.github.io/mantenimiento-integral/" target="_blank" rel="noopener" data-en="Visit the website ↗">Visitar la página ↗</a>
         </div>
       </article>
       <div class="tarjeta vacia">
         <div class="grande">🏛️</div>
-        <h3>Tu negocio aquí</h3>
-        <p>El próximo lugar del Olimpo está libre. ¿Lo apartamos para ti?</p>
-        <a class="boton linea" href="#contacto">Quiero el mío</a>
-        <button class="secreto esquina" data-dios="hefesto" type="button" aria-label="Martillo">🔨</button>
+        <h3 data-en="Your business here">Tu negocio aquí</h3>
+        <p data-en="The next spot on Olympus is free. Shall we save it for you?">El próximo lugar del Olimpo está libre. ¿Lo apartamos para ti?</p>
+        <a class="boton linea" href="#contacto" data-en="I want mine">Quiero el mío</a>
+        <button class="secreto esquina" data-dios="hefesto" type="button" aria-label="Martillo" data-en-aria="Hammer">🔨</button>
       </div>
     </div>
     <div class="friso" style="margin-top:40px;margin-bottom:0"></div>
@@ -180,22 +183,22 @@
 </div>
 
 <!-- ===== Sobre mí ===== -->
-<div class="templo" id="templo-sobre-mi" role="region" aria-label="Sobre mí">
+<div class="templo" id="templo-sobre-mi" role="region" aria-label="Sobre mí" data-en-aria="About me" tabindex="-1">
   <div class="interior">
-    <button class="salir" type="button">← Salir del templo</button>
+    <button class="salir" type="button" data-en="← Leave the temple">← Salir del templo</button>
     <div class="friso"></div>
     <div class="sobre">
-      <div class="medallon"><div class="foto"><img src="img/isaac.webp" alt="Isaac Cifuentes"></div><button class="secreto" data-dios="atenea" type="button" aria-label="Búho">🦉</button></div>
+      <div class="medallon"><div class="foto"><img src="img/isaac.webp" alt="Isaac Cifuentes"></div><button class="secreto" data-dios="atenea" type="button" aria-label="Búho" data-en-aria="Owl">🦉</button></div>
       <div>
-        <h2>Sobre mí</h2>
-        <p>Soy <strong>Isaac Cifuentes</strong>, de Jesús María, Aguascalientes. Fundé Olimpo para hacer páginas que la gente disfrute usar, no solo que existan.</p>
-        <p>Fui docente y hoy trabajo creando soluciones con inteligencia artificial. Me gusta explicar las cosas con calma y en palabras sencillas (gané ocho campeonatos de oratoria, así que platicar es lo mío). Nunca te vas a quedar con dudas sobre tu página.</p>
+        <h2 data-en="About me">Sobre mí</h2>
+        <p data-en="I’m <strong>Isaac Cifuentes</strong>, from Jesús María, Aguascalientes, Mexico. I founded Olimpo to make websites people enjoy using, not just websites that exist.">Soy <strong>Isaac Cifuentes</strong>, de Jesús María, Aguascalientes. Fundé Olimpo para hacer páginas que la gente disfrute usar, no solo que existan.</p>
+        <p data-en="I used to be a teacher, and today I build solutions with artificial intelligence as a tool, while I take care of every detail myself. I like explaining things calmly and in plain words (I won eight public speaking championships, so talking is my thing). You’ll never be left with doubts about your website.">Fui docente y hoy creo soluciones usando la inteligencia artificial como herramienta, mientras yo cuido cada detalle. Me gusta explicar las cosas con calma y en palabras sencillas (gané ocho campeonatos de oratoria, así que platicar es lo mío). Nunca te vas a quedar con dudas sobre tu página.</p>
         <div class="datos">
-          <span class="dato">🎤 8 campeonatos de oratoria</span>
-          <span class="dato">🤖 Desarrollo con IA</span>
-          <span class="dato">🧑‍🏫 Fui docente</span>
-          <span class="dato">🌎 Inglés B2</span>
-          <button class="secreto" id="cadenas" type="button" aria-label="Unas cadenas viejas" style="font-size:1.25rem">⛓️</button>
+          <span class="dato" data-en="🎤 8 public speaking titles">🎤 8 campeonatos de oratoria</span>
+          <span class="dato" data-en="🤖 AI-powered development">🤖 Desarrollo con IA</span>
+          <span class="dato" data-en="🧑‍🏫 Former teacher">🧑‍🏫 Fui docente</span>
+          <span class="dato" data-en="🌎 English B2">🌎 Inglés B2</span>
+          <button class="secreto" id="cadenas" type="button" aria-label="Unas cadenas viejas" data-en-aria="Some old chains" style="font-size:1.25rem">⛓️</button>
         </div>
       </div>
     </div>
@@ -208,16 +211,17 @@
 <div id="codice" role="dialog" aria-modal="true" aria-labelledby="tituloCodice">
   <div class="pergamino">
     <div class="cabeza">
-      <div><h2 id="tituloCodice">📜 Códice del Olimpo</h2><div style="color:var(--gris);font-size:.9rem">Encuentra a los 15 dioses escondidos en el sitio (también dentro de los templos). Cada uno trae una pista, un relato… y un dato curioso al voltear su tarjeta.</div></div>
-      <button class="cerrar" type="button" id="cerrarCodice" aria-label="Cerrar">✕</button>
+      <div><h2 id="tituloCodice" data-en="📜 Codex of Olympus">📜 Códice del Olimpo</h2><div style="color:var(--gris);font-size:.9rem" data-en="Find the 15 gods hidden across the site (inside the temples too). Each one brings a hint, a short myth… and a fun fact when you flip its card.">Encuentra a los 15 dioses escondidos en el sitio (también dentro de los templos). Cada uno trae una pista, un relato… y un dato curioso al voltear su tarjeta.</div></div>
+      <button class="cerrar" type="button" id="cerrarCodice" aria-label="Cerrar" data-en-aria="Close">✕</button>
     </div>
     <div class="barra"><i id="progreso"></i></div>
     <div class="dioses" id="listaDioses"></div>
     <div class="recompensa" id="recompensa"></div>
-    <div style="text-align:center;margin-top:14px"><button type="button" class="salir" id="reiniciarAventura" style="margin:0">🔄 Empezar de nuevo</button></div>
+    <div style="text-align:center;margin-top:14px"><button type="button" class="salir" id="reiniciarAventura" style="margin:0" data-en="🔄 Start over">🔄 Empezar de nuevo</button></div>
   </div>
 </div>
 
+<script src="js/idioma.js"></script>
 <script src="js/sonido.js"></script>
 <script src="js/cielo.js"></script>
 <script src="js/panteon.js"></script>
