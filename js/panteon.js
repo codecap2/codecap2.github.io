@@ -48,6 +48,8 @@
     clearTimeout(reloj); reloj = setTimeout(function () { aviso.classList.remove('visible'); }, t);
   }
 
+  // Al tocar cualquier otra cosa, el aviso anterior se va al instante (así nunca queda estorbando ni "pegado")
+  addEventListener('pointerdown', function (e) { if (aviso.classList.contains('visible') && !e.target.closest('#aviso')) { aviso.classList.remove('visible'); clearTimeout(reloj); } }, true);
   function hallar(id, frase) {
     var g = DIOSES.filter(function (x) { return x.id === id; })[0], nuevo = !hallados[id];
     if (nuevo) hallados[id] = true;

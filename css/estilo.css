@@ -455,3 +455,13 @@ body.dia .caravana svg g { fill: #6b3d18; }
 #aviso:not(.visible) .ver { pointer-events: none; visibility: hidden; }
 /* Al cargar, el cielo aparece directo en su fase (sin pasar por la noche unos segundos) */
 html.arranque *, html.arranque *::before, html.arranque *::after { transition: none !important; }
+/* El título de Contacto queda centrado de verdad: un espacio invisible del lado izquierdo compensa la rosa */
+.contacto .titulo-fila::before { content: ""; flex: none; width: calc(1.45rem + 8px); }
+/* En celular el aviso sale abajo, para no tapar la lira ni el menú */
+@media (max-width: 760px) {
+  #aviso { top: auto; bottom: 14px; transform: translate(-50%, 16px); }
+  #aviso.visible { transform: translate(-50%, 0); }
+}
+/* X pequeñita para cerrar el códice, siempre a la mano en la esquina */
+#codice .cerrar { position: fixed; top: 12px; right: 12px; width: 30px; height: 30px; font-size: .85rem; line-height: 1; background: rgba(18,16,13,.92); border: 1px solid var(--oro); color: var(--oro2); z-index: 72; }
+#codice .cerrar:hover { background: var(--sangre); color: #fff; }

@@ -11,7 +11,7 @@
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return true; }
     try {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
-      maestro = ctx.createGain(); maestro.gain.value = .62; maestro.connect(ctx.destination);
+      maestro = ctx.createGain(); maestro.gain.value = .82; maestro.connect(ctx.destination);
       var n = ctx.sampleRate * 3;
       blanco = ctx.createBuffer(1, n, ctx.sampleRate); cafe = ctx.createBuffer(1, n, ctx.sampleRate);
       var b = blanco.getChannelData(0), c = cafe.getChannelData(0), ult = 0;
