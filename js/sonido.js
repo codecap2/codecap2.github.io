@@ -9,7 +9,7 @@
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return true; }
     try {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
-      maestro = ctx.createGain(); maestro.gain.value = .9; maestro.connect(ctx.destination);
+      maestro = ctx.createGain(); maestro.gain.value = .62; maestro.connect(ctx.destination);
       var n = ctx.sampleRate * 3;
       blanco = ctx.createBuffer(1, n, ctx.sampleRate); cafe = ctx.createBuffer(1, n, ctx.sampleRate);
       var b = blanco.getChannelData(0), c = cafe.getChannelData(0), ult = 0;
@@ -97,9 +97,20 @@
     trueno: function () {
       enElCielo = true;   // todo lo del trueno pasa por el eco del cielo
       try {
-        soplo('lowpass', 2200, 300, 1, .45, 0, .6, .003); crujido(22, .3, 0, .3);
-        for (var i = 0; i < 9; i++) soplo('lowpass', 240 - i * 16, 45, .85 - i * .08, 2.4 + i * .35, .35 + i * .45 + Math.random() * .25, .7, .3);
-        tono(36, 'sine', .5, 5, .3, 24, .6);
+        var t = ctx.currentTime;
+        // 1) El rayo: un desgarro rápido de muchas descargas, grave y con cuerpo (no un siseo eléctrico)
+        for (var i = 0; i < 14; i++) soplo('lowpass', 2600 - i * 120, 2600 - i * 120, .5 * Math.random() + .3, .05 + Math.random() * .05, i * .012 + Math.random() * .01, .5, .002, blanco);
+        tono(70, 'sine', .9, .7, 0, 32, .003);
+        // 2) El trueno: un solo retumbar grave cuyo volumen sube y baja al azar, como cuando rueda entre las nubes
+        var s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), fl2 = ctx.createBiquadFilter(), g = ctx.createGain();
+        s.buffer = cafe; s.loop = true; fl.type = 'lowpass'; fl.frequency.value = 190; fl.Q.value = .4; fl2.type = 'lowpass'; fl2.frequency.value = 420; fl2.Q.value = .3;
+        g.gain.setValueAtTime(.0001, t);
+        var at = t + .08, nivel = 1.1;
+        g.gain.exponentialRampToValueAtTime(nivel, at + .25);
+        for (var k = 0; k < 11; k++) { at += .35 + Math.random() * .45; nivel *= .82; g.gain.setTargetAtTime(nivel * (.5 + Math.random() * .7), at, .18); }
+        g.gain.setTargetAtTime(.0001, at + .3, .9);
+        s.connect(fl); fl.connect(fl2); fl2.connect(g); salida(g); s.start(t, Math.random() * 2); s.stop(at + 5);
+        tono(34, 'sine', .45, 5.5, .15, 24, .5);
       } finally { enElCielo = false; }
     },
     logro: function () { siseo(2500, 4000, .05, .18, 0, 1.2, .01); siseo(1800, 3000, .04, .14, .12, 1.2, .01); },   // el códice: un pergamino que se desenrolla
@@ -133,7 +144,7 @@
     sol: function () { soplo('bandpass', 300, 600, .25, 3, 0, .6, 1.2); [196, 247, 294, 392].forEach(function (f, i) { cuerda(f, .5, .3 + i * .18, .3); }); },
     // Selene: noche serena, notas de arpa altas y suaves
     luna: function () { [784, 988, 1175, 1568].forEach(function (f, i) { cuerda(f, .3, i * .28, .7); }); },
-    lira: function () { [262, 294, 330, 392, 440, 523].forEach(function (f, i) { lira(f, .7, i * .13); }); },
+    lira: function () { [262, 294, 330, 392, 440, 523].forEach(function (f, i) { lira(f, .38, i * .13); }); },
     // Artemisa: la cuerda del arco vibra y la flecha corta el aire
     arco: function () { cuerda(98, .9, 0, .2); siseo(2500, 6000, .25, .45, .04, .8, .02); },
     espada: function () { siseo(4000, 9000, .25, .5, 0, 2, .02); metal(1700, .14, 1.4, .05); },
@@ -169,7 +180,7 @@
     },
     victoria: function () { campana(220, .45, 5); campana(330, .25, 4.5, .9); [392, 494, 587, 784, 988].forEach(function (f, i) { cuerda(f, .4, 1.4 + i * .1, .6); }); }
   };
-  S.nota = function (f) { if (!S.on || !iniciar()) return false; lira(f, .8, 0); return true; };
+  S.nota = function (f) { if (!S.on || !iniciar()) return false; lira(f, .42, 0); return true; };
   S.play = function (n) { if (!S.on || !EF[n] || !iniciar()) return; try { EF[n](); } catch (e) {} };
 
   // ---------- Ambiente del desierto ----------
