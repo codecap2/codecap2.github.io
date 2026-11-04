@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Olimpo · Diseño web en Aguascalientes</title>
+<meta name="description" content="Olimpo, de Isaac Cifuentes: páginas web para negocios de Aguascalientes que no quieren ser uno más. Con detalles, animaciones y 15 dioses escondidos.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://codecap2.github.io/">
+<meta property="og:title" content="Olimpo · Para negocios que no quieren ser uno más">
+<meta property="og:description" content="Páginas web hechas en Aguascalientes, con detalles, animaciones y secretos. Este sitio esconde 15 dioses: ¿cuántos encuentras?">
+<meta property="og:image" content="https://codecap2.github.io/img/vista-previa.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b0d12">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body class="noche">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gHielo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2fbff"/><stop offset=".45" stop-color="#9edcff"/><stop offset="1" stop-color="#2f7fc1"/></linearGradient>
+    <linearGradient id="gMango" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a3519"/><stop offset=".5" stop-color="#8a5a2e"/><stop offset="1" stop-color="#4a2a12"/></linearGradient>
+    <symbol id="iHacha" viewBox="0 0 64 64">
+      <rect x="35" y="4" width="6" height="57" rx="2.5" fill="url(#gMango)" stroke="#2e1a0a" stroke-width="1"/>
+      <rect x="34" y="40" width="8" height="2" fill="#2e1a0a" opacity=".6"/><rect x="34" y="45" width="8" height="2" fill="#2e1a0a" opacity=".6"/>
+      <path d="M35 8 L14 4 Q 9 17 11 33 L35 22 Z" fill="url(#gHielo)" stroke="#e6f7ff" stroke-width="1.2" stroke-linejoin="miter"/>
+      <path d="M14 4 Q 9 17 11 33" stroke="#ffffff" stroke-width="2" fill="none"/>
+      <path d="M41 9 L46 10 L46 20 L41 21 Z" fill="#6fa9cf" stroke="#e6f7ff" stroke-width="1"/>
+      <path d="M20 9 L26 19 M26 8 L31 16" stroke="#ffffff" stroke-width="1" opacity=".55"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="escenario" aria-hidden="true">
+  <div class="capa c-noche"></div><div class="capa c-amanecer"></div><div class="capa c-dia"></div><div class="capa c-atardecer"></div>
+  <div class="nube" style="top:10vh;animation-delay:-10s"></div>
+  <div class="nube" style="top:22vh;animation-delay:-45s;transform:scale(.7)"></div>
+  <canvas id="particulas"></canvas>
+  <svg class="dunas" viewBox="0 0 1440 320" preserveAspectRatio="none">
+    <path class="d1" d="M0 170 C 220 90 420 120 620 170 S 1000 110 1200 140 1440 120 1440 120 V320 H0Z"/>
+    <path class="d2" d="M0 220 C 260 160 460 250 720 210 S 1150 170 1440 215 V320 H0Z"/>
+    <path class="d3" d="M0 280 C 300 240 520 300 860 270 S 1250 250 1440 275 V320 H0Z"/>
+  </svg>
+  <div id="neblina"></div>
+</div>
+<div id="astros"><button id="sol" class="astro" type="button" aria-label="El sol"></button><button id="luna" class="astro" type="button" aria-label="La luna"></button></div>
+<canvas id="frente" aria-hidden="true"></canvas>
+<div id="destello" aria-hidden="true"></div>
+<div id="ola" aria-hidden="true"><svg viewBox="0 0 1400 400" preserveAspectRatio="none"><defs><linearGradient id="gOla" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd0ff" stop-opacity=".9"/><stop offset=".35" stop-color="#2a8fd0" stop-opacity=".85"/><stop offset="1" stop-color="#0b3f78" stop-opacity=".9"/></linearGradient></defs><path d="M0 400 L0 230 C 120 170 220 150 330 175 C 430 198 470 120 560 70 C 640 25 720 40 760 95 C 790 135 770 175 720 180 C 800 205 900 150 1000 170 C 1120 195 1250 160 1400 190 L1400 400 Z" fill="url(#gOla)"/><path d="M330 175 C 430 198 470 120 560 70 C 640 25 720 40 760 95 C 790 135 770 175 720 180" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity=".85"/></svg></div>
+<div id="pavo" aria-hidden="true"></div>
+<div id="tajo" class="tajo" aria-hidden="true"></div>
+<div id="tajo2" class="tajo" aria-hidden="true"></div>
+<div id="escudo" aria-hidden="true">🛡️</div>
+<div id="escarcha" aria-hidden="true"></div>
+<div class="puerta izq" aria-hidden="true"></div>
+<div class="puerta der" aria-hidden="true"></div>
+<div id="aviso" role="status" aria-live="polite"></div>
+
+<nav>
+  <div class="barra-nav">
+    <div class="lado izq">
+      <span class="logo"><button id="rayo" class="secreto" type="button" aria-label="Rayo">⚡</button><a id="irInicio" href="#" style="color:inherit;text-decoration:none">Olimpo</a></span>
+    </div>
+    <ul>
+      <li><a href="#trabajos" data-templo="trabajos">Trabajos</a></li>
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#sobre-mi" data-templo="sobre-mi">Sobre mí</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <div class="lado der">
+      <button id="chipClima" class="chip" type="button" title="El clima de Aguascalientes, en vivo"><span class="ico">🍂</span><span class="txt">Ags</span></button>
+      <button id="btnSonido" class="chip" type="button" aria-label="Encender sonido" title="Sonido">🔇</button>
+      <button id="btnCodice" class="chip" type="button" title="Códice del Olimpo">📜 <b><span id="cuenta">0</span>/15</b></button>
+    </div>
+  </div>
+</nav>
+
+<header class="portada" id="inicio">
+  <div class="envoltura">
+    <div class="columnas" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="antetitulo">Olimpo · Diseño web en Aguascalientes</div>
+    <h1>Para negocios<em>que no quieren ser uno&nbsp;más</em></h1>
+    <p>Páginas web hechas en Aguascalientes, con detalles, animaciones y secretos que hacen que tus clientes <strong class="vuelvan">vuelvan</strong>.</p>
+    <div class="botones">
+      <a class="boton oro" href="#trabajos" data-templo="trabajos">Ver mis trabajos</a>
+      <a class="boton linea" href="#contacto">Platiquemos</a>
+    </div>
+    <div class="reto">🏛️ Este sitio esconde <b>15 dioses</b>. ¿Cuántos encuentras? <button type="button" id="abrirReto">Abre el códice</button></div>
+  </div>
+</header>
+
+<main>
+<section id="servicios">
+  <div class="envoltura">
+    <div class="titulo-fila aparece"><h2>Servicios</h2><button class="secreto" data-dios="hera" type="button" aria-label="Pluma de pavo real">🦚</button></div>
+    <p class="sub aparece">Desde una tarjeta digital sencilla hasta una página llena de vida.</p>
+    <div class="servicios">
+      <div class="servicio vidrio aparece"><div class="icono">📇</div><h3>Página sencilla</h3><p>Una sola página con quién eres, tus servicios, fotos, mapa, horario y botón de WhatsApp.</p></div>
+      <div class="servicio vidrio aparece"><div class="icono">✨</div><h3>Página completa con magia</h3><p>Varias secciones, animaciones, galería y un secreto escondido pensado solo para tu negocio.</p></div>
+      <div class="servicio vidrio aparece"><div class="icono">🛠️</div><h3>Mantenimiento mensual</h3><p>Cambio tus precios, fotos u horarios y reviso que todo siga funcionando.</p></div>
+      <div class="servicio vidrio aparece" id="tarjetaExtras"><div class="icono">📍</div><h3>Extras</h3><p>Ficha de Google Maps, códigos QR, tarjetas de presentación y dominio propio (tunegocio.com).</p><button class="secreto esquina" id="hacha" type="button" aria-label="Un hacha de hielo"><svg><use href="#iHacha"/></svg></button></div>
+    </div>
+    <p class="nota aparece">Cotización sin costo y por escrito, para que sepas exactamente qué incluye.</p>
+  </div>
+</section>
+
+<section id="como-trabajo">
+  <div class="envoltura">
+    <div class="titulo-fila aparece"><h2>Cómo trabajamos</h2><button class="secreto" data-dios="ares" type="button" aria-label="Espadas cruzadas">⚔️</button></div>
+    <p class="sub aparece">Sin sorpresas feas; solo las bonitas que van dentro de tu página.</p>
+    <div class="pasos">
+      <div class="paso vidrio aparece"><h3>Platicamos</h3><p>Me cuentas de tu negocio y de lo que quieres lograr.</p></div>
+      <div class="paso vidrio aparece"><h3>Propuesta por escrito</h3><p>Qué incluye, cuánto cuesta y cuándo queda.</p></div>
+      <div class="paso vidrio aparece"><h3>Diseño y cambios</h3><p>Ves tu página antes de publicarla y la ajustamos juntos.</p></div>
+      <div class="paso vidrio aparece"><h3>Entrega</h3><p>La publicamos y te explico todo lo que tiene, con calma.</p><button class="secreto esquina" data-dios="artemisa" type="button" aria-label="Un arco">🏹</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" class="contacto">
+  <div class="envoltura">
+    <div class="titulo-fila aparece"><h2>¿Subimos tu negocio al Olimpo?</h2><button class="secreto" data-dios="afrodita" type="button" aria-label="Una rosa">🌹</button></div>
+    <p class="sub aparece">Escríbeme y platicamos sin compromiso.</p>
+    <div class="botones aparece">
+      <a class="boton oro" id="btnWhats" href="#contacto" target="_blank" rel="noopener">WhatsApp</a>
+      <a class="boton linea" id="btnCorreo" href="#contacto" target="_blank" rel="noopener">Correo</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="envoltura">
+    <div class="fila-pie"><span>Olimpo · Isaac Cifuentes · Hecho en Aguascalientes · 2026</span><button class="secreto" data-dios="dioniso" type="button" aria-label="Unas uvas">🍇</button></div>
+    <button id="sandalia" class="secreto" type="button" aria-label="Sandalia alada">🪽</button>
+    <div class="pista">Los dioses dejan pistas para los curiosos…</div>
+  </div>
+  <div class="abismo"><button id="llama" class="secreto" type="button" aria-label="Una llama en el abismo">🔥</button></div>
+</footer>
+
+<!-- ===== Templo de los trabajos ===== -->
+<div class="templo" id="templo-trabajos" role="region" aria-label="Templo de los trabajos">
+  <div class="interior">
+    <button class="salir" type="button">← Salir del templo</button>
+    <div class="friso"></div>
+    <div class="titulo-fila"><h2>Trabajos</h2><button class="secreto" data-dios="poseidon" type="button" aria-label="Tridente">🔱</button></div>
+    <p class="sub">Cada página es distinta, pero todas tienen algo en común: un detalle que hace sonreír.</p>
+    <div class="trabajos">
+      <article class="tarjeta">
+        <a href="https://codecap2.github.io/mantenimiento-integral/" target="_blank" rel="noopener"><img src="img/mantenimiento-integral.png?v=2" alt="Vista previa de la página de Mantenimiento Integral" loading="lazy"></a>
+        <div class="cuerpo">
+          <span class="etiqueta">Página completa · 2026</span>
+          <h3>Mantenimiento Integral</h3>
+          <p style="color:var(--gris);margin:0">Fontanería, electricidad y pintura, con más de 20 años de experiencia en pintura y decoración.</p>
+          <ul>
+            <li>Agua que va llenando la página al bajar 💧</li>
+            <li>Patitos de hule con consejos 🦆</li>
+            <li>Un foco con apagón y un rodillo que cambia de color 💡🎨</li>
+            <li>Códigos QR personalizados y vista previa para WhatsApp</li>
+          </ul>
+          <a class="boton oro" href="https://codecap2.github.io/mantenimiento-integral/" target="_blank" rel="noopener">Visitar la página ↗</a>
+        </div>
+      </article>
+      <div class="tarjeta vacia">
+        <div class="grande">🏛️</div>
+        <h3>Tu negocio aquí</h3>
+        <p>El próximo lugar del Olimpo está libre. ¿Lo apartamos para ti?</p>
+        <a class="boton linea" href="#contacto">Quiero el mío</a>
+        <button class="secreto esquina" data-dios="hefesto" type="button" aria-label="Martillo">🔨</button>
+      </div>
+    </div>
+    <div class="friso" style="margin-top:40px;margin-bottom:0"></div>
+  </div>
+</div>
+
+<!-- ===== Sobre mí ===== -->
+<div class="templo" id="templo-sobre-mi" role="region" aria-label="Sobre mí">
+  <div class="interior">
+    <button class="salir" type="button">← Salir del templo</button>
+    <div class="friso"></div>
+    <div class="sobre">
+      <div class="medallon"><div class="foto"><img src="img/isaac.webp" alt="Isaac Cifuentes"></div><button class="secreto" data-dios="atenea" type="button" aria-label="Búho">🦉</button></div>
+      <div>
+        <h2>Sobre mí</h2>
+        <p>Soy <strong>Isaac Cifuentes</strong>, de Jesús María, Aguascalientes. Fundé Olimpo para hacer páginas que la gente disfrute usar, no solo que existan.</p>
+        <p>Fui docente y hoy trabajo creando soluciones con inteligencia artificial. Me gusta explicar las cosas con calma y en palabras sencillas (gané ocho campeonatos de oratoria, así que platicar es lo mío). Nunca te vas a quedar con dudas sobre tu página.</p>
+        <div class="datos">
+          <span class="dato">🎤 8 campeonatos de oratoria</span>
+          <span class="dato">🤖 Desarrollo con IA</span>
+          <span class="dato">🧑‍🏫 Fui docente</span>
+          <span class="dato">🌎 Inglés B2</span>
+          <button class="secreto" id="cadenas" type="button" aria-label="Unas cadenas viejas" style="font-size:1.25rem">⛓️</button>
+        </div>
+      </div>
+    </div>
+    <div class="friso" style="margin-top:40px;margin-bottom:0"></div>
+  </div>
+</div>
+<div class="columna-t izq" aria-hidden="true"><div class="capitel"></div><div class="fuste"></div><div class="basa"></div></div>
+<div class="columna-t der" aria-hidden="true"><div class="capitel"></div><div class="fuste"></div><div class="basa"></div></div>
+
+<div id="codice" role="dialog" aria-modal="true" aria-labelledby="tituloCodice">
+  <div class="pergamino">
+    <div class="cabeza">
+      <div><h2 id="tituloCodice">📜 Códice del Olimpo</h2><div style="color:var(--gris);font-size:.9rem">Encuentra a los 15 dioses escondidos en el sitio (también dentro de los templos). Cada uno trae una pista, un relato… y un dato curioso al voltear su tarjeta.</div></div>
+      <button class="cerrar" type="button" id="cerrarCodice" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="barra"><i id="progreso"></i></div>
+    <div class="dioses" id="listaDioses"></div>
+    <div class="recompensa" id="recompensa"></div>
+    <div style="text-align:center;margin-top:14px"><button type="button" class="salir" id="reiniciarAventura" style="margin:0">🔄 Empezar de nuevo</button></div>
+  </div>
+</div>
+
+<script src="js/sonido.js"></script>
+<script src="js/cielo.js"></script>
+<script src="js/panteon.js"></script>
+</body>
+</html>
