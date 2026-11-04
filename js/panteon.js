@@ -56,7 +56,7 @@
     pintarCodice();
     document.querySelectorAll('[data-dios="' + id + '"]').forEach(function (b) { b.classList.add('hallado'); });
     if (I.lang === 'en') {
-      if (id === 'demeter') frase = C.iconoEstacion + ' Demeter brings ' + I.estaciones[C.estacion] + ' and its harvest. The sky follows the real weather in Aguascalientes.' + (I.saludos[C.fiesta] ? '  ' + I.saludos[C.fiesta] : '');
+      if (id === 'demeter') frase = C.iconoEstacion + ' Demeter brings ' + I.estaciones[C.estacion] + ' and its harvest. The sky follows the real weather where you are.' + (I.saludos[C.fiesta] ? '  ' + I.saludos[C.fiesta] : '');
       else if (I.frases[id]) frase = I.frases[id];
     }
     var nom = campo(g, 'n');
@@ -182,7 +182,7 @@
   }
   function rutear(conPuertas) {
     var h = location.hash.replace('#', '');
-    if (templos[h]) { if (abierto !== h) mostrarTemplo(h, conPuertas); }
+    if (Object.prototype.hasOwnProperty.call(templos, h)) { if (abierto !== h) mostrarTemplo(h, conPuertas); }
     else if (abierto) mostrarTemplo(null, conPuertas);
   }
   addEventListener('hashchange', function () { rutear(true); });
@@ -261,7 +261,7 @@
   $('#chipClima').onclick = function () {
     C.lluviaDe([C.iconoEstacion, '🌾', C.iconoEstacion], 36); S.play('cosecha');
     var extra = C.saludos[C.fiesta] ? '  ' + C.saludos[C.fiesta] : '';
-    hallar('demeter', C.iconoEstacion + ' Deméter trae el ' + C.nombreEstacion.toLowerCase() + ' y su cosecha. El cielo sigue el clima real de Aguascalientes.' + extra);
+    hallar('demeter', C.iconoEstacion + ' Deméter trae el ' + C.nombreEstacion.toLowerCase() + ' y su cosecha. El cielo sigue el clima real de donde estás.' + extra);
   };
   // Atenea: su búho vuela y deja el CV
   $('[data-dios="atenea"]').onclick = function () {

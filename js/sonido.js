@@ -1,6 +1,6 @@
 /* Olimpo · sonidos hechos con código (Web Audio), sin archivos de nadie, buscando que suenen reales:
    ruido café para viento, mar y truenos; cuerdas pulsadas de verdad (Karplus-Strong) para la lira y el arpa;
-   campanas y metales con armónicos inarmónicos, como los reales. Empieza apagado (botón 🔇/🔊). */
+   campanas y metales con armónicos inarmónicos, como los reales. Arranca tras el primer gesto (botón 🔇/🔊). */
 (function () {
   var S = window.Sonido = { on: false };
   var ctx, blanco, cafe, maestro, reverb, amb = [], tGrillos, tRafaga, cuerdas = {};

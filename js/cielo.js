@@ -1,17 +1,25 @@
-/* Olimpo · el cielo vivo: día y noche, clima real de Aguascalientes, estaciones y fiestas.
+/* Olimpo · el cielo vivo: día, noche y clima real de donde está quien visita (si no se sabe, Aguascalientes), estaciones y fiestas.
    Para probar: ?hora=dia|noche  ?clima=despejado|nublado|lluvia|tormenta|arena|niebla
    ?fiesta=navidad|anonuevo|reyes|muertos|patrias|sanvalentin|feria|ninguna  ?estacion=primavera|verano|otono|invierno */
 (function () {
   var q = new URLSearchParams(location.search);
   document.documentElement.classList.add('arranque');   // sin transiciones en el primer cuadro
   var calma = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var body = document.body, hoy = new Date();
+  var body = document.body;
+  // El cielo sigue el reloj de quien visita: si abres Olimpo de noche, es de noche en Olimpo
+  function fechaLocal() {
+    var n = new Date();
+    return { year: n.getFullYear(), month: n.getMonth() + 1, day: n.getDate(), hour: n.getHours(), minute: n.getMinutes() };
+  }
+  var hoy = fechaLocal();
   var C = window.Cielo = { modo: 'noche', clima: 'despejado', estacion: '', fiesta: '', temp: null };
 
   // ---------- Estación y fiesta según la fecha ----------
-  var m = hoy.getMonth() + 1, d = hoy.getDate(), md = m * 100 + d;
+  var m = hoy.month, d = hoy.day, md = m * 100 + d;
   function enRango(a, b) { return a <= b ? (md >= a && md <= b) : (md >= a || md <= b); }
-  C.estacion = q.get('estacion') || (enRango(320, 620) ? 'primavera' : enRango(621, 922) ? 'verano' : enRango(923, 1220) ? 'otono' : 'invierno');
+  var estacionPedida = q.get('estacion');
+  C.estacion = ['primavera', 'verano', 'otono', 'invierno'].indexOf(estacionPedida) >= 0 ? estacionPedida :
+    (enRango(320, 620) ? 'primavera' : enRango(621, 922) ? 'verano' : enRango(923, 1220) ? 'otono' : 'invierno');
   // Cada fiesta dura alrededor de su gran día (más o menos una semana antes y una después),
   // y en el gran día (el "pico") todo resalta todavía más. ?fiesta=X&pico=1 para probar.
   var fiestas = [
@@ -24,10 +32,11 @@
     ['feria', 411, 509, [425]],                      // Feria Nacional de San Marcos (día de San Marcos: 25 de abril)
     ['patrias', 908, 923, [915, 916]]
   ];
-  C.fiesta = q.get('fiesta') || ''; C.pico = q.get('pico') === '1';
-  if (!C.fiesta) fiestas.forEach(function (f) { if (enRango(f[1], f[2])) { C.fiesta = f[0]; C.pico = f[3].indexOf(md) >= 0; } });
-  if (C.fiesta === 'ninguna') C.fiesta = '';
-  C.halloween = C.fiesta === 'muertos' && (q.get('halloween') === '1' || (!q.get('fiesta') && md >= 1024 && md <= 1031));
+  var fiestaPedida = q.get('fiesta');
+  var fiestaForzada = fiestaPedida === 'ninguna' || fiestas.some(function (f) { return f[0] === fiestaPedida; });
+  C.fiesta = fiestaForzada && fiestaPedida !== 'ninguna' ? fiestaPedida : ''; C.pico = !!C.fiesta && q.get('pico') === '1';
+  if (!fiestaForzada) fiestas.forEach(function (f) { if (enRango(f[1], f[2])) { C.fiesta = f[0]; C.pico = f[3].indexOf(md) >= 0; } });
+  C.halloween = C.fiesta === 'muertos' && (q.get('halloween') === '1' || (!fiestaForzada && md >= 1024 && md <= 1031));
   body.classList.add(C.estacion);
   if (C.fiesta) body.classList.add(C.fiesta, 'en-fiesta');
   if (C.pico) body.classList.add('fiesta-pico');
@@ -69,14 +78,15 @@
   }
   var salida = 7 * 60 + 10, puesta = 18 * 60 + 15; // minutos; se ajustan con el clima real
   function faseAhora() {
-    var n = new Date(), min = n.getHours() * 60 + n.getMinutes();
+    var n = fechaLocal(), min = n.hour * 60 + n.minute;
     if (min >= salida - 40 && min < salida + 35) return 'amanecer';
     if (min >= salida + 35 && min < puesta - 35) return 'dia';
     if (min >= puesta - 35 && min < puesta + 40) return 'atardecer';
     return 'noche';
   }
-  C.manual = !!q.get('hora');
-  C.ponerModo(q.get('hora') || faseAhora()); primera = false;
+  var horaPedida = q.get('hora');
+  C.manual = ['amanecer', 'dia', 'atardecer', 'noche'].indexOf(horaPedida) >= 0;
+  C.ponerModo(C.manual ? horaPedida : faseAhora()); primera = false;
   setTimeout(function () { document.documentElement.classList.remove('arranque'); }, 120);
   setInterval(function () { if (!C.manual) { var f = faseAhora(); if (f !== C.fase) C.ponerModo(f); } }, 60000);
 
@@ -85,7 +95,7 @@
   var iconos = { despejado: '☀️', nublado: '☁️', lluvia: '🌧️', tormenta: '⛈️', arena: '🌪️', niebla: '🌫️' };
   C.ponerClima = function (c) {
     climas.forEach(function (k) { body.classList.remove(k); });
-    C.clima = c; body.classList.add(c); pintarChip();
+    C.clima = climas.indexOf(c) >= 0 ? c : 'despejado'; body.classList.add(C.clima); pintarChip();
     if (window.Sonido) Sonido.actualizarAmbiente();
     clearTimeout(C._t); if (c === 'tormenta') programarRayo();
   };
@@ -93,7 +103,28 @@
     var chip = document.getElementById('chipClima'); if (!chip) return;
     var ico = C.clima === 'despejado' && C.modo === 'noche' ? '🌙' : iconos[C.clima];
     chip.querySelector('.ico').textContent = C.iconoEstacion;
-    chip.querySelector('.txt').textContent = ico + (C.temp !== null ? ' ' + Math.round(C.temp) + '°' : '') + ' Ags';
+    chip.querySelector('.txt').textContent = ico + (C.temp !== null ? ' ' + Math.round(C.temp) + '°' : '') + ' ' + C.lugar;
+  }
+  // Nombre corto de la ciudad para el chip (Aguascalientes se queda como "Ags", de cariño)
+  function nombreCorto(ciudad) {
+    if (!ciudad) return 'Ags';
+    if (/^aguascalientes$/i.test(ciudad)) return 'Ags';
+    return ciudad.length > 12 ? ciudad.slice(0, 11) + '…' : ciudad;
+  }
+  C.lugar = 'Ags';
+  // Ubicación aproximada de quien visita (por su conexión, sin pedir permisos).
+  // Si no se puede saber en 3 segundos, se usa Aguascalientes, la casa de Olimpo.
+  function ubicacion() {
+    var ags = { lat: 21.88, lon: -102.29, ciudad: 'Aguascalientes' };
+    var espera = new Promise(function (ok) { setTimeout(function () { ok(ags); }, 3000); });
+    var consulta = fetch('https://ipapi.co/json/')
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (typeof j.latitude !== 'number' || typeof j.longitude !== 'number') return ags;
+        return { lat: j.latitude, lon: j.longitude, ciudad: j.city || '' };
+      })
+      .catch(function () { return ags; });
+    return Promise.race([consulta, espera]);
   }
   function programarRayo() {
     C._t = setTimeout(function () { C.destello(); programarRayo(); }, 7000 + Math.random() * 9000);
@@ -103,10 +134,15 @@
     el.classList.remove('activo'); void el.offsetWidth; el.classList.add('activo');
     if (window.Sonido) setTimeout(function () { Sonido.play('trueno'); }, 250);
   };
-  if (q.get('clima')) { C.ponerClima(q.get('clima')); }
+  if (climas.indexOf(q.get('clima')) >= 0) { C.ponerClima(q.get('clima')); }
   else {
     C.ponerClima('despejado');
-    fetch('https://api.open-meteo.com/v1/forecast?latitude=21.88&longitude=-102.29&current=temperature_2m,weather_code,wind_speed_10m&daily=sunrise,sunset&forecast_days=1&timezone=America%2FMexico_City')
+    ubicacion()
+      .then(function (u) {
+        C.lugar = nombreCorto(u.ciudad);
+        return fetch('https://api.open-meteo.com/v1/forecast?latitude=' + u.lat.toFixed(2) + '&longitude=' + u.lon.toFixed(2) +
+          '&current=temperature_2m,weather_code,wind_speed_10m&daily=sunrise,sunset&forecast_days=1&timezone=auto');
+      })
       .then(function (r) { return r.json(); })
       .then(function (j) {
         try {
@@ -287,4 +323,13 @@
   }
   requestAnimationFrame(pintar);
   if (calma) addEventListener('resize', function () { pintar(0); });
+
+  // En celular el aviso sale abajo… salvo cuando los botones de "Ver mis trabajos" y "Platiquemos"
+  // están en la parte baja de la pantalla: ahí sube arriba, para que nunca tape lo que trae clientes.
+  var botones = document.querySelector('.portada .botones');
+  if (botones && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (e) {
+      document.documentElement.classList.toggle('botones-abajo', e[0].isIntersecting);
+    }, { rootMargin: '-50% 0px 0px 0px' }).observe(botones);
+  }
 })();

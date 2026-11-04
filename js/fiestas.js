@@ -8,7 +8,7 @@
   var suave = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var astros = $('#astros'), escena = document.createElement('div'); escena.id = 'escenaFiesta'; escena.setAttribute('aria-hidden', 'true');
   document.body.insertBefore(escena, $('#frente'));
-  function avisar(txt) { var a = $('#aviso'); if (!a) return; a.textContent = txt; a.classList.add('visible'); clearTimeout(avisar.t); avisar.t = setTimeout(function () { a.classList.remove('visible'); }, 4200); }
+  function avisar(txt, ms) { var a = $('#aviso'); if (!a) return; a.textContent = txt; a.classList.add('visible'); clearTimeout(avisar.t); avisar.t = setTimeout(function () { a.classList.remove('visible'); }, ms || 4200); }
   function boton(html, clase, etiqueta, donde) { var b = document.createElement('button'); b.type = 'button'; b.className = 'escena ' + clase; b.innerHTML = html; b.setAttribute('aria-label', etiqueta); (donde || escena).appendChild(b); return b; }
 
   // ---------- Accesorios junto al logo ----------
@@ -74,35 +74,147 @@
   // ---------- Día de Muertos: altar y camino de cempasúchil que brilla en modo oscuro ----------
   if (f === 'muertos') {
     var camino = document.createElement('div'); camino.className = 'cempasuchil'; camino.setAttribute('aria-hidden', 'true');
-    // Camino en perspectiva: nace cerca (pétalos grandes) y se pierde en el horizonte (pétalos diminutos)
-    var c2 = '<svg viewBox="0 0 1440 320" preserveAspectRatio="none">';
-    for (var k = 0; k < 90; k++) {
-      var t = k / 89, lejos = Math.pow(t, .8), px = 260 + Math.sin(t * 3.2) * 160 + t * 760, py = 318 - lejos * 150, r = 6.5 - lejos * 5;
-      for (var lado = -1; lado <= 1; lado += 2) c2 += '<circle class="petalo-c" cx="' + (px + lado * (14 - lejos * 11)).toFixed(0) + '" cy="' + py.toFixed(0) + '" r="' + Math.max(.9, r).toFixed(1) + '" fill="' + ((k + lado) % 4 ? '#ff9f1c' : '#ffc23a') + '"/>';
+    escena.appendChild(camino);
+    // Camino en perspectiva: nace cerca de quien mira (pétalos grandes) y llega DIRECTO a la base del altar
+    // (pétalos diminutos). Se calcula con la posición real del altar y se vuelve a trazar si cambia la pantalla.
+    function trazarCamino() {
+      var cr = camino.getBoundingClientRect(), ar = altar.getBoundingClientRect();
+      var W = Math.max(1, cr.width), Hh = Math.max(1, cr.height);
+      var ex = ar.left + ar.width * .5 - cr.left, ey = ar.top + ar.height * .949 - cr.top;   // base del altar
+      var sx = W * .6, sy = Hh + 6;                                                      // cerca, abajo
+      var p1x = W * .72, p1y = Hh * .55, p2x = ex + W * .28, p2y = ey + (Hh - ey) * .2;    // curva suave en S
+      var bz = function (t, a, b, c, d) { var u = 1 - t; return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d; };
+      var esc = Math.min(1.25, Math.max(.7, W / 1300));                                     // tamaño según la pantalla
+      var s = '<svg viewBox="0 0 ' + W.toFixed(0) + ' ' + Hh.toFixed(0) + '">', velas = '', flores = '';
+      // Azar con semilla: el camino se ve natural, pero es el mismo cada vez que se vuelve a trazar
+      var semilla = 7; var rnd = function () { semilla = (semilla * 16807) % 2147483647; return (semilla - 1) / 2147483646; };
+      var tonosP = ['#ff9f1c', '#ffb02e', '#ff8a1f', '#ffc23a', '#ff7a1a'];
+      var anchoFin = Math.max(3, ar.width * .13);
+      var flor = function (x, y, r) { return '<g class="petalo-c"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="#ff8a1f"/><circle cx="' + x.toFixed(1) + '" cy="' + (y - r * .08).toFixed(1) + '" r="' + (r * .7).toFixed(1) + '" fill="#ffa52a"/><circle cx="' + x.toFixed(1) + '" cy="' + (y - r * .12).toFixed(1) + '" r="' + (r * .38).toFixed(1) + '" fill="#ffd34d"/></g>'; };
+      // De lejos hacia cerca, para que los pétalos grandes queden encima
+      for (var k = 89; k >= 0; k--) {
+        var t = k / 89, lejos = Math.pow(t, .75), px = bz(t, sx, p1x, p2x, ex), py = bz(t, sy, p1y, p2y, ey);
+        var r = Math.max(.9, (6 - lejos * 4.9) * esc), ancho = (62 * esc) * (1 - lejos) + anchoFin * lejos;
+        // El camino va lleno de pétalos, de orilla a orilla
+        var n = Math.max(3, Math.round(ancho * 2 / (r * 1.9)));
+        for (var p = 0; p < n; p++) {
+          var ox = -ancho + (p + .5) * (ancho * 2 / n) + (rnd() - .5) * r * 1.2, oy = (rnd() - .5) * r * 1.1;
+          s += '<ellipse cx="' + (px + ox).toFixed(1) + '" cy="' + (py + oy).toFixed(1) + '" rx="' + (r * (.8 + rnd() * .4)).toFixed(1) + '" ry="' + (r * .55).toFixed(1) +
+            '" transform="rotate(' + Math.round(rnd() * 180) + ' ' + (px + ox).toFixed(1) + ' ' + (py + oy).toFixed(1) + ')" fill="' + tonosP[Math.floor(rnd() * tonosP.length)] + '"/>';
+        }
+        // Y flores de cempasúchil enteras en las orillas
+        if (k % 4 === 0) for (var lado = -1; lado <= 1; lado += 2) flores += flor(px + lado * (ancho + r * .6), py, r * 2);
+        // Velitas que acompañan el último tramo, como las que alumbran el camino a casa
+        if (k === 58 || k === 72 || k === 84) {
+          var hv = (9 - lejos * 5) * esc, wv = Math.max(1.6, 3.2 * esc * (1 - lejos * .5));
+          for (var l2 = -1; l2 <= 1; l2 += 2) {
+            var vx = px + l2 * (ancho + r * 2.8 + 4 * esc), vy = py;
+            velas += '<rect x="' + (vx - wv / 2).toFixed(1) + '" y="' + (vy - hv).toFixed(1) + '" width="' + wv.toFixed(1) + '" height="' + hv.toFixed(1) + '" rx=".6" fill="#fbf4e6"/>' +
+              '<ellipse class="llamita" cx="' + vx.toFixed(1) + '" cy="' + (vy - hv - hv * .35).toFixed(1) + '" rx="' + (wv * .55).toFixed(1) + '" ry="' + (hv * .38).toFixed(1) + '" fill="#ffd34d"/>';
+          }
+        }
+      }
+      // Un tapetito de pétalos al pie del altar, donde termina el camino
+      for (var q2 = 0; q2 < 14; q2++) {
+        var an2 = q2 / 14 * Math.PI * 2, rr = ar.width * .34;
+        s += '<circle class="petalo-c" cx="' + (ex + Math.cos(an2) * rr * (q2 % 2 ? .6 : 1)).toFixed(1) + '" cy="' + (ey + 2 + Math.sin(an2) * rr * .16).toFixed(1) + '" r="' + (1.6 * esc + (q2 % 3) * .4).toFixed(1) + '" fill="' + (q2 % 3 ? '#ff9f1c' : '#ffc23a') + '"/>';
+      }
+      camino.innerHTML = s + flores + '<g class="velas-camino">' + velas + '</g></svg>';
     }
-    camino.innerHTML = c2 + '</svg>'; escena.appendChild(camino);
     // Altar de tres niveles, pequeño y a lo lejos sobre las dunas, lleno de detalles
     var cempa = function (x, y, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#ff9f1c"/><circle cx="' + x + '" cy="' + y + '" r="' + (r * .55) + '" fill="#ffc23a"/>'; };
     var arco = ''; for (var a1 = 0; a1 <= 18; a1++) { var an = Math.PI - a1 / 18 * Math.PI; arco += cempa((100 + Math.cos(an) * 84).toFixed(1), (112 - Math.sin(an) * 92).toFixed(1), a1 % 2 ? 5 : 6); }
     var calavera = function (x, y, c1, c2b) { return '<g transform="translate(' + x + ' ' + y + ')"><path d="M0 -7 C-5 -7 -7 -3 -7 0 C-7 3 -5 4 -4 5 L-4 7 L4 7 L4 5 C5 4 7 3 7 0 C7 -3 5 -7 0 -7 Z" fill="#fbf4e6"/><circle cx="-2.6" cy="0" r="1.8" fill="' + c1 + '"/><circle cx="2.6" cy="0" r="1.8" fill="' + c2b + '"/><path d="M-2 5 H2" stroke="#1d1a17" stroke-width=".8"/></g>'; };
     var vela = function (x, y, h) { return '<rect x="' + (x - 2.5) + '" y="' + (y - h) + '" width="5" height="' + h + '" rx="1" fill="#fbf4e6"/><ellipse class="llamita" cx="' + x + '" cy="' + (y - h - 4) + '" rx="2.4" ry="4.2" fill="#ffd34d"/><ellipse cx="' + x + '" cy="' + (y - h - 3) + '" rx="1" ry="2" fill="#fff"/>'; };
-    var papelAltar = ''; ['#ff4fa3', '#ff8a1f', '#9b5cff', '#ffd34d', '#2fc58a', '#ff4fa3', '#9b5cff'].forEach(function (cc, i) { papelAltar += '<path d="M' + (44 + i * 16) + ' 58 h14 v10 l-3.5 3 l-3.5 -3 l-3.5 3 l-3.5 -3 Z" fill="' + cc + '"/>'; });
-    var altar = boton('<svg viewBox="0 0 200 175">' + arco +
-      '<rect x="22" y="132" width="156" height="18" fill="#6a2f8a"/><path d="M22 150 h156 l-6 8 h-144 Z" fill="#4a1f63"/>' +
-      '<rect x="40" y="108" width="120" height="24" fill="#c2185b"/><rect x="58" y="86" width="84" height="22" fill="#ff8a1f"/><rect x="58" y="86" width="84" height="3" fill="#ffd34d"/>' +
-      papelAltar + '<rect x="86" y="58" width="28" height="28" rx="2" fill="#2a1a10" stroke="#f1d48a" stroke-width="2"/><circle cx="100" cy="69" r="5.5" fill="#6a5040"/><path d="M91 84 Q100 74 109 84" fill="#6a5040"/>' +
-      '<g class="velas">' + vela(50, 108, 12) + vela(150, 108, 12) + vela(34, 132, 14) + vela(166, 132, 14) + vela(68, 86, 10) + vela(132, 86, 10) + '</g>' +
-      calavera(74, 124, '#ff4fa3', '#4fd1ff') + calavera(126, 124, '#9bff6a', '#ff8a1f') + calavera(100, 146, '#ffd34d', '#9b5cff') +
-      '<ellipse cx="100" cy="128" rx="11" ry="6" fill="#c98a3c"/><path d="M93 126 h14 M96 123 v6 M104 123 v6" stroke="#f1d48a" stroke-width="1.6" stroke-linecap="round"/>' +
-      cempa(28, 128, 7) + cempa(172, 128, 7) + cempa(46, 104, 5) + cempa(154, 104, 5) +
-      '<path class="copal" d="M100 50 C96 42 104 38 100 30 C96 22 104 18 100 10" stroke="#e8e0d0" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/>' +
-      '</svg>', 'altar', T('Un altar de muertos', 'A Day of the Dead altar'));
+    // Altar de 7 niveles, como dice la tradición (de abajo hacia arriba):
+    // 1 la tierra: velas, copal y cempasúchil · 2 calaveritas de azúcar · 3 las fotos de quienes recordamos
+    // 4 su comida favorita, fruta y jarrito · 5 pan de muerto y el vaso de agua · 6 la sal · 7 la cruz, en lo más alto
+    arco = ''; for (var a2 = 0; a2 <= 22; a2++) { var an3 = Math.PI - a2 / 22 * Math.PI; arco += cempa((100 + Math.cos(an3) * 93).toFixed(1), (192 - Math.sin(an3) * 176).toFixed(1), a2 % 2 ? 4.6 : 5.6); }
+    var papelAltar = ''; ['#ff4fa3', '#ff8a1f', '#9b5cff', '#ffd34d', '#2fc58a', '#ff4fa3', '#9b5cff'].forEach(function (cc, i) { papelAltar += '<path d="M' + (44 + i * 16) + ' 26 h14 v9 l-3.5 3 l-3.5 -3 l-3.5 3 l-3.5 -3 Z" fill="' + cc + '"/>'; });
+    var tonos = ['#4a1f63', '#6a2f8a', '#8e2a8a', '#c2185b', '#e0457b', '#ff8a1f', '#ffb43a'], flecos = ['#ffd34d', '#2fc58a', '#4fd1ff', '#ff4fa3', '#fbf4e6'];
+    var yt = function (g) { return 196 - (g + 1) * 18; };
+    var gradas = '<rect x="4" y="196" width="192" height="6" rx="1" fill="#c98a3c"/><path d="M4 199 h192 M4 201 h192" stroke="#8a5a2a" stroke-width=".6"/>';
+    for (var g = 0; g < 7; g++) {
+      var w = 172 - g * 20, gx = 100 - w / 2;
+      gradas += '<rect x="' + gx + '" y="' + yt(g) + '" width="' + w + '" height="18" fill="' + tonos[g] + '"/>';
+      for (var z = 0; z < Math.floor(w / 8); z++) gradas += '<path d="M' + (gx + z * 8) + ' ' + yt(g) + ' h8 l-4 5 Z" fill="' + flecos[(z + g) % flecos.length] + '" opacity=".9"/>';
+    }
+    var pan = function (x, y) { return '<ellipse cx="' + x + '" cy="' + (y - 4) + '" rx="7" ry="4.5" fill="#c98a3c"/><path d="M' + (x - 5) + ' ' + (y - 5) + ' h10 M' + x + ' ' + (y - 8) + ' v7" stroke="#f1d48a" stroke-width="1.4" stroke-linecap="round"/><circle cx="' + x + '" cy="' + (y - 8.5) + '" r="1.4" fill="#f1d48a"/>'; };
+    var foto = function (x, y, ww, hh) { return '<rect x="' + (x - ww / 2) + '" y="' + (y - hh) + '" width="' + ww + '" height="' + hh + '" rx="1" fill="#2a1a10" stroke="#f1d48a" stroke-width="1.4"/><circle cx="' + x + '" cy="' + (y - hh * .62) + '" r="' + (ww * .18) + '" fill="#6a5040"/><path d="M' + (x - ww * .32) + ' ' + (y - 1.5) + ' Q' + x + ' ' + (y - hh * .45) + ' ' + (x + ww * .32) + ' ' + (y - 1.5) + '" fill="#6a5040"/>'; };
+    // El arco se arma sobre caña de azúcar, como en los pueblos
+    var cana = '<path d="M7 192 C7 60 52 16 100 16 C148 16 193 60 193 192" stroke="#7fae3a" stroke-width="2.2" fill="none"/>';
+    var altar = boton('<svg viewBox="0 -64 200 274">' + cana + arco + papelAltar + gradas +
+      // En el petate: la cruz de pétalos, para que el alma se oriente
+      '<circle cx="100" cy="199" r="1.6" fill="#ffc23a"/><circle cx="96" cy="199" r="1.4" fill="#ff9f1c"/><circle cx="104" cy="199" r="1.4" fill="#ff9f1c"/><circle cx="92" cy="199" r="1.2" fill="#ff9f1c"/><circle cx="108" cy="199" r="1.2" fill="#ff9f1c"/>' +
+      // Nivel 1, la tierra: copal, sombrero, mezcal, un juguete y flores
+      '<path d="M92 178 h16 l-3 -7 h-10 Z" fill="#8a5a3a"/><ellipse cx="100" cy="171" rx="4" ry="1.4" fill="#ff7a2a"/>' +
+      '<ellipse cx="68" cy="176" rx="9" ry="2" fill="#d9b26a"/><path d="M63 176 q5 -9 10 0 Z" fill="#e8c77e"/>' +
+      '<rect x="118" y="164" width="5" height="14" rx="1.5" fill="#7a9a5a"/><rect x="119.3" y="160" width="2.4" height="5" fill="#7a9a5a"/>' +
+      '<circle cx="134" cy="174.5" r="3.5" fill="#4fd1ff"/><path d="M130.5 174.5 h7" stroke="#ff4fa3" stroke-width="1.2"/>' +
+      cempa(38, 173, 5.5) + cempa(50, 174, 4.5) + cempa(150, 174, 4.5) + cempa(162, 173, 5.5) +
+      // Nivel 2, las fotos de quienes recordamos
+      foto(100, 160, 18, 20) + foto(68, 160, 12, 14) + foto(132, 160, 12, 14) + cempa(32, 156, 4.5) + cempa(168, 156, 4.5) +
+      // Nivel 3, su comida y bebida favoritas, la fruta y el jarrito
+      '<circle cx="56" cy="138" r="3.6" fill="#ff8a1f"/><circle cx="62" cy="139" r="3.4" fill="#ffa53a"/><path d="M134 141 q6 -9 12 -4 q-6 -1 -12 4 Z" fill="#ffd34d"/>' +
+      '<ellipse cx="100" cy="140" rx="9" ry="2.8" fill="#fbf4e6"/><ellipse cx="100" cy="139" rx="6.5" ry="1.8" fill="#8a2a1a"/>' +
+      '<path d="M116 142 h7 l1 -6 q-4.5 -3 -9 0 Z" fill="#b5562a"/><path d="M124 138 q3 0 2 3" stroke="#b5562a" stroke-width="1.2" fill="none"/>' +
+      // Nivel 4, pan de muerto y vaso de agua
+      pan(74, 124) + pan(126, 124) + '<rect x="96.5" y="114" width="7" height="10" rx="1" fill="#9fd8ff" opacity=".85"/><rect x="96.5" y="114" width="7" height="2" fill="#e6f6ff"/>' +
+      // Nivel 5, la sal
+      '<ellipse cx="100" cy="105" rx="8" ry="2.4" fill="#e8e0d0"/><path d="M94 105 q6 -7 12 0 Z" fill="#ffffff"/>' +
+      // Nivel 6, las ánimas: velitas y calaveritas de azúcar
+      calavera(86, 81, '#ff4fa3', '#4fd1ff') + calavera(114, 81, '#9bff6a', '#ff8a1f') +
+      // Nivel 7, lo más alto: la cruz
+      '<rect x="98.4" y="50" width="3.2" height="20" fill="#f1d48a"/><rect x="92.5" y="55.5" width="15" height="3.2" fill="#f1d48a"/>' +
+      '<g class="velas">' + vela(22, 178, 15) + vela(178, 178, 15) + vela(48, 160, 9) + vela(152, 160, 9) + vela(44, 142, 9) + vela(156, 142, 9) +
+        vela(74, 106, 7) + vela(126, 106, 7) + vela(70, 88, 7) + vela(130, 88, 7) + vela(84, 70, 7) + vela(116, 70, 7) + '</g>' +
+      // El humo del copal sube en un hilo hasta lo más alto… y se vuelve calaverita, luego cruz, luego vela
+      '<path class="humo" pathLength="100" d="M100 170 C94 150 106 130 100 110 C94 90 106 70 100 48 C95 28 105 8 100 -10 C98 -15 100 -18 100 -22" stroke="#efe8dc" stroke-width="1.5" fill="none" stroke-linecap="round"/>' +
+      '<g class="humo-forma f1" stroke="#efe8dc" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path pathLength="100" d="M100 -22 C88 -22 86 -32 86 -40 C86 -50 93 -56 100 -56 C107 -56 114 -50 114 -40 C114 -32 112 -22 100 -22"/>' +
+        '<circle pathLength="100" cx="94.5" cy="-41" r="3.2"/><circle pathLength="100" cx="105.5" cy="-41" r="3.2"/><path pathLength="100" d="M100 -36 l-1.6 3 h3.2 Z"/><path pathLength="100" d="M94 -27 h12 M97 -29.5 v5 M100 -29.5 v5 M103 -29.5 v5"/></g>' +
+      '<g class="humo-forma f2" stroke="#efe8dc" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path pathLength="100" d="M97.5 -22 V-38 H89 C86 -38 86 -44 89 -44 H97.5 V-53 C97.5 -57 102.5 -57 102.5 -53 V-44 H111 C114 -44 114 -38 111 -38 H102.5 V-22 Z"/>' +
+        '<circle pathLength="100" cx="100" cy="-41" r="1.8"/></g>' +
+      '<g class="humo-forma f3" stroke="#efe8dc" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path pathLength="100" d="M94 -22 V-42 Q100 -44 106 -42 V-22 Z"/><path pathLength="100" d="M100 -44 V-47"/>' +
+        '<path pathLength="100" d="M100 -47 C95.5 -51 97.5 -56 100 -61 C102.5 -56 104.5 -51 100 -47 Z"/></g>' +
+      '</svg>', 'altar', T('Un altar de muertos de siete niveles', 'A seven-level Day of the Dead altar'));
     altar.addEventListener('click', function () {
       altar.classList.add('vivo'); setTimeout(function () { altar.classList.remove('vivo'); }, 2400);
       var r = altar.getBoundingClientRect(); for (var n = 0; n < 4; n++) C.brasas(r.left + r.width * (.2 + n * .2), r.top + r.height * .45, 6, ['#ffd34d', '#ff9f1c', '#ffffff']);
       C.lluviaDe(['🌼', '🧡', '🌼'], 26); S.play('muertos');
       avisar(T('🕯️ El altar guía a las almas de regreso a casa con la luz de las velas y el aroma del cempasúchil. El Olimpo también recuerda.', '🕯️ The altar guides souls back home with candlelight and the scent of marigolds. Olympus remembers too.'));
     });
+    // El xoloitzcuintle: sentado al final del camino, junto al altar. Con cada clic explica un nivel.
+    var xolo = boton('<svg viewBox="0 0 40 50">' +
+      '<path d="M31 43 C38 41 38 33 35 30" stroke="#1c1a1f" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M14 2 L18.5 14 L11.5 15 Z M27 2 L22.5 14 L29.5 15 Z" fill="#1c1a1f"/><path d="M14.6 5.5 L16.8 12.5 L13.2 13 Z M26.4 5.5 L24.2 12.5 L27.8 13 Z" fill="#4a3a44"/>' +
+      '<path d="M15 21 C12 28 11 37 12.5 46 L29 46 C31 37 28.5 27 25.5 21 Z" fill="#1c1a1f"/><ellipse cx="27" cy="41" rx="6" ry="5.2" fill="#1c1a1f"/>' +
+      '<rect x="15.5" y="33" width="3" height="14" rx="1.4" fill="#1c1a1f"/><rect x="22" y="33" width="3" height="14" rx="1.4" fill="#1c1a1f"/>' +
+      '<ellipse cx="20.5" cy="16" rx="7.5" ry="6.6" fill="#1c1a1f"/><ellipse cx="20.5" cy="21" rx="3.8" ry="3" fill="#1c1a1f"/><circle cx="20.5" cy="19.6" r="1" fill="#4a3a44"/>' +
+      '<circle class="ojo" cx="17.6" cy="15" r="1" fill="#ffd34d"/><circle class="ojo" cx="23.4" cy="15" r="1" fill="#ffd34d"/>' +
+      '<path d="M15.5 25 Q20.5 28 25.5 25" stroke="#ff8a1f" stroke-width="1.6" fill="none"/><circle cx="20.5" cy="27.4" r="2" fill="#ff9f1c"/><circle cx="20.5" cy="27.4" r="1.1" fill="#ffd34d"/>' +
+      '</svg>', 'xolo', T('Un xoloitzcuintle que explica el altar', 'A xoloitzcuintle who explains the altar'));
+    var guia = [
+      ['🐕 ¡Guau! Soy un xoloitzcuintle. Según la tradición mexica, ayudo a las almas a cruzar el río hacia el Mictlán. Dame clic y te explico el altar, nivel por nivel.', '🐕 Woof! I am a xoloitzcuintle. In Mexica tradition, I help souls cross the river to Mictlán. Click me and I will explain the altar, level by level.'],
+      ['Hay muchas versiones del altar de siete niveles; esta es de las más conocidas. 1️⃣ Abajo está la tierra: la cruz de pétalos, el copal, las velas y algunos objetos que la persona quería.', 'There are many versions of the seven-level altar; this is one of the best known. 1️⃣ At the bottom is the earth: the petal cross, copal, candles and a few things the person loved.'],
+      ['2️⃣ Las fotos de quienes recordamos. Se ponen para que sepan que esta ofrenda es para ellos.', '2️⃣ Photos of those we remember, so they know this offering is for them.'],
+      ['3️⃣ Su comida y bebida favoritas, la fruta y el jarrito. Llegan con hambre del largo viaje.', '3️⃣ Their favorite food and drink, fruit and the clay jug. They arrive hungry from the long journey.'],
+      ['4️⃣ El pan de muerto y un vaso de agua, para calmar la sed del camino. El pan lleva "huesitos" encima.', '4️⃣ Pan de muerto and a glass of water to quench the thirst of the road. The bread has little "bones" on top.'],
+      ['5️⃣ La sal, que purifica y protege a las almas en su camino.', '5️⃣ Salt, which purifies and protects souls on their way.'],
+      ['6️⃣ Las ánimas: velitas para iluminarlas y calaveritas de azúcar, que nos recuerdan la muerte con dulzura.', '6️⃣ The souls: candles to light their way and sugar skulls, which remind us of death with sweetness.'],
+      ['7️⃣ Lo más alto: la cruz, el puente entre el cielo y la tierra.', '7️⃣ The very top: the cross, the bridge between heaven and earth.'],
+      ['🌼 El arco de cempasúchil es la puerta al mundo de los muertos, y el camino de pétalos les enseña por dónde llegar a casa. Su color y su aroma los guían. ¡Gracias por recordar conmigo!', '🌼 The marigold arch is the doorway to the world of the dead, and the petal path shows them the way home. Its color and scent guide them. Thank you for remembering with me!']
+    ];
+    var paso = 0;
+    xolo.addEventListener('click', function () {
+      xolo.classList.remove('salta'); void xolo.offsetWidth; xolo.classList.add('salta');
+      avisar(T(guia[paso][0], guia[paso][1]), 9000); paso = (paso + 1) % guia.length;
+    });
+    trazarCamino();
+    var tCamino; addEventListener('resize', function () { clearTimeout(tCamino); tCamino = setTimeout(trazarCamino, 150); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(trazarCamino);
   }
 
   // ---------- Tu foto también se viste para la fiesta ----------

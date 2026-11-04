@@ -422,8 +422,8 @@ body.fiesta-pico .accesorio { animation: accPico 1.8s ease-in-out infinite; }
 /* Camino de cempasúchil: discreto en modo claro, brilla en modo oscuro (aunque sea de día de verdad) */
 .cempasuchil { position: absolute; left: 0; right: 0; bottom: 0; height: 34vh; }
 .cempasuchil svg { width: 100%; height: 100%; display: block; transition: filter 1.5s; }
-.cempasuchil circle { opacity: .55; transition: opacity 1.5s; }
-body.noche .cempasuchil circle { opacity: 1; }
+.cempasuchil circle, .cempasuchil ellipse { opacity: .82; transition: opacity 1.5s; }
+body.noche .cempasuchil circle, body.noche .cempasuchil ellipse { opacity: 1; }
 body.noche .cempasuchil svg { filter: drop-shadow(0 0 5px #ff9f1c) drop-shadow(0 0 14px rgba(255,140,20,.65)); animation: cempaLatido 3s ease-in-out infinite alternate; }
 body.noche.fiesta-pico .cempasuchil svg { filter: drop-shadow(0 0 7px #ffb02e) drop-shadow(0 0 24px rgba(255,150,30,.95)); }
 @keyframes cempaLatido { to { opacity: .82; } }
@@ -461,6 +461,9 @@ html.arranque *, html.arranque *::before, html.arranque *::after { transition: n
 @media (max-width: 760px) {
   #aviso { top: auto; bottom: 14px; transform: translate(-50%, 16px); }
   #aviso.visible { transform: translate(-50%, 0); }
+  /* …pero si los botones principales están abajo, el aviso sube para no taparlos */
+  html.botones-abajo #aviso { top: calc(var(--nav) + 10px); bottom: auto; transform: translate(-50%, -16px); }
+  html.botones-abajo #aviso.visible { transform: translate(-50%, 0); }
 }
 /* X pequeñita para cerrar el códice, siempre a la mano en la esquina */
 #codice .cerrar { position: fixed; top: 12px; right: 12px; width: 30px; height: 30px; font-size: .85rem; line-height: 1; background: rgba(18,16,13,.92); border: 1px solid var(--oro); color: var(--oro2); z-index: 72; }
@@ -472,7 +475,20 @@ button.accesorio:focus-visible { outline: 2px solid var(--oro2); outline-offset:
 .accesorio.baila { animation: baila .9s ease; }
 @keyframes baila { 15% { transform: rotate(-18deg) scale(1.25); } 35% { transform: rotate(16deg) scale(1.25); } 55% { transform: rotate(-10deg) scale(1.15); } 75% { transform: rotate(6deg); } }
 /* Altar pequeño, a lo lejos sobre las dunas, del que sale el camino */
-.altar { left: 4vw; bottom: 9vh; width: clamp(84px, 11vw, 150px); aspect-ratio: 200 / 175; }
+.altar { left: 4vw; bottom: 9vh; width: clamp(100px, 13vw, 175px); aspect-ratio: 200 / 274; }
+/* El humo del copal sube en un hilo y en lo alto dibuja, por turnos, una calaverita, una cruz y una vela */
+.altar .humo { stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; animation: humoSube 12s ease-in-out infinite; }
+@keyframes humoSube { 0% { stroke-dashoffset: 100; opacity: 0; } 6% { opacity: .6; } 40% { stroke-dashoffset: 0; opacity: .6; } 82% { stroke-dashoffset: 0; opacity: .45; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+.altar .humo-forma > * { stroke-dasharray: 100; stroke-dashoffset: 100; }
+.altar .humo-forma { opacity: 0; }
+.altar .humo-forma { animation: humoForma 36s ease-in-out infinite; }
+.altar .humo-forma > * { animation: humoTrazo 36s ease-in-out infinite; }
+.altar .humo-forma.f2, .altar .humo-forma.f2 > * { animation-delay: 12s; }
+.altar .humo-forma.f3, .altar .humo-forma.f3 > * { animation-delay: 24s; }
+@keyframes humoForma { 0%, 12% { opacity: 0; } 13.5%, 21% { opacity: .65; } 27% { opacity: .5; } 33%, 100% { opacity: 0; } }
+@keyframes humoTrazo { 0%, 12% { stroke-dashoffset: 100; } 21%, 100% { stroke-dashoffset: 0; } }
+body.noche .altar .humo, body.noche .altar .humo-forma { filter: drop-shadow(0 0 2px rgba(255,255,255,.5)); }
+@media (prefers-reduced-motion: reduce) { .altar .humo { animation: none; stroke-dashoffset: 0; opacity: .35; } .altar .humo-forma, .altar .humo-forma > * { animation: none; stroke-dashoffset: 0; } .altar .humo-forma.f1 { opacity: .35; } }
 .altar .copal { animation: copal 3.5s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
 @keyframes copal { 0%, 100% { opacity: .15; transform: translateY(4px) scaleY(.8); } 50% { opacity: .5; transform: translateY(-4px) scaleY(1.1); } }
 /* Cada pétalo del camino titila un poquito de noche */
@@ -491,3 +507,30 @@ body.dia .antetitulo { color: #3a1d08; font-weight: 700; text-shadow: 0 1px 0 rg
 body.dia main .sub, body.dia .vidrio p, body.dia .portada p { color: #2a170b; }
 body.dia .nota { color: #5a140c; font-weight: 600; }
 body.dia .reto { background: rgba(20,12,6,.78); }
+
+/* Xoloitzcuintle negro, sentado al final del camino, junto al altar */
+.xolo { left: calc(4vw + clamp(100px, 13vw, 175px) - 4px); bottom: 8.4vh; width: clamp(28px, 3.4vw, 46px); aspect-ratio: 40 / 50; cursor: pointer; }
+.xolo svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.xolo .ojo { transition: filter .6s; }
+body.noche .xolo .ojo { filter: drop-shadow(0 0 2px #ffd34d); }
+body.noche .xolo svg { filter: drop-shadow(0 0 1.5px rgba(255,190,90,.85)) drop-shadow(0 0 6px rgba(255,150,40,.35)); }
+.xolo.salta { animation: xoloSalta .5s ease; }
+@keyframes xoloSalta { 40% { transform: translateY(-14%) rotate(-4deg); } 70% { transform: translateY(0) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { .xolo.salta { animation: none; } }
+/* Detalles que puedes pedir: cada uno se prueba en vivo */
+.detalles { margin: 26px auto 0; padding: 26px 24px 24px; text-align: center; }
+.detalles h3 { margin: 0 0 6px; }
+.detalles .sub { margin: 0 auto 18px; max-width: 620px; }
+.detalles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.detalle { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 14px; border: 1px solid rgba(212,175,90,.28); border-radius: 14px; background: rgba(10,10,14,.25); }
+.detalle b { color: var(--oro2); font-size: 1.02rem; }
+.detalle span { font-size: .9rem; line-height: 1.45; flex: 1; }
+.detalle .probar { margin-top: 6px; font: inherit; font-size: .86rem; font-weight: 600; color: var(--oro2); background: transparent; border: 1px solid var(--oro); border-radius: 999px; padding: .4rem 1rem; cursor: pointer; text-decoration: none; transition: background .2s, color .2s; }
+.detalle .probar:hover, .detalle .probar:focus-visible { background: var(--oro); color: #12100d; }
+body.dia .detalle { background: rgba(255,250,240,.72); }
+body.dia .detalle span, body.dia .detalles .sub { color: #3a1d10; text-shadow: none; }
+body.dia .detalles h3 { color: #5a140c; }
+body.dia .detalle b, body.dia .detalle .probar { color: #6b1a10; border-color: #8a5a1a; }
+body.dia .detalle .probar:hover { background: #6b1a10; color: #fff; }
+@media (max-width: 860px) { .detalles-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .detalles-grid { grid-template-columns: 1fr; } }
