@@ -5,6 +5,8 @@
   var S = window.Sonido = { on: false };
   var ctx, blanco, cafe, maestro, reverb, amb = [], tGrillos, tRafaga, cuerdas = {};
 
+  // En celulares todo es más ligero: ecos más cortos y menos chasquidos, para que el audio no truene
+  var LIGERO = innerWidth < 760 || (navigator.hardwareConcurrency || 8) <= 4 || /iPhone|iPad|Android/i.test(navigator.userAgent);
   function iniciar() {
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return true; }
     try {
@@ -15,12 +17,13 @@
       var b = blanco.getChannelData(0), c = cafe.getChannelData(0), ult = 0;
       for (var i = 0; i < n; i++) { b[i] = Math.random() * 2 - 1; ult = (ult + .02 * b[i]) / 1.02; c[i] = ult * 3.5; }
       // Eco de templo: una reverberación suave para que todo suene en un lugar, no "dentro de la compu"
-      var largo = ctx.sampleRate * 2.2, ir = ctx.createBuffer(2, largo, ctx.sampleRate);
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}   // iPhone: que suene aunque esté en silencio el timbre
+      var largo = Math.floor(ctx.sampleRate * (LIGERO ? 1.2 : 2.2)), ir = ctx.createBuffer(2, largo, ctx.sampleRate);
       for (var k = 0; k < 2; k++) { var d = ir.getChannelData(k); for (var j = 0; j < largo; j++) d[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / largo, 3); }
       reverb = ctx.createConvolver(); reverb.buffer = ir;
       var rg = ctx.createGain(); rg.gain.value = .22; reverb.connect(rg); rg.connect(maestro);
       // Eco del cielo para el trueno: una sala enorme (5 s) + rebotes que se van apagando, como entre montañas
-      var largoG = ctx.sampleRate * 5, irG = ctx.createBuffer(2, largoG, ctx.sampleRate);
+      var largoG = Math.floor(ctx.sampleRate * (LIGERO ? 2.5 : 5)), irG = ctx.createBuffer(2, largoG, ctx.sampleRate);
       for (var k2 = 0; k2 < 2; k2++) { var dG = irG.getChannelData(k2); for (var j2 = 0; j2 < largoG; j2++) dG[j2] = (Math.random() * 2 - 1) * Math.pow(1 - j2 / largoG, 2.2); }
       cielo = ctx.createConvolver(); cielo.buffer = irG;
       var cg = ctx.createGain(); cg.gain.value = .55; cielo.connect(cg); cg.connect(maestro);
@@ -90,7 +93,7 @@
       var gg = ctx.createGain(); gg.gain.value = k ? .35 : 1; s.connect(gg); gg.connect(suave); s.start(t + k * .004);
     });
   }
-  function crujido(n, dura, retraso, vol) { for (var i = 0; i < n; i++) siseo(1500 + Math.random() * 4000, 1200, (vol || .2) * Math.random(), .02 + Math.random() * .03, (retraso || 0) + Math.random() * dura, 2, .001); }
+  function crujido(n, dura, retraso, vol) { if (LIGERO) n = Math.ceil(n / 3); for (var i = 0; i < n; i++) siseo(1500 + Math.random() * 4000, 1200, (vol || .2) * Math.random(), .02 + Math.random() * .03, (retraso || 0) + Math.random() * dura, 2, .001); }
 
   var EF = {
     // Zeus: el rayo es un latigazo grave; el trueno retumba y rueda a lo lejos
@@ -227,11 +230,13 @@
   var despertado = false;
   function despertar(e) {
     if (despertado) return; despertado = true;
-    ['pointerdown', 'keydown', 'touchstart'].forEach(function (t) { removeEventListener(t, despertar, true); });
+    ['pointerdown', 'keydown', 'touchstart', 'touchend', 'click'].forEach(function (t) { removeEventListener(t, despertar, true); });
     if (e && btn && btn.contains(e.target)) return;   // si su primer toque fue para apagarlo, no suena nada
     if (S.on && iniciar()) ambiente();
   }
-  ['pointerdown', 'keydown', 'touchstart'].forEach(function (t) { addEventListener(t, despertar, true); });
+  // iPhone a veces crea el audio "dormido": se despierta en cualquier toque o clic
+  ['touchend', 'click'].forEach(function (t) { addEventListener(t, function () { if (ctx && ctx.state !== 'running') ctx.resume(); }, true); });
+  ['pointerdown', 'keydown', 'touchstart', 'touchend', 'click'].forEach(function (t) { addEventListener(t, despertar, true); });
   if (btn) btn.addEventListener('click', function () {
     S.on = !S.on; pintarBoton(); despertado = true;
     if (S.on) { iniciar(); ambiente(); EF.hoja(); } else pararAmbiente();

@@ -137,7 +137,8 @@
     var n = Math.round(W * H / 8000 * F);
     for (var i = 0; i < n; i++) estrellas.push({ x: Math.random() * W, y: Math.random() * H * .75, r: Math.random() * 1.3 + .2, f: Math.random() * 6.28, oro: i % 9 === 0 });
   }
-  addEventListener('resize', medir); medir();
+  // Al cambiar de tamaño (o al hacer zoom con los dedos) se espera a que termine, para no gastar memoria de más
+  var tMedir; addEventListener('resize', function () { clearTimeout(tMedir); tMedir = setTimeout(medir, 250); }); medir();
 
   function agregar(p) { if (parts.length < 700 * F) { if (p.s) p.s = Math.round(p.s / 4) * 4; parts.push(p); } }
   // Los emojis se dibujan una sola vez en una "calcomanía" y luego solo se pegan: así caen fluidos, sin trabarse

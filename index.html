@@ -9,7 +9,7 @@
 <meta property="og:url" content="https://codecap2.github.io/">
 <meta property="og:title" content="Olimpo · Para negocios que no quieren ser uno más">
 <meta property="og:description" content="Páginas web hechas en Aguascalientes, con detalles, animaciones y secretos para los curiosos. ¿Te atreves a explorar el Olimpo?">
-<meta property="og:image" content="https://codecap2.github.io/img/vista-previa.png?v=3">
+<meta property="og:image" content="https://codecap2.github.io/img/vista-previa.png?v=4">
 <meta property="og:image:alt" content="Olimpo · Para negocios que no quieren ser uno más · Diseño web en Aguascalientes">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -52,11 +52,11 @@
 <div id="astros"><button id="sol" class="astro" type="button" aria-label="El sol"></button><button id="luna" class="astro" type="button" aria-label="La luna"></button></div>
 <canvas id="frente" aria-hidden="true"></canvas>
 <div id="destello" aria-hidden="true"></div>
-<div id="ola" aria-hidden="true"><svg viewBox="0 0 1400 400" preserveAspectRatio="none"><defs><linearGradient id="gOla" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd0ff" stop-opacity=".9"/><stop offset=".35" stop-color="#2a8fd0" stop-opacity=".85"/><stop offset="1" stop-color="#0b3f78" stop-opacity=".9"/></linearGradient></defs><path d="M0 400 L0 230 C 120 170 220 150 330 175 C 430 198 470 120 560 70 C 640 25 720 40 760 95 C 790 135 770 175 720 180 C 800 205 900 150 1000 170 C 1120 195 1250 160 1400 190 L1400 400 Z" fill="url(#gOla)"/><path d="M330 175 C 430 198 470 120 560 70 C 640 25 720 40 760 95 C 790 135 770 175 720 180" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity=".85"/></svg></div>
+<div id="ola" aria-hidden="true"><div class="capa-ola o1"></div><div class="capa-ola o2"></div><div class="capa-ola o3"></div></div>
 <div id="pavo" aria-hidden="true"></div>
 <div id="tajo" class="tajo" aria-hidden="true"></div>
 <div id="tajo2" class="tajo" aria-hidden="true"></div>
-<div id="escudo" aria-hidden="true">🛡️</div>
+<div id="escudo" aria-hidden="true"><svg viewBox="0 0 200 200"><defs><radialGradient id="eBronce" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#f3d28a"/><stop offset=".55" stop-color="#b8863a"/><stop offset="1" stop-color="#6e4a1c"/></radialGradient><radialGradient id="eRojo" cx="45%" cy="40%" r="65%"><stop offset="0" stop-color="#e0473a"/><stop offset="1" stop-color="#7c1410"/></radialGradient></defs><circle cx="100" cy="100" r="96" fill="url(#eBronce)" stroke="#4a3010" stroke-width="3"/><circle cx="100" cy="100" r="80" fill="url(#eRojo)" stroke="#f1d48a" stroke-width="3"/><circle cx="100" cy="100" r="70" fill="none" stroke="#f1d48a" stroke-width="1.5" stroke-dasharray="6 5" opacity=".8"/><g fill="#f1d48a" stroke="#6e4a1c" stroke-width="1.2"><path d="M58 142 L132 52 L140 58 L66 148 Z"/><path d="M142 142 L68 52 L60 58 L134 148 Z"/><rect x="52" y="138" width="20" height="6" rx="2" transform="rotate(-50 62 141)"/><rect x="128" y="138" width="20" height="6" rx="2" transform="rotate(50 138 141)"/></g><g fill="#f6dc95"><circle cx="100" cy="11" r="4"/><circle cx="100" cy="189" r="4"/><circle cx="11" cy="100" r="4"/><circle cx="189" cy="100" r="4"/><circle cx="37" cy="37" r="4"/><circle cx="163" cy="37" r="4"/><circle cx="37" cy="163" r="4"/><circle cx="163" cy="163" r="4"/></g><ellipse cx="78" cy="62" rx="30" ry="12" fill="#fff" opacity=".18" transform="rotate(-30 78 62)"/></svg></div>
 <div id="escarcha" aria-hidden="true"></div>
 <div class="puerta izq" aria-hidden="true"></div>
 <div class="puerta der" aria-hidden="true"></div>
@@ -138,11 +138,11 @@
 
 <footer>
   <div class="envoltura">
-    <div class="fila-pie"><span data-en="Olimpo · Isaac Cifuentes · Made in Aguascalientes, Mexico · 2026">Olimpo · Isaac Cifuentes · Hecho en Aguascalientes · 2026</span><button class="secreto" data-dios="dioniso" type="button" aria-label="Unas uvas" data-en-aria="Some grapes">🍇</button></div>
+    <div class="fila-pie"><span data-en="Olimpo · Isaac Cifuentes · Made in Aguascalientes, Mexico · 2026">Olimpo · Isaac Cifuentes · Hecho en Aguascalientes · 2026</span> <button class="secreto" data-dios="dioniso" type="button" aria-label="Unas uvas" data-en-aria="Some grapes">🍇</button></div>
     <button id="sandalia" class="secreto" type="button" aria-label="Sandalia alada" data-en-aria="Winged sandal">🪽</button>
     <div class="pista" data-en="The gods leave clues for the curious…">Los dioses dejan pistas para los curiosos…</div>
   </div>
-  <div class="abismo"><button id="llama" class="secreto" type="button" aria-label="Una llama en el abismo" data-en-aria="A flame in the abyss">🔥</button></div>
+  <div class="abismo"><button id="llama" class="secreto" type="button" aria-label="Una llama en el abismo" data-en-aria="A flame in the abyss"><svg viewBox="0 0 40 56" aria-hidden="true"><defs><linearGradient id="fHades" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#1b4fd8"/><stop offset=".45" stop-color="#2fd6d0"/><stop offset=".85" stop-color="#e8fffd"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><path d="M20 2 C26 14 36 20 36 34 C36 46 29 54 20 54 C11 54 4 46 4 34 C4 26 9 22 12 14 C14 22 17 24 19 25 C18 16 17 10 20 2 Z" fill="url(#fHades)"/><path d="M20 26 C24 32 28 36 28 42 C28 48 24 52 20 52 C16 52 12 48 12 43 C12 38 16 36 18 31 C19 35 20 36 21 36 C20 33 19 30 20 26 Z" fill="#ffffff" opacity=".85"/></svg></button></div>
 </footer>
 
 <!-- ===== Templo de los trabajos ===== -->

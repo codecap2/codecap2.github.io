@@ -7,10 +7,10 @@
 }
 @media (max-width: 1080px) { :root { --nav: 86px; } }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scrollbar-width: none; }
+html { scroll-behavior: smooth; scrollbar-width: none; background: #0b0d12; overflow-x: clip; overscroll-behavior: none; }
 html::-webkit-scrollbar, .templo::-webkit-scrollbar, .pergamino::-webkit-scrollbar { display: none; }
 .templo, .pergamino { scrollbar-width: none; }
-body { margin: 0; background: var(--piedra); color: var(--marmol); font-family: Inter, "Segoe UI", sans-serif; line-height: 1.6; overflow-x: hidden; }
+body { margin: 0; background: var(--piedra); color: var(--marmol); font-family: Inter, "Segoe UI", sans-serif; line-height: 1.6; overflow-x: clip; }
 a { color: var(--oro2); }
 button { font: inherit; }
 .envoltura { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
@@ -72,7 +72,7 @@ nav::after { content: ""; position: absolute; left: 0; right: 0; bottom: -8px; h
 nav .barra-nav { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; height: 62px; gap: 12px; padding: 0 24px; }
 .lado { display: flex; align-items: center; gap: 10px; }
 .lado.izq { justify-self: start; } .lado.der { justify-self: end; }
-.logo { font-size: 1.35rem; font-weight: 700; color: var(--marmol); text-decoration: none; display: flex; align-items: center; gap: .35rem; }
+.logo { font-size: 1.35rem; font-weight: 700; color: var(--marmol); text-decoration: none; display: flex; align-items: center; gap: .6rem; }
 #rayo { font-size: 1.25rem; opacity: 1; filter: none; padding: 2px; }
 .marca { width: 32px; height: 32px; display: block; filter: drop-shadow(0 0 6px rgba(216,52,44,.35)); }
 .tarjeta .caso { color: var(--gris); font-size: .92rem; margin: .8rem 0 0; }
@@ -88,7 +88,7 @@ nav ul a:hover, nav ul a.activo { color: var(--oro2); }
   nav ul { grid-column: 1 / -1; grid-row: 2; gap: 1.2rem; }
   nav ul a { font-size: .86rem; }
 }
-@media (max-width: 430px) { #chipClima .txt { display: none; } .logo { font-size: 1.12rem; } .lado { gap: 6px; } .chip { padding: .25rem .55rem; } nav ul { gap: .9rem; } }
+@media (max-width: 520px) { #chipClima .txt { display: none; } .logo { font-size: 1.12rem; } .lado { gap: 6px; } .chip { padding: .25rem .55rem; } nav ul { gap: .9rem; } }
 
 /* ===== Portada ===== */
 .portada { min-height: calc(100vh - var(--nav)); display: flex; align-items: center; text-align: center; padding: 50px 0 22vh; }
@@ -162,7 +162,7 @@ body.marcha .paso { animation: marcha .5s ease-in-out 4 alternate; }
 
 footer { background: rgba(7,8,11,.82); backdrop-filter: blur(6px); padding: 22px 0 6px; text-align: center; color: var(--gris); font-size: .9rem; margin-top: 30px; }
 footer::before { content: ""; position: absolute; left: 0; right: 0; top: -9px; height: 10px; background: var(--greca) repeat-x 0 0/20px 10px; }
-.fila-pie { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+.fila-pie { display: block; text-align: center; text-wrap: balance; } .fila-pie .secreto { margin-left: 4px; }
 #sandalia { font-size: 1.3rem; }
 .pista { font-style: italic; opacity: .6; font-size: .82rem; margin-top: .2rem; }
 .abismo { padding: 22px 0 26px; text-align: center; background: linear-gradient(transparent, #000); }
@@ -190,7 +190,7 @@ footer::before { content: ""; position: absolute; left: 0; right: 0; top: -9px; 
 .salir:hover { background: rgba(212,175,90,.12); }
 .templo h2 { font-size: clamp(2rem, 5vw, 3rem); }
 /* Puertas de piedra antigua */
-.puerta { position: fixed; top: var(--nav); bottom: 0; width: 50.5vw; z-index: 65; pointer-events: none; transition: transform .55s cubic-bezier(.6,0,1,.6);
+.puerta { position: fixed; top: var(--nav); bottom: 0; width: 51%; z-index: 65; pointer-events: none; transition: transform .55s cubic-bezier(.6,0,1,.6);
   background: var(--grano), radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 40%, rgba(0,0,0,.45)), linear-gradient(90deg, #4a4239, #6b6154 30%, #5a5146 70%, #3b342d); }
 .puerta::before { content: ""; position: absolute; inset: 7% 9%; border: 6px solid rgba(0,0,0,.28); box-shadow: inset 0 0 0 3px rgba(255,255,255,.06), 0 0 0 3px rgba(255,255,255,.05); background: var(--greca) repeat-x 0 10px / 30px 15px; }
 .puerta::after { content: ""; position: absolute; top: 50%; width: 46px; height: 46px; margin-top: -23px; border-radius: 50%; border: 7px solid #8a6a2c; box-shadow: 0 2px 6px rgba(0,0,0,.6), inset 0 2px 4px rgba(255,220,150,.4); }
@@ -323,7 +323,7 @@ body.dia .vuelvan { color: #b3120c; text-shadow: 0 0 14px rgba(255,255,255,.6); 
 #aviso .grupo { white-space: nowrap; }
 main > section { scroll-margin-top: calc(var(--nav) + 20px); }
 /* Dentro de un templo el resto del sitio se apaga: es otra página */
-html.en-templo, html.en-templo body { overflow: hidden; }
+html.en-templo { overflow: hidden; } html.en-templo nav { position: fixed; top: 0; left: 0; right: 0; }
 html.en-templo main, html.en-templo .portada, html.en-templo footer, html.en-templo #escenario, html.en-templo #astros { visibility: hidden; }
 .templo { background-color: #0a0908; }
 .chip.guia { animation: guia 1.2s ease-in-out 3; }
@@ -335,3 +335,64 @@ html.en-templo main, html.en-templo .portada, html.en-templo footer, html.en-tem
   .columnas span { opacity: .9; }
   html { scroll-behavior: auto; }
 }
+
+/* ===================== Ronda de pulido (5 de noviembre) ===================== */
+body { overflow-x: clip; overscroll-behavior: none; max-width: 100%; background: transparent; }   /* el fondo oscuro vive en html, así el cielo (z-index -1) se ve */
+.templo { overflow-x: hidden; overscroll-behavior: contain; }
+/* El sol y la luna pasan DETRÁS del texto de la portada; se pueden tocar donde no hay texto */
+.portada { position: relative; z-index: 2; pointer-events: none; }
+.portada a, .portada button, .portada .columnas span { pointer-events: auto; }
+/* "vuelvan" legible también con el cielo del atardecer y de la noche */
+body.atardecer .vuelvan, body.noche .vuelvan { color: #ff6b5e; text-shadow: 0 1px 2px rgba(0,0,0,.7), 0 0 18px rgba(255,59,48,.45); }
+/* En celular: efectos más ligeros para que nunca se trabe ni se cierre la página */
+@media (max-width: 1080px) {
+  :root { --grano: none; }
+  .vidrio { backdrop-filter: blur(4px) saturate(1.4); -webkit-backdrop-filter: blur(4px) saturate(1.4); }
+}
+@media (max-width: 520px) { .lado.der { gap: 5px; } .chip { padding: .22rem .5rem; font-size: .8rem; } .logo { font-size: 1.05rem; gap: .45rem; } .marca { width: 28px; height: 28px; } }
+
+/* Poseidón: una ola de verdad que sube desde abajo y corre de lado a lado */
+#ola { left: 0; right: 0; width: auto; bottom: 0; height: 48vh; transform: translateY(105%); opacity: 1; filter: none; overflow: hidden; }
+#ola .capa-ola { position: absolute; left: 0; bottom: 0; width: 200%; height: 100%; background-repeat: repeat-x; background-position: 0 100%; }
+#ola .o1 { height: 100%; background-size: 50% 100%; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200' preserveAspectRatio='none'%3E%3Cpath d='M0 70 C100 20 300 20 400 70 S700 120 800 70 V200 H0Z' fill='%230b3f78'/%3E%3C/svg%3E"); }
+#ola .o2 { height: 84%; background-size: 40% 100%; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200' preserveAspectRatio='none'%3E%3Cpath d='M0 70 C100 20 300 20 400 70 S700 120 800 70 V200 H0Z' fill='%232a8fd0'/%3E%3C/svg%3E"); opacity: .9; }
+#ola .o3 { height: 66%; background-size: 33.333% 100%; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200' preserveAspectRatio='none'%3E%3Cpath d='M0 70 C100 20 300 20 400 70 S700 120 800 70 V200 H0Z' fill='%237fd0ff'/%3E%3Cpath d='M0 70 C100 20 300 20 400 70 S700 120 800 70' fill='none' stroke='%23ffffff' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E"); opacity: .85; }
+#ola.activo { animation: olaSube 3s ease-in-out; }
+#ola.activo .o1 { animation: olaCorre 3s linear; } #ola.activo .o2 { animation: olaCorre 2.2s linear; } #ola.activo .o3 { animation: olaCorre 1.6s linear; }
+@keyframes olaSube { 0% { transform: translateY(105%); } 35% { transform: translateY(10%); } 62% { transform: translateY(0); } 100% { transform: translateY(105%); } }
+@keyframes olaCorre { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+
+/* Hera: un abanico nítido de plumas de pavo real con sus ojos, centrado abajo */
+#pavo { left: 50%; bottom: 0; margin-left: 0; width: max(110vw, 115vh); height: auto; aspect-ratio: 2 / 1; border-radius: 0; background: none; -webkit-mask: none; mask: none; transform: translateX(-50%) scale(.2); transform-origin: 50% 100%; }
+#pavo svg { width: 100%; height: 100%; display: block; }
+#pavo.activo { animation: pavoAbre 3.4s ease; }
+@keyframes pavoAbre { 0% { opacity: 0; transform: translateX(-50%) scale(.15); } 30% { opacity: 1; transform: translateX(-50%) scale(1); } 75% { opacity: .95; transform: translateX(-50%) scale(1.02); } 100% { opacity: 0; transform: translateX(-50%) scale(1.06); } }
+
+/* Ares: un escudo griego (aspis) de verdad */
+#escudo { font-size: 0; width: min(50vw, 300px); aspect-ratio: 1; filter: drop-shadow(0 10px 30px rgba(0,0,0,.6)) drop-shadow(0 0 30px rgba(216,52,44,.45)); }
+#escudo svg { width: 100%; height: 100%; display: block; }
+
+/* Hades: llama del inframundo, azul turquesa hasta blanco */
+#llama { opacity: .45; filter: none; }
+#llama svg { width: 26px; height: 36px; animation: flamita 1.3s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+@keyframes flamita { 0% { transform: scale(1, 1); } 50% { transform: scale(.96, 1.06) skewX(-2deg); } 100% { transform: scale(1.03, .97) skewX(2deg); } }
+
+/* Aves que aletean de verdad (búho de Atenea y fénix) */
+.ave { position: fixed; z-index: 67; pointer-events: none; width: 92px; height: 92px; }
+.ave svg { width: 100%; height: 100%; overflow: visible; }
+.ave .ala-i, .ave .ala-d { transform-box: view-box; animation-duration: .26s; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-direction: alternate; }
+.ave .ala-i { transform-origin: 44px 52px; animation-name: aleteoI; }
+.ave .ala-d { transform-origin: 56px 52px; animation-name: aleteoD; }
+@keyframes aleteoI { from { transform: rotate(22deg); } to { transform: rotate(-40deg); } }
+@keyframes aleteoD { from { transform: rotate(-22deg); } to { transform: rotate(40deg); } }
+
+/* Carta del Fénix: brillo cálido, sin la cuadrícula de puntos */
+.dios.fenix .frente::before, .dios.fenix .reverso::before { display: none; }
+.dios.fenix .frente, .dios.fenix .reverso { background: radial-gradient(ellipse at 50% 120%, rgba(255,106,31,.38), transparent 62%), linear-gradient(170deg, #2a0f08, #140705); animation: brasaCarta 2.6s ease-in-out infinite alternate; }
+.dios.fenix .frente::after { width: 30%; background: linear-gradient(100deg, transparent, rgba(255,240,210,.16), transparent); }
+.dios.fenix .em { width: 48px; height: 48px; animation: latido 1.8s ease-in-out infinite; }
+.dios.fenix .em svg { width: 100%; height: 100%; display: block; overflow: visible; }
+@keyframes brasaCarta { to { box-shadow: 0 0 34px rgba(255,90,20,.5), inset 0 0 40px rgba(255,80,20,.2); } }
+.dios.fenix .em .ala-i, .dios.fenix .em .ala-d { transform-box: view-box; animation: .8s ease-in-out infinite alternate; }
+.dios.fenix .em .ala-i { transform-origin: 44px 52px; animation-name: aleteoI; }
+.dios.fenix .em .ala-d { transform-origin: 56px 52px; animation-name: aleteoD; }

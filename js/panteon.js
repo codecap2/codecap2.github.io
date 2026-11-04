@@ -68,16 +68,40 @@
     if (total() < N) return '<div class="dios bloqueado especial"><div class="giro"><div class="cara frente"><div class="em">🔒</div><h3>' + T('Carta secreta', 'Secret card') + '</h3><div class="dom">' + T('Sin revelar', 'Not revealed') + '</div><p>' + T('Se revela cuando conquistas el Olimpo.', 'Revealed when you conquer Olympus.') + '</p></div></div></div>';
     var en = I.lang === 'en';
     return '<div class="dios hallada especial fenix" data-carta="fenix" tabindex="0" role="button" aria-label="' + T('Voltear la tarjeta del Fénix', 'Flip the Phoenix card') + '"><div class="giro">' +
-      '<div class="cara frente"><div class="em">🐦‍🔥</div><h3>' + T('El Fénix', 'The Phoenix') + '</h3><div class="dom">' + T('Criatura legendaria · carta secreta', 'Legendary creature · secret card') + '</div><p>' + T('Los griegos lo conocían por el historiador Heródoto: un ave sagrada que aparecía cada 500 años. Relatos posteriores cuentan que al morir arde en llamas y renace de sus propias cenizas.', 'The Greeks knew it from the historian Herodotus: a sacred bird that appeared every 500 years. Later tales say that when it dies it bursts into flames and is reborn from its own ashes.') + '</p><div class="voltear">' + T('↻ Voltéala para un dato curioso', '↻ Flip it for a fun fact') + '</div></div>' +
+      '<div class="cara frente"><div class="em">' + aveSVG('fenix') + '</div><h3>' + T('El Fénix', 'The Phoenix') + '</h3><div class="dom">' + T('Criatura legendaria · carta secreta', 'Legendary creature · secret card') + '</div><p>' + T('Los griegos lo conocían por el historiador Heródoto: un ave sagrada que aparecía cada 500 años. Relatos posteriores cuentan que al morir arde en llamas y renace de sus propias cenizas.', 'The Greeks knew it from the historian Herodotus: a sacred bird that appeared every 500 years. Later tales say that when it dies it bursts into flames and is reborn from its own ashes.') + '</p><div class="voltear">' + T('↻ Voltéala para un dato curioso', '↻ Flip it for a fun fact') + '</div></div>' +
       '<div class="cara reverso"><h4>' + T('✨ Dato curioso', '✨ Fun fact') + '</h4><p>' + T('En griego se llamaba phoínix, una palabra que también nombraba al rojo púrpura, el color de su plumaje… o sea, un rojo intenso 😉.', 'In Greek it was called phoínix, a word that also named purple-red, the color of its feathers… an intense red 😉.') + '</p><div class="voltear">' + T('↻ Volver', '↻ Back') + '</div></div></div></div>';
   }
-  // El vuelo del fénix: cruza la pantalla dejando una estela de fuego
+  // Aves dibujadas con alas que aletean (en lugar de emojis tiesos)
+  function aveSVG(tipo) {
+    if (tipo === 'buho') return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
+      '<path class="ala-i" d="M44 50 C26 38 8 48 6 66 C18 62 30 64 44 66 Z" fill="#6b4524"/>' +
+      '<path class="ala-d" d="M56 50 C74 38 92 48 94 66 C82 62 70 64 56 66 Z" fill="#6b4524"/>' +
+      '<ellipse cx="50" cy="60" rx="17" ry="22" fill="#8a5a30"/><ellipse cx="50" cy="66" rx="11" ry="14" fill="#d9b98a"/>' +
+      '<path d="M36 36 L40 24 L46 33 Z M64 36 L60 24 L54 33 Z" fill="#6b4524"/><circle cx="50" cy="40" r="15" fill="#8a5a30"/>' +
+      '<circle cx="44" cy="40" r="6" fill="#fff6e0"/><circle cx="56" cy="40" r="6" fill="#fff6e0"/><circle cx="44" cy="40" r="3.4" fill="#f0a020"/><circle cx="56" cy="40" r="3.4" fill="#f0a020"/>' +
+      '<circle cx="44" cy="40" r="1.6" fill="#1d1a17"/><circle cx="56" cy="40" r="1.6" fill="#1d1a17"/><path d="M48 45 L52 45 L50 50 Z" fill="#e0a040"/></svg>';
+    return '<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="gFenix" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0a8"/><stop offset=".4" stop-color="#ffb02e"/><stop offset=".8" stop-color="#ff4a1f"/><stop offset="1" stop-color="#a3201d"/></linearGradient></defs>' +
+      '<path d="M40 62 C26 70 12 84 2 96 C14 92 24 88 34 80 C26 90 22 96 20 100 C34 92 42 82 48 70 Z" fill="url(#gFenix)" opacity=".9"/>' +
+      '<path class="ala-i" d="M46 52 C34 30 18 18 4 16 C12 28 16 38 26 46 C16 44 10 46 4 50 C20 56 34 58 46 58 Z" fill="url(#gFenix)" opacity=".85"/>' +
+      '<path class="ala-d" d="M54 52 C66 28 82 14 98 12 C90 26 86 38 76 46 C86 44 92 46 98 50 C82 58 66 60 54 58 Z" fill="url(#gFenix)"/>' +
+      '<ellipse cx="50" cy="58" rx="8" ry="14" fill="url(#gFenix)"/><circle cx="54" cy="42" r="6" fill="#ffb02e"/>' +
+      '<path d="M54 36 C56 28 60 26 62 22 C62 28 60 32 58 37 Z" fill="#ff4a1f"/><path d="M59 42 L66 44 L59 46 Z" fill="#ffe08a"/><circle cx="55.5" cy="41" r="1.3" fill="#1d1a17"/></svg>';
+  }
+  function crearAve(tipo, x, y, tam) {
+    var a = document.createElement('div'); a.className = 'ave'; a.innerHTML = aveSVG(tipo);
+    a.style.left = x + 'px'; a.style.top = y + 'px'; if (tam) { a.style.width = tam + 'px'; a.style.height = tam + 'px'; }
+    if (tipo === 'fenix') a.style.filter = 'drop-shadow(0 0 16px #ff6a1f) drop-shadow(0 0 34px rgba(255,42,0,.7))';
+    body.appendChild(a); return a;
+  }
+  // El vuelo del fénix: renace en la parte de abajo, sube en curva aleteando y deja una estela de fuego
   function vueloFenix() {
     if (suave) return;
-    var f = volador('🐦‍🔥', -80, innerHeight * .7, 'font-size:4rem;filter:drop-shadow(0 0 18px #ff6a1f) drop-shadow(0 0 40px #ff2a00)');
+    var W = innerWidth, H = innerHeight, tam = Math.min(160, W * .3), f = crearAve('fenix', -tam, H * .72, tam);
     S.play('fenix');
-    var anim = f.animate([{ transform: 'translate(0,0) rotate(10deg)' }, { transform: 'translate(' + (innerWidth * .5) + 'px,-' + (innerHeight * .45) + 'px) rotate(-8deg) scale(1.3)', offset: .55 }, { transform: 'translate(' + (innerWidth + 160) + 'px,-' + (innerHeight * .6) + 'px) rotate(-14deg) scale(.9)' }], { duration: 3200, easing: 'ease-in-out' });
-    var estela = setInterval(function () { var q = f.getBoundingClientRect(); C.brasas(q.left + q.width * .3, q.top + q.height * .6, 8); C.brasas(q.left + q.width * .3, q.top + q.height * .6, 3, ['#ffffff', '#fff3b0']); }, 30);
+    var marcos = [];
+    for (var i = 0; i <= 12; i++) { var p = i / 12; marcos.push({ transform: 'translate(' + (p * (W + tam * 2)) + 'px,' + (-Math.sin(p * Math.PI) * H * .45 + Math.sin(p * Math.PI * 4) * 18) + 'px) rotate(' + (Math.cos(p * Math.PI) * -14) + 'deg) scale(' + (.8 + Math.sin(p * Math.PI) * .5) + ')' }); }
+    var anim = f.animate(marcos, { duration: 3600, easing: 'linear' });
+    var estela = setInterval(function () { var q = f.getBoundingClientRect(); C.brasas(q.left + q.width * .25, q.top + q.height * .75, 7); C.brasas(q.left + q.width * .25, q.top + q.height * .75, 2, ['#ffffff', '#fff3b0']); }, 30);
     anim.onfinish = function () { clearInterval(estela); f.remove(); };
   }
 
@@ -140,7 +164,8 @@
       abierto = nombre;
       if (!nombre) {   // al salir hacia una sección (Servicios, Contacto), que quede bien acomodada
         var sec = location.hash && document.getElementById(location.hash.slice(1));
-        if (sec && sec.tagName === 'SECTION') requestAnimationFrame(function () { sec.scrollIntoView({ block: sec.offsetHeight < innerHeight * .85 ? 'center' : 'start' }); });
+        // ya acomodada cuando se abren las puertas
+        if (sec && sec.tagName === 'SECTION') setTimeout(function () { sec.scrollIntoView({ block: sec.offsetHeight < innerHeight * .85 ? 'center' : 'start', behavior: 'instant' }); }, 30);
       }
     };
     if (!conPuertas || suave) { cambiar(); return; }
@@ -216,6 +241,17 @@
     }
   });
   // Hera: la cola del pavo real con los cien ojos de Argos
+  // El abanico del pavo real: plumas con sus "ojos" (los cien ojos de Argos), dibujadas una sola vez
+  (function () {
+    var s = '<svg viewBox="0 0 1000 500" preserveAspectRatio="xMidYMax meet" aria-hidden="true">';
+    for (var i = 0; i < 25; i++) {
+      var ang = (-84 + i * 7) * Math.PI / 180, largo = 440 - Math.abs(i - 12) * 6, x = 500 + Math.sin(ang) * largo, y = 500 - Math.cos(ang) * largo, deg = (-84 + i * 7);
+      s += '<line x1="500" y1="500" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#c9a54a" stroke-width="2" opacity=".7"/>';
+      s += '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + deg + ')"><ellipse rx="26" ry="42" fill="#1f7a6b" opacity=".9"/><ellipse rx="19" ry="30" fill="#d4af5a"/><ellipse rx="13" ry="21" fill="#167a8f"/><ellipse rx="8" ry="13" fill="#0b2a5a"/><ellipse cx="-2" cy="-4" rx="2.5" ry="4" fill="#ffffff" opacity=".7"/></g>';
+      if (i % 2) { var x2 = 500 + Math.sin(ang) * largo * .62, y2 = 500 - Math.cos(ang) * largo * .62; s += '<g transform="translate(' + x2.toFixed(1) + ' ' + y2.toFixed(1) + ') rotate(' + deg + ')"><ellipse rx="15" ry="24" fill="#1f7a6b" opacity=".85"/><ellipse rx="10" ry="16" fill="#d4af5a"/><ellipse rx="6" ry="10" fill="#0b2a5a"/></g>'; }
+    }
+    $('#pavo').innerHTML = s + '<circle cx="500" cy="500" r="46" fill="#1f5a8a"/><circle cx="500" cy="500" r="30" fill="#167a8f"/></svg>';
+  })();
   $('[data-dios="hera"]').onclick = function () { reiniciar($('#pavo'), 'activo'); S.play('pavo'); hallar('hera', '🦚 Hera despliega la cola de su pavo real y sus cien ojos te miran.'); };
   // Poseidón: una ola cruza la pantalla
   $('[data-dios="poseidon"]').onclick = function () { reiniciar($('#ola'), 'activo'); S.play('ola'); hallar('poseidon', '🔱 ¡Poseidón alza su tridente y manda una ola!'); };
@@ -228,12 +264,15 @@
   // Atenea: su búho vuela y deja el CV
   $('[data-dios="atenea"]').onclick = function () {
     // el búho vuela directo al códice, como enseñando el camino
-    var r = this.getBoundingClientRect(), b = volador('🦉', r.left, r.top, 'font-size:3rem'), meta = $('#btnCodice').getBoundingClientRect();
-    var dx = meta.left + meta.width / 2 - r.left - 24, dy = meta.top + meta.height / 2 - r.top - 24;
+    var r = this.getBoundingClientRect(), b = crearAve('buho', r.left - 30, r.top - 40, 96), meta = $('#btnCodice').getBoundingClientRect();
+    var dx = meta.left + meta.width / 2 - r.left - 18, dy = meta.top + meta.height / 2 - r.top + 8;
     S.play('buho');
     var llegar = function () { b.remove(); reiniciar($('#btnCodice'), 'guia'); };
-    if (!suave && b.animate) b.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(' + (dx * .35) + 'px,' + (dy * .55 - 60) + 'px) scale(1.5)', offset: .45 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.5)', opacity: .2 }], { duration: 1900, easing: 'ease-in-out' }).onfinish = llegar;
-    else llegar();
+    if (!suave && b.animate) {
+      var marcos = [];   // vuelo en curva con un ligero subibaja, como un ave de verdad
+      for (var i = 0; i <= 10; i++) { var p = i / 10, ease = p * p * (3 - 2 * p); marcos.push({ transform: 'translate(' + (dx * ease) + 'px,' + (dy * ease - Math.sin(p * Math.PI) * 120 + Math.sin(p * Math.PI * 5) * 10) + 'px) rotate(' + (Math.sin(p * Math.PI * 2) * 8) + 'deg) scale(' + (1 + Math.sin(p * Math.PI) * .35 - p * .55) + ')', opacity: p > .9 ? (1 - p) * 10 : 1 }); }
+      b.animate(marcos, { duration: 2200, easing: 'linear' }).onfinish = llegar;
+    } else llegar();
     hallar('atenea', '🦉 El búho de Atenea te deja un pergamino secreto: el CV de Isaac.');
   };
   // Helios: el sol baja despacio detrás de las dunas, con su atardecer
@@ -345,14 +384,13 @@
       if (dash) { p.setAttribute('stroke-dasharray', dash); p.setAttribute('stroke-dashoffset', offset || 0); }
       if (filtro) p.style.filter = filtro; svg.appendChild(p); return p;
     }
-    // Dos cadenas que caen en vertical, cada una con su hoja; se balancean, sueltan chispas y se encienden
+    // Dos cadenas que caen y cuelgan en vertical; se balancean, sueltan chispas y se encienden
     body.appendChild(svg);
     var cadenas = [W * .33, W * .67].map(function (x, i) {
       var fuego = capa('#ff6a1f', 16, '', 0, 'blur(3px) drop-shadow(0 0 14px #ff3a00)');
       var a = capa('#5d5d63', 8, '14 6'), b = capa('#b9b9c2', 3, '14 6', 7), nucleo = capa('#ffd36b', 5, '', 0, 'blur(1px)');
-      var hoja = document.createElementNS(NS, 'path'); hoja.setAttribute('fill', '#c9ccd4'); hoja.setAttribute('stroke', '#f2f4f8'); hoja.setAttribute('stroke-width', 1.5);
-      svg.appendChild(hoja); fuego.style.opacity = 0; nucleo.style.opacity = 0;
-      return { x: x, largo: -40, vel: 0, meta: H * (.5 + i * .06), ang: 0, vang: (i ? -1 : 1) * .02, capas: [fuego, a, b, nucleo], a: a, b: b, fuego: fuego, nucleo: nucleo, hoja: hoja };
+      fuego.style.opacity = 0; nucleo.style.opacity = 0;
+      return { x: x, largo: -40, vel: 0, meta: H * (.5 + i * .06), ang: 0, vang: (i ? -1 : 1) * .02, capas: [fuego, a, b, nucleo], a: a, b: b, fuego: fuego, nucleo: nucleo };
     });
     var t0 = performance.now(), chispeo = false, ardiendo = false;
     function paso(t) {
@@ -363,9 +401,6 @@
         var px = k.x + Math.sin(k.ang) * k.largo, py = Math.cos(k.ang) * k.largo, cx = k.x + Math.sin(k.ang) * k.largo * .5 + k.vang * 300;
         var d = 'M' + k.x + ',-10 Q' + cx + ',' + (py * .5) + ' ' + px + ',' + py;
         k.capas.forEach(function (p) { p.setAttribute('d', d); });
-        var giro = -k.ang * 57.3;
-        k.hoja.setAttribute('d', 'M' + (px - 7) + ',' + py + ' L' + (px + 7) + ',' + py + ' L' + (px + 4) + ',' + (py + 90) + ' L' + px + ',' + (py + 120) + ' L' + (px - 4) + ',' + (py + 90) + ' Z');
-        k.hoja.setAttribute('transform', 'rotate(' + giro + ' ' + px + ' ' + py + ')');
         k.px = px; k.py = py;
       });
       if (e > 650 && !chispeo) { chispeo = true; S.play('chispas'); }
@@ -377,11 +412,9 @@
           k.fuego.style.opacity = al * (.75 + Math.random() * .25); k.nucleo.style.opacity = al * (.6 + Math.random() * .4);
           k.fuego.setAttribute('stroke-width', 13 + Math.random() * 8);
           k.b.setAttribute('stroke', 'rgb(255,' + Math.round(200 - al * 80) + ',' + Math.round(150 - al * 120) + ')');
-          k.hoja.setAttribute('fill', 'rgb(255,' + Math.round(200 - al * 110) + ',' + Math.round(120 - al * 100) + ')');
-          k.hoja.style.filter = 'drop-shadow(0 0 ' + (8 + al * 14) + 'px #ff4a00)';
           var largo = k.a.getTotalLength();
           for (var j = 0; j < 3; j++) { var p = k.a.getPointAtLength(Math.random() * largo); C.brasas(p.x, p.y, 1); }
-          C.brasas(k.px, k.py + 60, 2);
+          C.brasas(k.px, k.py, 3);
         });
       }
       if (e > 3400) { cadenas.forEach(function (k) { k.meta = -200; }); svg.style.transition = 'opacity .7s'; svg.style.opacity = 0; body.classList.remove('furia'); }
