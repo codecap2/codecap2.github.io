@@ -534,3 +534,19 @@ body.dia .detalle b, body.dia .detalle .probar { color: #6b1a10; border-color: #
 body.dia .detalle .probar:hover { background: #6b1a10; color: #fff; }
 @media (max-width: 860px) { .detalles-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .detalles-grid { grid-template-columns: 1fr; } }
+/* ---------- Fluidez en celular ----------
+   El vidrio esmerilado (backdrop-filter) obliga al celular a volver a desenfocar el cielo animado en cada cuadro al bajar.
+   En pantallas táctiles se cambia por un vidrio "pintado", casi igual a la vista y mucho más ligero. */
+@media (max-width: 760px), (pointer: coarse) {
+  .vidrio, nav, footer, .boton.linea { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .vidrio { background: linear-gradient(150deg, rgba(70,16,16,.78) 0%, rgba(28,14,18,.74) 50%, rgba(16,13,18,.72) 100%); }
+  body.dia .vidrio { background: linear-gradient(150deg, rgba(255,222,208,.88) 0%, rgba(255,242,232,.86) 50%, rgba(255,249,243,.84) 100%); }
+  nav { background: rgba(9,10,14,.97); }
+  footer { background: rgba(7,8,11,.95); }
+  .boton.linea { background: rgba(10,10,14,.82); }
+  /* El camino brilla igual, pero sin que cada flor titile por separado (eso redibuja todo el camino en cada cuadro) */
+  .cempasuchil .petalo-c { animation: none !important; }
+}
+/* El camino y la escena viven en su propia capa: al bajar, el navegador solo la mueve, no la vuelve a pintar */
+.cempasuchil { contain: strict; }
+body.noche .cempasuchil svg { will-change: opacity; }

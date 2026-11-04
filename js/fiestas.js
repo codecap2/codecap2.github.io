@@ -92,20 +92,21 @@
       var anchoFin = Math.max(3, ar.width * .13);
       var flor = function (x, y, r) { return '<g class="petalo-c"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="#ff8a1f"/><circle cx="' + x.toFixed(1) + '" cy="' + (y - r * .08).toFixed(1) + '" r="' + (r * .7).toFixed(1) + '" fill="#ffa52a"/><circle cx="' + x.toFixed(1) + '" cy="' + (y - r * .12).toFixed(1) + '" r="' + (r * .38).toFixed(1) + '" fill="#ffd34d"/></g>'; };
       // De lejos hacia cerca, para que los pétalos grandes queden encima
-      for (var k = 89; k >= 0; k--) {
-        var t = k / 89, lejos = Math.pow(t, .75), px = bz(t, sx, p1x, p2x, ex), py = bz(t, sy, p1y, p2y, ey);
+      var pasos = W < 760 ? 63 : 89, densidad = W < 760 ? .8 : 1;   // en celular, menos pétalos (no se nota y va más fluido)
+      for (var k = pasos; k >= 0; k--) {
+        var t = k / pasos, lejos = Math.pow(t, .75), px = bz(t, sx, p1x, p2x, ex), py = bz(t, sy, p1y, p2y, ey);
         var r = Math.max(.9, (6 - lejos * 4.9) * esc), ancho = (62 * esc) * (1 - lejos) + anchoFin * lejos;
         // El camino va lleno de pétalos, de orilla a orilla
-        var n = Math.max(3, Math.round(ancho * 2 / (r * 1.9)));
+        var n = Math.max(3, Math.round(ancho * 2 / (r * 1.9) * densidad));
         for (var p = 0; p < n; p++) {
           var ox = -ancho + (p + .5) * (ancho * 2 / n) + (rnd() - .5) * r * 1.2, oy = (rnd() - .5) * r * 1.1;
           s += '<ellipse cx="' + (px + ox).toFixed(1) + '" cy="' + (py + oy).toFixed(1) + '" rx="' + (r * (.8 + rnd() * .4)).toFixed(1) + '" ry="' + (r * .55).toFixed(1) +
             '" transform="rotate(' + Math.round(rnd() * 180) + ' ' + (px + ox).toFixed(1) + ' ' + (py + oy).toFixed(1) + ')" fill="' + tonosP[Math.floor(rnd() * tonosP.length)] + '"/>';
         }
         // Y flores de cempasúchil enteras en las orillas
-        if (k % 4 === 0) for (var lado = -1; lado <= 1; lado += 2) flores += flor(px + lado * (ancho + r * .6), py, r * 2);
+        if (k % (W < 760 ? 3 : 4) === 0) for (var lado = -1; lado <= 1; lado += 2) flores += flor(px + lado * (ancho + r * .6), py, r * 2);
         // Velitas que acompañan el último tramo, como las que alumbran el camino a casa
-        if (k === 58 || k === 72 || k === 84) {
+        if (k === Math.round(pasos * .65) || k === Math.round(pasos * .81) || k === Math.round(pasos * .94)) {
           var hv = (9 - lejos * 5) * esc, wv = Math.max(1.6, 3.2 * esc * (1 - lejos * .5));
           for (var l2 = -1; l2 <= 1; l2 += 2) {
             var vx = px + l2 * (ancho + r * 2.8 + 4 * esc), vy = py;
