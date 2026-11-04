@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estudio Aurora · Página de artista (concepto de Olimpo)</title>
+<meta name="description" content="Concepto de página de artista hecho por Olimpo: portafolio con galería, comisiones con precios y proceso, y sobre mí. El arte es de muestra, generado con código.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Estudio Aurora · Página de artista">
+<meta property="og:description" content="Concepto de Olimpo: galería, comisiones y sobre mí, pensada para artistas.">
+<meta property="og:image" content="https://codecap2.github.io/demos/artista/vista-previa.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f6f1ea">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f6f1ea'/%3E%3Ccircle cx='32' cy='30' r='14' fill='%23c8553d'/%3E%3Cpath d='M10 50 Q32 34 54 50' stroke='%231f3b3d' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --papel: #f6f1ea; --papel2: #efe6da; --tinta: #1d1a17; --gris: #5f574e; --terracota: #c8553d; --terracota2: #a63f2b; --azul: #1f3b3d; --linea: rgba(29,26,23,.12); }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--papel); color: var(--tinta); font-family: "DM Sans", system-ui, sans-serif; line-height: 1.6; }
+  h1, h2, h3 { font-family: Fraunces, Georgia, serif; line-height: 1.12; margin: 0; text-wrap: balance; }
+  p { text-wrap: pretty; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--terracota); outline-offset: 3px; border-radius: 6px; }
+  .envoltura { max-width: 1120px; margin: 0 auto; padding: 0 22px; }
+  .aviso-demo { background: var(--azul); color: #f6f1ea; text-align: center; font-size: .88rem; padding: .55rem 16px; }
+  .aviso-demo a { color: #ffd2bd; }
+
+  /* Barra */
+  header.barra { position: sticky; top: 0; z-index: 20; background: rgba(246,241,234,.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--linea); }
+  .barra .envoltura { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 66px; }
+  .firma { font-family: Fraunces, serif; font-weight: 700; font-size: 1.3rem; text-decoration: none; display: flex; align-items: center; gap: .5rem; justify-self: start; }
+  .firma button { background: none; border: 0; padding: 0; cursor: pointer; display: grid; }
+  .firma svg { width: 30px; height: 30px; }
+  nav ul { list-style: none; display: flex; gap: 1.6rem; margin: 0; padding: 0; }
+  nav a { text-decoration: none; color: var(--gris); font-weight: 500; }
+  nav a:hover { color: var(--terracota); }
+  .estado { justify-self: end; font-size: .85rem; font-weight: 700; color: var(--azul); background: #dcebe5; border-radius: 999px; padding: .3rem .8rem; display: inline-flex; align-items: center; gap: .4rem; }
+  .estado::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #2e9b6a; box-shadow: 0 0 0 3px rgba(46,155,106,.25); }
+  @media (max-width: 760px) { .barra .envoltura { grid-template-columns: 1fr auto; height: auto; padding: 10px 16px; row-gap: 6px; } .estado { grid-row: 1; grid-column: 2; font-size: .76rem; padding: .25rem .65rem; } .firma { font-size: 1.12rem; white-space: nowrap; } nav { grid-row: 2; grid-column: 1 / -1; justify-self: center; } nav ul { gap: 1.1rem; font-size: .92rem; } }
+
+  /* Portada */
+  .portada { padding: 70px 0 60px; }
+  .portada .envoltura { display: grid; grid-template-columns: 1.05fr 1fr; gap: 50px; align-items: center; }
+  @media (max-width: 860px) { .portada .envoltura { grid-template-columns: 1fr; text-align: center; } }
+  .portada .rol { color: var(--terracota); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: .82rem; }
+  .portada h1 { font-size: clamp(2.8rem, 7vw, 5rem); margin: .4rem 0 1rem; }
+  .portada h1 em { font-style: italic; color: var(--terracota); }
+  .portada p { font-size: 1.12rem; color: var(--gris); max-width: 46ch; }
+  @media (max-width: 860px) { .portada p { margin-left: auto; margin-right: auto; } }
+  .botones { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.6rem; }
+  @media (max-width: 860px) { .botones { justify-content: center; } }
+  .boton { display: inline-block; text-decoration: none; font-weight: 700; padding: .85rem 1.5rem; border-radius: 999px; border: 2px solid var(--tinta); transition: transform .2s, background .2s, color .2s; cursor: pointer; font: inherit; font-weight: 700; }
+  .boton.lleno { background: var(--tinta); color: var(--papel); }
+  .boton:hover { transform: translateY(-2px); }
+  .boton.lleno:hover { background: var(--terracota); border-color: var(--terracota); }
+  .mosaico { display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: 70px; gap: 12px; }
+  .mosaico .pieza { border-radius: 16px; overflow: hidden; box-shadow: 0 14px 30px rgba(29,26,23,.15); }
+  .mosaico .pieza:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .mosaico .pieza:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .mosaico .pieza:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 7; }
+  .mosaico .pieza:nth-child(4) { grid-column: 1 / 4; grid-row: 4 / 7; }
+  .pieza svg { width: 100%; height: 100%; display: block; }
+
+  section { padding: 80px 0; }
+  .titulo { text-align: center; margin-bottom: 2.4rem; }
+  .titulo h2 { font-size: clamp(2rem, 4.5vw, 3rem); }
+  .titulo p { color: var(--gris); margin: .6rem auto 0; max-width: 56ch; }
+
+  /* Portafolio */
+  #portafolio { background: var(--papel2); }
+  .filtros { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
+  .filtros button { font: inherit; font-weight: 500; background: transparent; border: 1.5px solid var(--linea); color: var(--gris); padding: .45rem 1.05rem; border-radius: 999px; cursor: pointer; transition: all .2s; }
+  .filtros button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+  .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+  .obra { background: none; border: 0; padding: 0; cursor: zoom-in; text-align: left; font: inherit; color: inherit; transition: transform .3s; }
+  .obra:hover { transform: translateY(-4px); }
+  .obra .marco { aspect-ratio: 4 / 5; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 26px rgba(29,26,23,.13); }
+  .obra .marco svg { width: 100%; height: 100%; display: block; transition: transform .5s; }
+  .obra:hover .marco svg { transform: scale(1.04); }
+  .obra .pie { display: flex; justify-content: space-between; gap: 10px; margin-top: .6rem; font-size: .92rem; }
+  .obra .pie b { font-family: Fraunces, serif; font-weight: 600; font-size: 1.02rem; }
+  .obra .pie span { color: var(--gris); }
+  .obra.oculta { display: none; }
+
+  /* Visor */
+  dialog#visor { border: 0; padding: 0; background: transparent; max-width: min(92vw, 980px); width: 100%; }
+  dialog#visor::backdrop { background: rgba(20,17,14,.86); backdrop-filter: blur(4px); }
+  .visor-cont { display: grid; grid-template-columns: 1.3fr 1fr; background: var(--papel); border-radius: 20px; overflow: hidden; }
+  @media (max-width: 760px) { .visor-cont { grid-template-columns: 1fr; } }
+  .visor-arte { aspect-ratio: 4 / 5; max-height: 80vh; }
+  .visor-arte svg { width: 100%; height: 100%; display: block; }
+  .visor-info { padding: 28px 26px; display: flex; flex-direction: column; gap: .5rem; }
+  .visor-info h3 { font-size: 1.8rem; }
+  .visor-info .meta { color: var(--gris); }
+  .visor-nav { margin-top: auto; display: flex; gap: 8px; }
+  .visor-nav button, .cerrar { font: inherit; background: var(--papel2); border: 1px solid var(--linea); border-radius: 999px; padding: .5rem 1rem; cursor: pointer; }
+  .cerrar { position: absolute; top: 12px; right: 12px; width: 42px; height: 42px; padding: 0; font-size: 1.1rem; background: rgba(246,241,234,.92); }
+
+  /* Comisiones */
+  .planes { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+  .plan { background: #fff; border: 1px solid var(--linea); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: .7rem; position: relative; }
+  .plan.destacado { border: 2px solid var(--terracota); box-shadow: 0 16px 40px rgba(200,85,61,.18); }
+  .plan .insignia { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--terracota); color: #fff; font-size: .78rem; font-weight: 700; padding: .25rem .8rem; border-radius: 999px; white-space: nowrap; }
+  .plan .muestra { aspect-ratio: 16 / 10; border-radius: 12px; overflow: hidden; }
+  .plan .muestra svg { width: 100%; height: 100%; display: block; }
+  .plan h3 { font-size: 1.45rem; }
+  .plan .precio { font-family: Fraunces, serif; font-size: 2rem; font-weight: 700; }
+  .plan .precio small { font-family: "DM Sans", sans-serif; font-size: .9rem; color: var(--gris); font-weight: 500; }
+  .plan ul { margin: 0; padding-left: 1.1rem; color: var(--gris); }
+  .plan .boton { margin-top: auto; text-align: center; }
+  .proceso { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-top: 46px; counter-reset: p; }
+  .proceso div { padding-top: 12px; border-top: 3px solid var(--azul); }
+  .proceso div::before { counter-increment: p; content: "0" counter(p); font-family: Fraunces, serif; color: var(--terracota); font-weight: 700; font-size: 1.4rem; }
+  .proceso h3 { font-size: 1.12rem; margin: .2rem 0 .3rem; }
+  .proceso p { margin: 0; color: var(--gris); font-size: .95rem; }
+  .preguntas { max-width: 760px; margin: 46px auto 0; }
+  details { border-bottom: 1px solid var(--linea); padding: 14px 4px; }
+  summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 10px; }
+  summary::after { content: "+"; font-size: 1.3rem; line-height: 1; color: var(--terracota); transition: transform .25s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { margin: .6rem 0 0; color: var(--gris); }
+
+  /* Sobre mí */
+  #sobre-mi { background: var(--azul); color: #f6f1ea; }
+  .sobre { display: grid; grid-template-columns: 300px 1fr; gap: 50px; align-items: center; }
+  @media (max-width: 760px) { .sobre { grid-template-columns: 1fr; text-align: center; } }
+  .retrato { width: 280px; height: 280px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 6px solid #f6f1ea; }
+  .retrato svg { width: 100%; height: 100%; display: block; }
+  .sobre h2 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 1rem; }
+  .sobre p { color: #d6e2de; }
+  .redes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.4rem; }
+  @media (max-width: 760px) { .redes { justify-content: center; } }
+  .redes .boton { border-color: #f6f1ea; color: #f6f1ea; }
+  .redes .boton.lleno { background: #f6f1ea; color: var(--azul); }
+
+  footer { text-align: center; padding: 34px 20px; color: var(--gris); font-size: .9rem; }
+  footer a { color: var(--terracota2); }
+
+  #toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 30px); opacity: 0; background: var(--tinta); color: var(--papel); padding: .75rem 1.2rem; border-radius: 14px; transition: all .3s; z-index: 50; max-width: calc(100% - 32px); text-align: center; pointer-events: none; }
+  #toast.visible { opacity: 1; transform: translate(-50%, 0); }
+  #pintura { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+
+  .aparece { opacity: 0; transform: translateY(24px); transition: opacity .7s, transform .7s; }
+  .aparece.visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } .aparece { opacity: 1; transform: none; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="aviso-demo">🎨 Página de muestra hecha por <a href="https://codecap2.github.io/">Olimpo</a>. La artista y las obras son ficticias: el arte se genera con código.</div>
+
+<header class="barra">
+  <div class="envoltura">
+    <span class="firma"><button type="button" id="pincel" aria-label="El pincel de Aurora"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="28" r="15" fill="#c8553d"/><path d="M8 50 Q32 32 56 50" stroke="#1f3b3d" stroke-width="5" fill="none" stroke-linecap="round"/></svg></button>Estudio Aurora</span>
+    <nav aria-label="Secciones"><ul><li><a href="#portafolio">Portafolio</a></li><li><a href="#comisiones">Comisiones</a></li><li><a href="#sobre-mi">Sobre mí</a></li></ul></nav>
+    <span class="estado">Comisiones abiertas</span>
+  </div>
+</header>
+
+<main>
+<section class="portada" aria-labelledby="titulo-portada">
+  <div class="envoltura">
+    <div>
+      <div class="rol">Ilustración · Arte digital</div>
+      <h1 id="titulo-portada">Mundos que se sienten <em>como un sueño</em></h1>
+      <p>Soy Aurora, ilustradora. Pinto paisajes, cielos y formas que cuentan historias. Aquí puedes ver mi trabajo y pedir una pieza hecha solo para ti.</p>
+      <div class="botones"><a class="boton lleno" href="#comisiones">Pedir una comisión</a><a class="boton" href="#portafolio">Ver portafolio</a></div>
+    </div>
+    <div class="mosaico" aria-hidden="true" id="mosaico"></div>
+  </div>
+</section>
+
+<section id="portafolio" aria-labelledby="titulo-portafolio">
+  <div class="envoltura">
+    <div class="titulo aparece"><h2 id="titulo-portafolio">Portafolio</h2><p>Toca cualquier obra para verla en grande.</p></div>
+    <div class="filtros" role="group" aria-label="Filtrar obras" id="filtros"></div>
+    <div class="galeria" id="galeria"></div>
+  </div>
+</section>
+
+<section id="comisiones" aria-labelledby="titulo-comisiones">
+  <div class="envoltura">
+    <div class="titulo aparece"><h2 id="titulo-comisiones">Comisiones</h2><p>Elige el tipo de pieza. Todos los precios incluyen el archivo en alta resolución y una ronda de ajustes.</p></div>
+    <div class="planes" id="planes"></div>
+    <div class="proceso aparece">
+      <div><h3>Me escribes</h3><p>Cuéntame tu idea, tus referencias y para cuándo la necesitas.</p></div>
+      <div><h3>Boceto y anticipo</h3><p>Te mando un boceto rápido. Con el 50% de anticipo, empiezo.</p></div>
+      <div><h3>Avances</h3><p>Ves el progreso y me dices si algo quieres ajustar.</p></div>
+      <div><h3>Entrega</h3><p>Recibes tu pieza en alta resolución, lista para imprimir o publicar.</p></div>
+    </div>
+    <div class="preguntas aparece">
+      <details><summary>¿Cuánto tarda una comisión?</summary><p>Entre 1 y 3 semanas, según el tipo de pieza y la fila de pedidos. Siempre te doy una fecha antes de empezar.</p></details>
+      <details><summary>¿Puedo usar la pieza para mi negocio?</summary><p>Sí, con licencia de uso comercial. Cuéntame para qué la quieres y te cotizo esa opción.</p></details>
+      <details><summary>¿Cómo pago?</summary><p>Por transferencia o PayPal: 50% para empezar y 50% al entregar.</p></details>
+      <details><summary>¿Qué no dibujo?</summary><p>Contenido que ofenda o que copie el estilo exacto de otro artista. Lo demás, ¡platiquémoslo!</p></details>
+    </div>
+  </div>
+</section>
+
+<section id="sobre-mi" aria-labelledby="titulo-sobre">
+  <div class="envoltura sobre">
+    <div class="retrato aparece" id="retrato" role="img" aria-label="Retrato ilustrado de Aurora"></div>
+    <div class="aparece">
+      <h2 id="titulo-sobre">Hola, soy Aurora</h2>
+      <p>Llevo años pintando los paisajes que imagino antes de dormir. Me encantan los cielos al atardecer, las montañas y los colores que se mezclan como acuarela.</p>
+      <p>Trabajo con personas y marcas que buscan una pieza única: un regalo, una portada o la cara de su proyecto.</p>
+      <div class="redes"><a class="boton lleno demo" href="#">Instagram</a><a class="boton demo" href="#">Correo</a><a class="boton demo" href="#">Tienda de impresiones</a></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <p>Estudio Aurora © 2026 · Una página de muestra forjada por <a href="https://codecap2.github.io/">Olimpo</a>, diseño web en Aguascalientes.<br>¿Quieres una así con tu arte? <a href="https://codecap2.github.io/#contacto">Escríbeme</a>.</p>
+</footer>
+
+<dialog id="visor" aria-labelledby="visorTitulo">
+  <button class="cerrar" type="button" id="cerrarVisor" aria-label="Cerrar">✕</button>
+  <div class="visor-cont">
+    <div class="visor-arte" id="visorArte"></div>
+    <div class="visor-info">
+      <span class="meta" id="visorCategoria"></span>
+      <h3 id="visorTitulo"></h3>
+      <p class="meta" id="visorMeta"></p>
+      <p id="visorTexto"></p>
+      <div class="visor-nav"><button type="button" id="anterior" aria-label="Obra anterior">← Anterior</button><button type="button" id="siguiente" aria-label="Obra siguiente">Siguiente →</button></div>
+    </div>
+  </div>
+</dialog>
+<canvas id="pintura" aria-hidden="true"></canvas>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg', calma = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Azar con semilla: cada obra se ve siempre igual
+  function azarCon(semilla) { var s = semilla; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  var PALETAS = [
+    ['#2b2d42', '#ef8354', '#f6c28b', '#bfc0c0', '#4f5d75'], ['#0f3d3e', '#e2dcc8', '#f1a661', '#100f0f', '#7d9d9c'],
+    ['#22223b', '#c9ada7', '#f2e9e4', '#9a8c98', '#4a4e69'], ['#264653', '#e9c46a', '#f4a261', '#e76f51', '#2a9d8f'],
+    ['#3d2c8d', '#c84b31', '#ffd166', '#1b1a17', '#916bbf'], ['#14213d', '#fca311', '#e5e5e5', '#000000', '#7b8fa1']
+  ];
+  function svg(contenido, vb) { return '<svg xmlns="' + NS + '" viewBox="' + (vb || '0 0 400 500') + '" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + contenido + '</svg>'; }
+  function cielo(id, a, b) { return '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/></linearGradient></defs><rect width="400" height="500" fill="url(#' + id + ')"/>'; }
+  function cordillera(r, y, amp, color, pasos) {
+    var d = 'M0 500 L0 ' + y; for (var i = 0; i <= pasos; i++) { var x = i * 400 / pasos; d += ' L' + x.toFixed(1) + ' ' + (y - r() * amp).toFixed(1); }
+    return '<path d="' + d + ' L400 500 Z" fill="' + color + '"/>';
+  }
+  var GEN = {
+    paisaje: function (r, p, id) {
+      var s = cielo(id, p[2], p[1]) + '<circle cx="' + (120 + r() * 160) + '" cy="' + (110 + r() * 70) + '" r="' + (38 + r() * 30) + '" fill="#fff6e6" opacity=".9"/>';
+      s += cordillera(r, 300, 90, p[4], 7) + cordillera(r, 360, 70, p[0], 9) + cordillera(r, 430, 50, p[3] === '#000000' ? '#111' : p[0], 12);
+      return s + '<rect y="455" width="400" height="45" fill="' + p[0] + '" opacity=".85"/>';
+    },
+    cosmos: function (r, p, id) {
+      var s = cielo(id, '#0b0d1a', p[0]);
+      for (var i = 0; i < 90; i++) s += '<circle cx="' + (r() * 400).toFixed(1) + '" cy="' + (r() * 500).toFixed(1) + '" r="' + (r() * 1.6 + .3).toFixed(2) + '" fill="#fff" opacity="' + (r() * .8 + .2).toFixed(2) + '"/>';
+      var cx = 140 + r() * 120, cy = 180 + r() * 140, rad = 70 + r() * 50;
+      s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + rad + '" fill="' + p[1] + '"/><circle cx="' + (cx - rad * .3) + '" cy="' + (cy - rad * .3) + '" r="' + rad * .8 + '" fill="' + p[2] + '" opacity=".35"/>';
+      s += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rad * 1.7 + '" ry="' + rad * .32 + '" fill="none" stroke="' + p[2] + '" stroke-width="5" transform="rotate(-18 ' + cx + ' ' + cy + ')" opacity=".8"/>';
+      return s + '<circle cx="' + (r() * 400) + '" cy="' + (60 + r() * 80) + '" r="' + (10 + r() * 12) + '" fill="' + p[3] + '"/>';
+    },
+    abstracto: function (r, p, id) {
+      var s = '<rect width="400" height="500" fill="' + p[2] + '"/>';
+      for (var i = 0; i < 9; i++) {
+        var c = p[Math.floor(r() * p.length)];
+        if (r() < .5) s += '<circle cx="' + (r() * 400) + '" cy="' + (r() * 500) + '" r="' + (40 + r() * 120) + '" fill="' + c + '" opacity="' + (.55 + r() * .4).toFixed(2) + '"/>';
+        else s += '<rect x="' + (r() * 300) + '" y="' + (r() * 400) + '" width="' + (60 + r() * 160) + '" height="' + (60 + r() * 160) + '" rx="' + (r() * 60) + '" fill="' + c + '" opacity="' + (.55 + r() * .4).toFixed(2) + '" transform="rotate(' + (r() * 40 - 20) + ' 200 250)"/>';
+      }
+      return s + '<path d="M0 ' + (300 + r() * 120) + ' Q200 ' + (180 + r() * 140) + ' 400 ' + (300 + r() * 120) + '" stroke="' + p[0] + '" stroke-width="8" fill="none" stroke-linecap="round"/>';
+    },
+    botanico: function (r, p, id) {
+      var s = '<rect width="400" height="500" fill="' + p[2] + '"/><circle cx="200" cy="240" r="' + (130 + r() * 30) + '" fill="' + p[1] + '" opacity=".35"/>';
+      for (var i = 0; i < 7; i++) {
+        var ang = -80 + i * 27 + r() * 10, largo = 150 + r() * 90, rad = ang * Math.PI / 180;
+        var x2 = 200 + Math.sin(rad) * largo, y2 = 470 - Math.cos(rad) * largo;
+        s += '<path d="M200 470 Q' + (200 + Math.sin(rad) * largo * .4) + ' ' + (470 - Math.cos(rad) * largo * .7) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke="' + p[0] + '" stroke-width="4" fill="none"/>';
+        s += '<ellipse cx="' + x2.toFixed(1) + '" cy="' + y2.toFixed(1) + '" rx="' + (22 + r() * 16) + '" ry="' + (9 + r() * 6) + '" fill="' + p[i % 2 ? 4 : 0] + '" transform="rotate(' + (ang - 90) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + ')"/>';
+      }
+      return s + '<rect x="150" y="452" width="100" height="48" rx="8" fill="' + p[3] + '"/>';
+    }
+  };
+  var CATS = { paisaje: 'Paisajes', cosmos: 'Cosmos', abstracto: 'Abstracto', botanico: 'Botánico' };
+  var OBRAS = [
+    ['paisaje', 'Montañas al despertar', 2026, 'Las montañas todavía dormidas, justo cuando el sol las toca.'],
+    ['cosmos', 'Anillos de agosto', 2025, 'Un planeta imaginado en una noche sin luna.'],
+    ['abstracto', 'Ritmo de mercado', 2026, 'Los colores de un tianguis, convertidos en formas.'],
+    ['botanico', 'Maceta en la ventana', 2025, 'La planta que siempre busca el sol.'],
+    ['paisaje', 'Desierto rosado', 2025, 'El desierto a la hora en que todo se vuelve rosa.'],
+    ['cosmos', 'La luna que se quedó', 2026, 'Una luna que no quiso irse al amanecer.'],
+    ['abstracto', 'Domingo lento', 2024, 'Formas que flotan sin prisa.'],
+    ['botanico', 'Helechos de la abuela', 2026, 'Inspirado en el patio de mi abuela.'],
+    ['paisaje', 'Valle de neblina', 2024, 'Capas de montañas que se pierden en la niebla.'],
+    ['cosmos', 'Mapa de constelaciones', 2025, 'Un cielo lleno de historias por contar.'],
+    ['abstracto', 'Canción en naranja', 2025, 'Lo que imagino cuando escucho mi canción favorita.'],
+    ['botanico', 'Jardín de medianoche', 2024, 'Hojas que solo se abren de noche.']
+  ];
+  function pintarObra(i, extra) { var o = OBRAS[i], r = azarCon(1000 + i * 7919); return svg(GEN[o[0]](r, PALETAS[i % PALETAS.length], 'g' + i + (extra || ''))); }
+
+  // Mosaico de la portada
+  document.getElementById('mosaico').innerHTML = [0, 1, 7, 2].map(function (i) { return '<div class="pieza">' + pintarObra(i, 'm') + '</div>'; }).join('');
+  // Filtros y galería
+  var filtros = document.getElementById('filtros'), galeria = document.getElementById('galeria');
+  filtros.innerHTML = ['todo'].concat(Object.keys(CATS)).map(function (k) { return '<button type="button" data-cat="' + k + '" aria-pressed="' + (k === 'todo') + '">' + (k === 'todo' ? 'Todo' : CATS[k]) + '</button>'; }).join('');
+  galeria.innerHTML = OBRAS.map(function (o, i) {
+    return '<button type="button" class="obra aparece" data-cat="' + o[0] + '" data-i="' + i + '" aria-label="Ver ' + o[1] + ' en grande"><div class="marco">' + pintarObra(i) + '</div><div class="pie"><b>' + o[1] + '</b><span>' + o[2] + '</span></div></button>';
+  }).join('');
+  filtros.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    filtros.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+    galeria.querySelectorAll('.obra').forEach(function (o) { o.classList.toggle('oculta', b.dataset.cat !== 'todo' && o.dataset.cat !== b.dataset.cat); });
+  });
+  // Visor
+  var visor = document.getElementById('visor'), actual = 0;
+  function visibles() { return [].slice.call(galeria.querySelectorAll('.obra:not(.oculta)')).map(function (o) { return +o.dataset.i; }); }
+  function mostrar(i) {
+    actual = i; var o = OBRAS[i];
+    document.getElementById('visorArte').innerHTML = pintarObra(i, 'v');
+    document.getElementById('visorArte').setAttribute('role', 'img'); document.getElementById('visorArte').setAttribute('aria-label', o[1]);
+    document.getElementById('visorCategoria').textContent = CATS[o[0]];
+    document.getElementById('visorTitulo').textContent = o[1];
+    document.getElementById('visorMeta').textContent = o[2] + ' · Ilustración digital';
+    document.getElementById('visorTexto').textContent = o[3];
+  }
+  galeria.addEventListener('click', function (e) { var b = e.target.closest('.obra'); if (!b) return; mostrar(+b.dataset.i); visor.showModal(); });
+  function mover(paso) { var v = visibles(), k = v.indexOf(actual); mostrar(v[(k + paso + v.length) % v.length]); }
+  document.getElementById('anterior').onclick = function () { mover(-1); };
+  document.getElementById('siguiente').onclick = function () { mover(1); };
+  document.getElementById('cerrarVisor').onclick = function () { visor.close(); };
+  visor.addEventListener('click', function (e) { if (e.target === visor) visor.close(); });
+  visor.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') mover(1); if (e.key === 'ArrowLeft') mover(-1); });
+
+  // Planes de comisión
+  var PLANES = [
+    ['Boceto', 'desde $25 USD', ['Dibujo a lápiz digital', '1 personaje o elemento', 'Entrega en 3 a 5 días'], 3, ''],
+    ['Ilustración a color', 'desde $60 USD', ['Color y sombras completas', 'Hasta 2 personajes', 'Fondo sencillo', 'Entrega en 1 a 2 semanas'], 0, 'La más pedida'],
+    ['Pieza completa', 'desde $120 USD', ['Escena con fondo detallado', 'Personajes o paisaje', 'Archivo listo para imprimir', 'Entrega en 2 a 3 semanas'], 4, '']
+  ];
+  document.getElementById('planes').innerHTML = PLANES.map(function (p, k) {
+    return '<article class="plan aparece' + (p[4] ? ' destacado' : '') + '">' + (p[4] ? '<span class="insignia">' + p[4] + '</span>' : '') +
+      '<div class="muestra">' + svg(GEN[OBRAS[p[3]][0]](azarCon(1000 + p[3] * 7919), PALETAS[p[3] % PALETAS.length], 'p' + k)) + '</div>' +
+      '<h3>' + p[0] + '</h3><div class="precio">' + p[1].replace('desde ', '<small>desde </small>') + '</div><ul>' + p[2].map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>' +
+      '<a class="boton' + (p[4] ? ' lleno' : '') + ' demo" href="#">Pedir esta comisión</a></article>';
+  }).join('');
+  // Retrato ilustrado (ficticio)
+  document.getElementById('retrato').innerHTML = svg('<rect width="400" height="400" fill="#f1a661"/><circle cx="200" cy="420" r="170" fill="#c8553d"/><circle cx="200" cy="190" r="86" fill="#f6d7b9"/><path d="M110 190 Q110 90 200 88 Q300 90 292 200 Q270 120 200 128 Q140 128 110 190 Z" fill="#1f3b3d"/><circle cx="170" cy="198" r="7" fill="#1d1a17"/><circle cx="232" cy="198" r="7" fill="#1d1a17"/><path d="M178 236 Q200 252 224 236" stroke="#1d1a17" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="300" cy="80" r="26" fill="#fff6e6" opacity=".8"/>', '0 0 400 400');
+
+  // Avisos de demo
+  var toast = document.getElementById('toast'), t;
+  function avisar(txt) { toast.textContent = txt; toast.classList.add('visible'); clearTimeout(t); t = setTimeout(function () { toast.classList.remove('visible'); }, 3200); }
+  document.addEventListener('click', function (e) { var a = e.target.closest('a.demo'); if (a) { e.preventDefault(); avisar('🎨 Es una página de muestra: aquí iría tu Instagram, tu correo o tu formulario de comisiones.'); } });
+
+  // Secreto: el pincel salpica pintura
+  var cv = document.getElementById('pintura'), ctx = cv.getContext('2d'), gotas = [];
+  function medir() { cv.width = innerWidth; cv.height = innerHeight; } addEventListener('resize', medir); medir();
+  var clicsPincel = 0;
+  document.getElementById('pincel').addEventListener('click', function (e) {
+    clicsPincel++; var rr = this.getBoundingClientRect();
+    var cols = ['#c8553d', '#1f3b3d', '#f1a661', '#e9c46a', '#2a9d8f', '#916bbf'];
+    for (var i = 0; i < 46; i++) { var a = Math.random() * 6.28, s = 2 + Math.random() * 9; gotas.push({ x: rr.left + rr.width / 2, y: rr.top + rr.height / 2, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, r: 3 + Math.random() * 9, c: cols[i % cols.length], v: 70 + Math.random() * 40 }); }
+    avisar(clicsPincel === 1 ? '🎨 ¡Splash! Las páginas de Olimpo siempre esconden un secreto.' : '🎨 ¡Otra vez! Cada artista merece su propio detalle mágico.');
+    if (!calma) requestAnimationFrame(pintar);
+  });
+  var pintando = false;
+  function pintar() {
+    if (pintando) return; pintando = true;
+    (function paso() {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      for (var i = gotas.length - 1; i >= 0; i--) { var g = gotas[i]; g.x += g.vx; g.y += g.vy; g.vy += .35; g.vx *= .98; g.v--; if (g.v <= 0) { gotas.splice(i, 1); continue; } ctx.globalAlpha = Math.min(1, g.v / 30); ctx.fillStyle = g.c; ctx.beginPath(); ctx.arc(g.x, g.y, g.r, 0, 6.28); ctx.fill(); }
+      if (gotas.length) requestAnimationFrame(paso); else { pintando = false; ctx.clearRect(0, 0, cv.width, cv.height); }
+    })();
+  }
+
+  // Aparecer al bajar
+  var obs = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }); }, { threshold: .1 });
+  document.querySelectorAll('.aparece').forEach(function (el) { obs.observe(el); });
+})();
+</script>
+</body>
+</html>
