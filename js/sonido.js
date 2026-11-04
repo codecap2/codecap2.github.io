@@ -19,10 +19,20 @@
       for (var k = 0; k < 2; k++) { var d = ir.getChannelData(k); for (var j = 0; j < largo; j++) d[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / largo, 3); }
       reverb = ctx.createConvolver(); reverb.buffer = ir;
       var rg = ctx.createGain(); rg.gain.value = .22; reverb.connect(rg); rg.connect(maestro);
+      // Eco del cielo para el trueno: una sala enorme (5 s) + rebotes que se van apagando, como entre montañas
+      var largoG = ctx.sampleRate * 5, irG = ctx.createBuffer(2, largoG, ctx.sampleRate);
+      for (var k2 = 0; k2 < 2; k2++) { var dG = irG.getChannelData(k2); for (var j2 = 0; j2 < largoG; j2++) dG[j2] = (Math.random() * 2 - 1) * Math.pow(1 - j2 / largoG, 2.2); }
+      cielo = ctx.createConvolver(); cielo.buffer = irG;
+      var cg = ctx.createGain(); cg.gain.value = .55; cielo.connect(cg); cg.connect(maestro);
+      rebote = ctx.createDelay(2); rebote.delayTime.value = .55;
+      var vuelta = ctx.createGain(), apaga = ctx.createBiquadFilter(); vuelta.gain.value = .42; apaga.type = 'lowpass'; apaga.frequency.value = 700;
+      rebote.connect(apaga); apaga.connect(vuelta); vuelta.connect(rebote);
+      var rsal = ctx.createGain(); rsal.gain.value = .5; apaga.connect(rsal); rsal.connect(maestro); rsal.connect(cielo);
       return true;
     } catch (e) { return false; }
   }
-  function salida(g, eco) { g.connect(maestro); if (eco !== false) g.connect(reverb); }
+  var cielo, rebote, enElCielo = false;
+  function salida(g, eco) { g.connect(maestro); if (eco !== false) g.connect(reverb); if (enElCielo) { g.connect(cielo); g.connect(rebote); } }
   function env(g, t, ataque, vol, dura) {
     g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(vol, .0002), t + ataque);
     g.gain.exponentialRampToValueAtTime(.0001, t + dura);
@@ -85,9 +95,12 @@
   var EF = {
     // Zeus: el rayo es un latigazo grave; el trueno retumba y rueda a lo lejos
     trueno: function () {
-      soplo('lowpass', 1600, 260, 1, .4, 0, .6, .003); crujido(18, .25, 0, .35);
-      for (var i = 0; i < 8; i++) soplo('lowpass', 220 - i * 15, 50, .9 - i * .09, 2.2 + i * .3, .3 + i * .4 + Math.random() * .2, .7, .25);
-      tono(38, 'sine', .55, 4.5, .3, 26, .5);
+      enElCielo = true;   // todo lo del trueno pasa por el eco del cielo
+      try {
+        soplo('lowpass', 2200, 300, 1, .45, 0, .6, .003); crujido(22, .3, 0, .3);
+        for (var i = 0; i < 9; i++) soplo('lowpass', 240 - i * 16, 45, .85 - i * .08, 2.4 + i * .35, .35 + i * .45 + Math.random() * .25, .7, .3);
+        tono(36, 'sine', .5, 5, .3, 24, .6);
+      } finally { enElCielo = false; }
     },
     logro: function () { siseo(2500, 4000, .05, .18, 0, 1.2, .01); siseo(1800, 3000, .04, .14, .12, 1.2, .01); },   // el códice: un pergamino que se desenrolla
     hoja: function () { siseo(1800, 3500, .1, .25, 0, 1, .02); },
