@@ -10,7 +10,7 @@
   // En celulares todo es más ligero: ecos más cortos y menos chasquidos, para que el audio no truene
   var LIGERO = innerWidth < 760 || (navigator.hardwareConcurrency || 8) <= 4 || /iPhone|iPad|Android/i.test(navigator.userAgent);
   function iniciar() {
-    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return true; }
+    if (ctx) { if (ctx.state === 'suspended' && !document.hidden) ctx.resume(); return true; }
     try {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
       // Limitador final: si varios sonidos coinciden (cohetes + música + viento), los contiene en vez de saturar o tronar
@@ -373,6 +373,11 @@
     if (e && btn && btn.contains(e.target)) return;   // si su primer toque fue para apagarlo, no suena nada
     if (S.on && iniciar()) { ambiente(); var fi = window.Cielo && Cielo.fiesta; if (fi === 'patrias' || fi === 'muertos' || fi === 'feria') S.precargar(['musica/' + fi]); if (fi === 'patrias' || fi === 'feria' || fi === 'anonuevo') S.precargar(['fuegos/cohete', 'fuegos/estallido-silbido', 'fuegos/estallido-2', 'fuegos/estallido-eco']); }
   }
+  // Si la página deja de verse (otra pestaña, ventana minimizada, pantalla bloqueada con Windows + L) o se cierra,
+  // el sonido se pausa al instante; al volver, regresa solo donde iba.
+  function silenciar() { if (ctx && ctx.state === 'running') ctx.suspend(); }
+  document.addEventListener('visibilitychange', function () { if (document.hidden) silenciar(); else if (ctx && S.on && despertado) ctx.resume(); });
+  addEventListener('pagehide', silenciar); addEventListener('freeze', silenciar);
   // iPhone a veces crea el audio "dormido": se despierta en cualquier toque o clic
   ['touchend', 'click'].forEach(function (t) { addEventListener(t, function () { if (ctx && ctx.state !== 'running') ctx.resume(); }, true); });
   ['pointerdown', 'keydown', 'touchstart', 'touchend', 'click'].forEach(function (t) { addEventListener(t, despertar, true); });
