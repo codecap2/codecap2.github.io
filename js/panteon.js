@@ -408,7 +408,9 @@
     var W = innerWidth, H = innerHeight, dpr = Math.min(2, window.devicePixelRatio || 1), cv = document.createElement('canvas'), g = cv.getContext('2d');
     cv.className = 'capa-cadena'; cv.width = W * dpr; cv.height = H * dpr; body.appendChild(cv); g.scale(dpr, dpr);
     var img = new Image(); img.src = 'img/cadena.webp';
-    var ANCHO = Math.max(16, Math.min(24, W / 40)), ESC = ANCHO / 64, PER = 170, Y0 = 300, PASO = PER * ESC;   // el eslabón se repite cada 170 px de la imagen
+    // La foto se repite cada 170 px (dos eslabones). Se teje por MEDIOS periodos (un eslabón a la vez) y cada tramo
+    // se encima un poco con el siguiente, así en las curvas los eslabones siguen unidos y no se ven cortes.
+    var ANCHO = Math.max(16, Math.min(24, W / 40)), ESC = ANCHO / 64, MEDIO = 85, Y0 = 300, PASO = MEDIO * ESC, ENCIMA = 14;
     // Cada cadena: sus dos puntas (fuera de cuadro, arriba), qué tanto cuelga (s) y su vaivén de lado
     var cadenas = [[.04, .44, .5], [.56, .96, .58]].map(function (c, i) {
       return { A: { x: W * c[0], y: -30 }, B: { x: W * c[1], y: -30 }, cayo: { s: -80 - i * 40, v: 0, meta: Math.min(H * c[2], W * .42) }, vaiven: { x: (i ? -1 : 1) * W * .05, v: 0 } };
@@ -424,14 +426,15 @@
     }
     function pintar(pts) {
       if (!img.complete || !img.naturalWidth) return;
-      var total = pts[pts.length - 1].L, j = 0;
-      for (var d = 0; d < total; d += PASO) {
+      var total = pts[pts.length - 1].L, j = 0, n = 0;
+      for (var d = 0; d < total; d += PASO, n++) {
         while (j < pts.length - 2 && pts[j + 1].L < d) j++;
         var a = pts[j].p, b = pts[j + 1].p, k = (d - pts[j].L) / Math.max(.001, pts[j + 1].L - pts[j].L);
         var x = a.x + (b.x - a.x) * k, y = a.y + (b.y - a.y) * k, ang = Math.atan2(b.y - a.y, b.x - a.x) - Math.PI / 2;
         if (y < -PASO || y > H + PASO) continue;
         g.save(); g.translate(x, y); g.rotate(ang);
-        g.drawImage(img, 0, Y0, 64, PER + 2, -ANCHO / 2, 0, ANCHO, PASO + 2 * ESC);
+        var sy = Y0 + (n % 2) * MEDIO - ENCIMA;   // alterna eslabón de frente y de lado, como en la cadena real
+        g.drawImage(img, 0, sy, 64, MEDIO + 2 * ENCIMA, -ANCHO / 2, -ENCIMA * ESC, ANCHO, (MEDIO + 2 * ENCIMA) * ESC);
         g.restore();
       }
     }
