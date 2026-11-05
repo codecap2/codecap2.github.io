@@ -252,16 +252,22 @@
     for (var i = 0; i < (n || 40); i++) agregar({ f: 1, t: 'emoji', x: azar(0, W), y: azar(-H * .6, -10), vx: azar(-.5, .5), vy: azar(1.5, 3.5), rot: azar(0, 6), e: emojis[i % emojis.length], s: azar(16, 30), vida: 400 });
   };
 
+  var viento = { fuerza: 1, meta: 1, hasta: 0 };
   function generar() {
     var dia = C.modo === 'dia';
-    if (dia && Math.random() < .35 * F) agregar({ t: 'arena', x: -5, y: azar(H * .45, H), vx: azar(1, 3), vy: azar(-.2, .2), vida: 900, r: azar(.6, 1.6) });
+    // El viento sopla en ráfagas: casi siempre suave y, cada tantos segundos, una ráfaga fuerte que levanta arena
+    var ahoraV = performance.now();
+    if (ahoraV > viento.hasta) { viento.meta = viento.meta > 1.2 ? 1 : 2.6 + Math.random() * 1.2; viento.hasta = ahoraV + (viento.meta > 1.2 ? 2200 + Math.random() * 1400 : 8000 + Math.random() * 7000); }
+    viento.fuerza += (viento.meta - viento.fuerza) * .03; C.rafaga = viento.fuerza;
+    // Granos de arena que salen de las dunas: los de cerca (abajo) más grandes y rápidos; los de lejos, finitos y lentos
+    if (Math.random() < (dia ? .5 : .22) * F * viento.fuerza) { var prof = Math.random(); agregar({ t: 'arena', x: -6, y: H * (.68 + prof * .3), vx: (.8 + prof * 2.4) * viento.fuerza + azar(0, .5), vy: 0, fase: azar(0, 6.28), vida: 1100, r: .45 + prof * 1.25, a: .22 + prof * .45 }); }
+    if (viento.fuerza > 1.6 && Math.random() < .22 * F) agregar({ t: 'estela', x: -80, y: H * (.72 + Math.random() * .24), vx: azar(10, 15), vy: 0, vida: 240, largo: azar(50, 130) });
     if (C.clima === 'arena') for (var i = 0; i < 7 * F; i++) agregar({ t: 'arena', x: azar(-50, W * .3), y: azar(0, H), vx: azar(7, 16), vy: azar(-.6, .8), vida: 300, r: azar(.6, 2.2) });
     if (C.clima === 'lluvia' || C.clima === 'tormenta') for (var j = 0; j < 5; j++) agregar({ t: 'gota', x: azar(0, W + 100), y: -20, vx: -2, vy: azar(12, 18), vida: 200 });
     if (C.fiesta === 'navidad' && Math.random() < .8) agregar({ t: 'copo', x: azar(0, W), y: -6, vx: azar(-.4, .4), vy: azar(.6, 1.6), vida: 1500, r: azar(1, 3) });
     var pico = C.pico ? 2.2 : 1;   // en el gran día, todo se multiplica
     if (C.fiesta === 'muertos' && Math.random() < .12 * pico * F) agregar({ t: 'petalo', x: azar(0, W), y: -10, vx: azar(-.6, .6), vy: azar(.6, 1.4), rot: azar(0, 6), vida: 1500, c: Math.random() < .8 ? '#ff9f1c' : '#c2185b' });
-    if (C.halloween && C.modo === 'noche' && Math.random() < .006 * pico) agregar({ t: 'emoji', x: -20, y: azar(H * .1, H * .45), vx: azar(2, 4), vy: azar(-.6, .6), rot: 0, e: '🦇', s: 22, vida: 900 });
-    if (C.fiesta === 'sanvalentin' && Math.random() < .05 * pico) agregar({ t: 'emoji', x: azar(0, W), y: H + 20, vx: azar(-.3, .3), vy: azar(-1.4, -.7), rot: 0, e: '💗', s: azar(14, 24), vida: 900 });
+    if (C.fiesta === 'sanvalentin' && Math.random() < .05 * pico) agregar({ t: 'corazon', x: azar(0, W), y: H + 20, vx: azar(-.3, .3), vy: azar(-1.4, -.7), rot: azar(0, 6), vida: 900, s: azar(.8, 1.6) });
     if ((C.fiesta === 'feria' || C.fiesta === 'patrias') && Math.random() < .2 * pico * F) {
       var cols = C.fiesta === 'patrias' ? ['#0b8a3e', '#ffffff', '#ce1126'] : ['#e91e63', '#ffc107', '#00bcd4', '#8bc34a', '#ff5722'];
       agregar({ t: 'confeti', x: azar(0, W), y: -10, vx: azar(-.8, .8), vy: azar(1, 2.2), rot: azar(0, 6), vida: 1200, c: cols[Math.floor(Math.random() * cols.length)] });
@@ -323,7 +329,9 @@
       var g = a.f ? fx : ctx;   // los efectos de los dioses van al frente de todo; el clima, al fondo
       g.globalAlpha = (a.t === 'chispa' || a.t === 'brasa') ? Math.min(1, a.vida / 40) : (a.t === 'emoji' && a.vida < 40 ? a.vida / 40 : 1);
       if (a.t === 'brasa') { g.fillStyle = a.c; g.globalAlpha *= .25; g.beginPath(); g.arc(a.x, a.y, a.r * 3, 0, 6.28); g.fill(); g.globalAlpha *= 4; g.beginPath(); g.arc(a.x, a.y, a.r, 0, 6.28); g.fill(); continue; }
-      if (a.t === 'arena') { g.fillStyle = dia ? 'rgba(120,70,30,.55)' : 'rgba(200,180,150,.35)'; g.fillRect(a.x, a.y, a.r * 2.4, a.r); }
+      if (a.t === 'arena') { var brinco = a.fase !== undefined ? -Math.abs(Math.sin(a.fase + a.x / 26)) * a.r * 3 : 0; g.globalAlpha = (a.a || .5) * Math.min(1, a.vida / 60); g.fillStyle = dia ? '#8e5a2c' : '#d8c8aa'; g.beginPath(); g.arc(a.x, a.y + brinco, a.r, 0, 6.28); g.fill(); }
+      else if (a.t === 'estela') { g.globalAlpha = Math.min(1, a.vida / 60) * (dia ? .2 : .1); g.strokeStyle = dia ? '#a0683a' : '#e6dcc8'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(a.x, a.y); g.quadraticCurveTo(a.x - a.largo * .5, a.y - 3, a.x - a.largo, a.y + 1); g.stroke(); }
+      else if (a.t === 'corazon') { g.save(); g.translate(a.x + Math.sin(a.y / 50) * 12, a.y); g.rotate(Math.sin(a.rot) * .35); g.scale(a.s, a.s); g.globalAlpha = Math.min(1, a.vida / 80) * .85; g.fillStyle = '#ff5c8a'; g.beginPath(); g.moveTo(0, 4); g.bezierCurveTo(-9, -3, -5, -11, 0, -5); g.bezierCurveTo(5, -11, 9, -3, 0, 4); g.fill(); g.restore(); }
       else if (a.t === 'gota') { g.strokeStyle = 'rgba(180,200,230,.6)'; g.lineWidth = 1; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(a.x + a.vx, a.y + 10); g.stroke(); }
       else if (a.t === 'copo') { g.fillStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.arc(a.x + Math.sin(a.y / 30) * 6, a.y, a.r, 0, 6.28); g.fill(); }
       else if (a.t === 'chispa') { g.fillStyle = a.c; g.fillRect(a.x, a.y, a.tam || 2.4, a.tam || 2.4); }
@@ -410,6 +418,24 @@
     document.addEventListener('click', function (e) { if (!letrero.contains(e.target)) { letrero.classList.remove('abierto'); abrirLista(false); } });
     if (window.Idioma && Idioma.aplicar) Idioma.aplicar();
     document.documentElement.classList.add('con-previa');
+  }
+
+  // ---------- Profundidad: el desierto como una ventana ----------
+  // Cada capa se mueve distinto con el cursor y al bajar la página: lo lejano casi no se mueve, lo cercano sí.
+  // Solo se usan transform (el navegador mueve las capas sin repintarlas), así el celular no se traba.
+  var LISTA_P = [['.p-montes', .12], ['.p-lejos', .25], ['.p-medio', .45], ['.p-cerca', .7], ['.p-frente', 1], ['#escenaFiesta', .55], ['#astros', .06]], capasP = [];
+  var buscarCapas = function () { capasP = LISTA_P.map(function (c) { return [document.querySelector(c[0]), c[1]]; }).filter(function (c) { return c[0]; }); };   // la escena de fiestas se crea después
+  if (document.getElementById('paisaje') && !calma) {
+    var px = 0, py = 0, mx = 0, my = 0, pendiente = false;
+    var mover = function () {
+      pendiente = false; if (capasP.length < LISTA_P.length) buscarCapas(); px += (mx - px) * .08; py += (my - py) * .08;
+      var bajada = Math.min(scrollY, innerHeight);
+      capasP.forEach(function (c) { c[0].style.transform = 'translate3d(' + (-px * 18 * c[1]).toFixed(2) + 'px,' + (-py * 8 * c[1] + bajada * .06 * c[1]).toFixed(2) + 'px,0)'; });
+      if (Math.abs(mx - px) > .002 || Math.abs(my - py) > .002) pedir();
+    };
+    var pedir = function () { if (!pendiente) { pendiente = true; requestAnimationFrame(mover); } };
+    if (matchMedia('(hover: hover)').matches) addEventListener('pointermove', function (e) { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; pedir(); }, { passive: true });
+    addEventListener('scroll', pedir, { passive: true }); pedir();
   }
 
   // En celular el aviso sale abajo… salvo cuando los botones de "Ver mis trabajos" y "Platiquemos"

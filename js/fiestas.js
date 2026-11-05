@@ -58,6 +58,8 @@
     logo.appendChild(b);
   }
   if (logo && ACC[f]) { ponerAccesorio(f); if (C.halloween) ponerAccesorio('halloween'); }
+  // En Halloween, de noche, de vez en cuando cruzan murciélagos (con silueta y aleteo, no emojis)
+  if (C.halloween) { setTimeout(function () { if (C.modo !== 'dia') soltarMurcielagos(3); }, 4000); setInterval(function () { if (C.modo !== 'dia') soltarMurcielagos(3); }, 30000); }
   // El gorro de Navidad se acomoda en la O final de "Olimpo" (se mide la palabra real, en cualquier pantalla)
   var gorro = $('.acc-navidad'), palabra = $('#irInicio');
   function acomodarGorro() {

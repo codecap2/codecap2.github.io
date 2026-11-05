@@ -49,10 +49,10 @@ body.atardecer #sol { transform: translateY(42vh); box-shadow: 0 0 80px 30px rgb
 .astro.arriba { transform: translateY(-48vh) !important; pointer-events: none; }
 .dunas { position: absolute; left: 0; bottom: 0; width: 100%; height: 34vh; }
 .dunas path { transition: fill 2.6s ease-in-out; }
-.d1 { fill: #12151f; } .d2 { fill: #0d1018; } .d3 { fill: #080a10; }
-body[data-fase="dia"] .d1 { fill: #e0a868; } body[data-fase="dia"] .d2 { fill: #c98a4f; } body[data-fase="dia"] .d3 { fill: #a96d3b; }
-body[data-fase="amanecer"] .d1 { fill: #b0788a; } body[data-fase="amanecer"] .d2 { fill: #8a5a72; } body[data-fase="amanecer"] .d3 { fill: #5e3d55; }
-body[data-fase="atardecer"] .d1 { fill: #3a1f33; } body[data-fase="atardecer"] .d2 { fill: #26152a; } body[data-fase="atardecer"] .d3 { fill: #160c1a; }
+/* (los colores de las dunas ahora viven en las variables del paisaje, al final del archivo) */
+
+
+
 #neblina { position: absolute; inset: 0; background: transparent; transition: background 2s; pointer-events: none; }
 body.arena #neblina { background: rgba(214,160,96,.42); }
 body.noche.arena #neblina { background: rgba(60,48,40,.45); }
@@ -653,3 +653,33 @@ body.noche .bandera-dunas { filter: saturate(.7) brightness(.55); }
 .acc-patrias { margin-top: -8px !important; }
 .secreto img { width: 1.7em; height: 1.7em; display: block; }
 #escudo svg { overflow: visible; }
+
+/* ===== Paisaje con profundidad: una ventana al mundo griego =====
+   Mientras más lejos, más claro y más brumoso (perspectiva del aire). Cada capa es su propia "hoja" que el navegador
+   solo mueve (transform), así el paralaje no traba el celular. */
+body { --montes: #1c2233; --nieve: #3a4358; --templo: #141927; --d1: #151a27; --d2: #10141f; --d3: #0b0e17; --d4: #07090f; --cresta: rgba(170,190,255,.10); --ondas: rgba(170,190,255,.07); --arbol: #0a0d14; --fuego: 1; }
+body[data-fase="dia"] { --montes: #e9c9a0; --nieve: #fbf1e2; --templo: #d9b48a; --d1: #e4b07c; --d2: #d69c62; --d3: #c4844b; --d4: #ab6b36; --cresta: rgba(255,244,214,.28); --ondas: rgba(120,64,24,.16); --arbol: #6e5a2c; --fuego: 0; }
+body[data-fase="amanecer"] { --montes: #c9a0b0; --nieve: #f1dce6; --templo: #b38898; --d1: #b27d8e; --d2: #9a6479; --d3: #7d4f65; --d4: #5e3c54; --cresta: rgba(255,214,226,.35); --ondas: rgba(60,20,40,.18); --arbol: #4a2c40; --fuego: .5; }
+body[data-fase="atardecer"] { --montes: #5a3049; --nieve: #8a5a72; --templo: #4a2640; --d1: #3d2136; --d2: #2d182c; --d3: #201221; --d4: #150b17; --cresta: rgba(255,170,120,.22); --ondas: rgba(255,170,120,.08); --arbol: #120a12; --fuego: .8; }
+#paisaje { position: absolute; inset: 0; pointer-events: none; }
+#paisaje .capa-p { position: absolute; left: -3%; width: 106%; bottom: 0; height: 34vh; display: block; will-change: transform; }
+#paisaje .p-montes { height: 40vh; opacity: .9; }
+#paisaje path, #paisaje rect, #paisaje circle { transition: fill 2.6s ease-in-out, stroke 2.6s ease-in-out; }
+#paisaje .m1 { fill: var(--montes); } #paisaje .nieve { fill: var(--nieve); opacity: .8; }
+#paisaje .templo path, #paisaje .templo rect { fill: var(--templo); }
+#paisaje .fuego-templo { fill: #ffb347; opacity: calc(var(--fuego) * .9); filter: blur(1.2px); animation: fuegoTemplo 1.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes fuegoTemplo { to { opacity: calc(var(--fuego) * .45); transform: scale(.75); } }
+#paisaje .d1 { fill: var(--d1); } #paisaje .d2 { fill: var(--d2); } #paisaje .d3 { fill: var(--d3); } #paisaje .d4 { fill: var(--d4); }
+#paisaje .cresta { fill: none; stroke: var(--cresta); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+#paisaje .p-montes .cresta { opacity: .5; }
+#paisaje .ondas { fill: none; stroke: var(--ondas); stroke-width: 1.4; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+#paisaje .pasto { fill: none; stroke: var(--arbol); stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+#paisaje .cipres { fill: var(--arbol); transform-box: fill-box; transform-origin: 50% 100%; animation: cipres 6s ease-in-out infinite alternate; }
+#paisaje .c2 { animation-delay: -2s; } #paisaje .c3 { animation-delay: -4s; }
+@keyframes cipres { to { transform: rotate(1.6deg); } }
+/* Aves a lo lejos, de día */
+#paisaje .aves { position: absolute; top: 18vh; left: -12vw; width: clamp(60px, 7vw, 110px); opacity: 0; }
+#paisaje .aves svg { width: 100%; display: block; } #paisaje .aves path { fill: none; stroke: #5a4632; stroke-width: 2.4; stroke-linecap: round; }
+body[data-fase="dia"] #paisaje .aves, body[data-fase="amanecer"] #paisaje .aves { opacity: .55; animation: aves 46s linear infinite; }
+@keyframes aves { from { transform: translate(0, 0); } 50% { transform: translate(60vw, -4vh); } to { transform: translate(125vw, 2vh); } }
+@media (prefers-reduced-motion: reduce) { #paisaje .cipres, #paisaje .aves, #paisaje .fuego-templo { animation: none; } }

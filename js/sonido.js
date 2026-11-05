@@ -64,10 +64,34 @@
       [698, 1], [698, 1], [698, 1.5], [698, .5], [698, 1], [659, 1], [659, 1], [659, .5], [659, .5], [659, 1], [587, 1], [587, 1], [659, 1], [587, 2], [784, 2]];
     notas.slice(0, cuantas || notas.length).forEach(function (n) { campanita(n[0], .075, t + .05); t += n[1] * q; });
   }
+  // Guitarra de verdad (para el requinto, el vals y los rasgueos): la uña ataca la cuerda (golpecito de ruido),
+  // la cuerda vibra con su "posición de pulsado" (filtro de peine) y se apaga como una cuerda real; la caja de madera
+  // le da cuerpo (resonancias graves de 100 y 210 Hz) y se le quita el brillo metálico de arriba.
+  function guitarra(f, vol, retraso) {
+    var clave = 'gt' + Math.round(f), buf = cuerdas[clave];
+    if (!buf) {
+      var sr = ctx.sampleRate, n = Math.floor(sr * 1.7), per = Math.max(2, Math.round(sr / f)), linea = new Float32Array(per), prev = 0;
+      for (var i = 0; i < per; i++) { var r = Math.random() * 2 - 1; prev = prev * .45 + r * .55; linea[i] = prev; }   // ruido suavizado: uña, no púa
+      var corte = Math.max(1, Math.round(per * .13)), exc = Float32Array.from(linea);
+      for (var i2 = 0; i2 < per; i2++) linea[i2] = exc[i2] - exc[(i2 + corte) % per] * .9;                          // pulsada cerca del puente
+      buf = ctx.createBuffer(1, n, sr); var d = buf.getChannelData(0), p = 0;
+      for (var j = 0; j < n; j++) { var sig = (p + 1) % per; var v = (linea[p] * .5 + linea[sig] * .5) * .9935; d[j] = linea[p]; linea[p] = v; p = sig; }
+      cuerdas[clave] = buf;
+    }
+    var t = ctx.currentTime + (retraso || 0), s = ctx.createBufferSource(), g = ctx.createGain();
+    var c1 = ctx.createBiquadFilter(), c2 = ctx.createBiquadFilter(), c3 = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter();
+    c1.type = 'peaking'; c1.frequency.value = 100; c1.Q.value = 1; c1.gain.value = 6;
+    c2.type = 'peaking'; c2.frequency.value = 210; c2.Q.value = 1.3; c2.gain.value = 5;
+    c3.type = 'peaking'; c3.frequency.value = 2600; c3.Q.value = 1; c3.gain.value = 2.5;
+    lp.type = 'lowpass'; lp.frequency.value = 4200; lp.Q.value = .5;
+    s.buffer = buf; g.gain.setValueAtTime(vol, t); g.gain.setTargetAtTime(.0001, t + .9, .35);
+    s.connect(c1); c1.connect(c2); c2.connect(c3); c3.connect(lp); lp.connect(g); salida(g); s.start(t); s.stop(t + 1.75);
+    siseo(3200, 2000, vol * .07, .02, retraso || 0, 1.2, .001);   // el toque de la uña
+  }
   // Rasgueo de guitarra: las cuerdas suenan una tras otra, muy rápido, como con la mano
   function rasgueo(notas, vol, retraso, haciaArriba) {
     var orden = haciaArriba ? notas.slice().reverse() : notas;
-    orden.forEach(function (f, i) { cuerda(f, vol * (1 - i * .08), retraso + i * .014, .45); });
+    orden.forEach(function (f, i) { guitarra(f, vol * (1 - i * .08) * 1.3, retraso + i * .016); });
   }
   // Órgano de carrusel: tubos (fundamental, octava y quinta) un poquito desafinados entre sí, que "laten" como los de verdad
   function organo(f, vol, dura, retraso) {
@@ -243,8 +267,8 @@
     // Día de Muertos: un vals en La menor con guitarra (bajo + rasgueo) y una melodía de requinto; al final, una campana lejana
     muertos: function () {
       var q = .32, A = [N.A3, N.C4, N.E4], Dm = [N.D4, N.F4, N.A4], E = [N.Gs3, N.B3, N.E4], bajos = [N.A2, N.D3, N.E2, N.A2], acordes = [A, Dm, E, A];
-      for (var c = 0; c < 4; c++) { var r = c * 3 * q; cuerda(bajos[c], .55, r, .3); rasgueo(acordes[c], .22, r + q); rasgueo(acordes[c], .18, r + 2 * q, true); }
-      tocar([[N.E5, 1], [N.A4, 1], [N.C5, 1], [N.D5, 1.5], [N.C5, .5], [N.A4, 1], [N.B4, 1], [N.Gs4, 1], [N.B4, 1], [N.A4, 3]], q, function (f, d, t) { cuerda(f, .42, t, .75); });
+      for (var c = 0; c < 4; c++) { var r = c * 3 * q; guitarra(bajos[c], .65, r); rasgueo(acordes[c], .22, r + q); rasgueo(acordes[c], .18, r + 2 * q, true); }
+      tocar([[N.E5, 1], [N.A4, 1], [N.C5, 1], [N.D5, 1.5], [N.C5, .5], [N.A4, 1], [N.B4, 1], [N.Gs4, 1], [N.B4, 1], [N.A4, 3]], q, function (f, d, t) { guitarra(f, .5, t); });
       campana(N.A4, .1, 3.5, 12 * q);
     },
     // Feria: el vals del carrusel, con órgano de tubos, "um-pa-pa" en el bajo y la melodía arriba
@@ -281,13 +305,13 @@
       var requinto = function (vol) { return function (f, d, t) {
         // cuerda pulsada sobre caja de madera (como guitarra); solo las notas largas llevan trémolo
         var veces = d >= 3 * q ? Math.round(d / (q / 2)) : 1;
-        for (var k = 0; k < veces; k++) lira(f, vol * (k ? .65 : 1), t + k * (d / veces));
+        for (var k = 0; k < veces; k++) guitarra(f, vol * (k ? .65 : 1), t + k * (d / veces));
       }; };
       tocar(t1, q, requinto(.5)); tocar(t2, q, requinto(.3));
       // Guitarrón y vihuela: "um-pa" en Do y en Sol, como lleva el son
       var C = [N.C4, N.E4, N.G4], G = [N.B3, N.D4, N.G4];
-      for (var b = 0; b < 8; b++) { var ac = b < 4 ? C : G, raiz = b < 4 ? N.C3 : N.G2, r = b * 4 * q; cuerda(raiz, .6, r, .25); rasgueo(ac, .18, r + 2 * q); }
-      cuerda(N.C3, .6, 32 * q, .25); rasgueo(C, .2, 32 * q);
+      for (var b = 0; b < 8; b++) { var ac = b < 4 ? C : G, raiz = b < 4 ? N.C3 : N.G2, r = b * 4 * q; guitarra(raiz, .7, r); rasgueo(ac, .18, r + 2 * q); }
+      guitarra(N.C3, .7, 32 * q); rasgueo(C, .2, 32 * q);
     },
     // Reyes: "Noche de paz" (de 1818, dominio público) con campanitas, y una campana grave al empezar
     reyes: function () {
