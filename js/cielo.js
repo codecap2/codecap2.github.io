@@ -220,13 +220,15 @@
   C.paletaFuegos = function () {
     return C.fiesta === 'patrias' ? ['#0b8a3e', '#ffffff', '#ce1126'] : C.fiesta === 'feria' ? ['#ff4fa3', '#ffd34d', '#4fd1ff', '#9bff6a', '#ff7a3d'] : ['#f1d48a', '#ff5a4a', '#ffffff', '#ffb347', '#8fd3ff'];
   };
-  // Los fuegos artificiales solo suenan la primera tanda de cada visita (después se ven, pero en silencio, para no cansar)
-  var finSonidoFuegos = 0;
-  function fuegosSuenan() { var ahora = performance.now(); if (!finSonidoFuegos) finSonidoFuegos = ahora + 2500; return ahora < finSonidoFuegos; }
+  // Todos los cohetes suenan: los que lanza el visitante (con un toque en el último segundo y medio) suenan cerca y claros;
+  // los que salen solos, lejanos y suaves. El sonido sale del lado de la pantalla donde está el cohete.
+  var ultimoToque = -9999;
+  addEventListener('pointerdown', function () { ultimoToque = performance.now(); }, true);
+  function lado(x) { return Math.max(-.7, Math.min(.7, (x / (W || innerWidth)) * 1.4 - .7)); }
   C.cohete = function (x, ty, colores) {
-    var dist = Math.max(80, H - ty), v = Math.sqrt(2 * .05 * dist);
-    agregar({ t: 'cohete', x: x, y: H + 10, vx: azar(-.4, .4), vy: -v, ty: ty, vida: 400, c: colores || C.paletaFuegos(), suena: fuegosSuenan() });
-    if (window.Sonido && fuegosSuenan()) Sonido.play('cohete');
+    var dist = Math.max(80, H - ty), v = Math.sqrt(2 * .05 * dist), cerca = performance.now() - ultimoToque < 1500;
+    agregar({ t: 'cohete', x: x, y: H + 10, vx: azar(-.4, .4), vy: -v, ty: ty, vida: 400, c: colores || C.paletaFuegos(), suena: { cerca: cerca } });
+    if (window.Sonido) Sonido.play('cohete', { cerca: cerca, pan: lado(x) });
   };
   function estallar(x, y, cols, sonar) {
     var n = Math.round(80 * F), forma = Math.random();
@@ -234,7 +236,7 @@
       var a = i / n * 6.28 + Math.random() * .1, s = forma < .5 ? azar(2.5, 4.2) : azar(.8, 4.5);
       agregar({ t: 'chispa', g: .035, tam: 2.2, x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, vida: azar(60, 100), c: cols[i % cols.length] });
     }
-    if (window.Sonido && sonar) Sonido.play('estallido');
+    if (window.Sonido && sonar) Sonido.play('estallido', { cerca: sonar.cerca, pan: lado(x) });
   }
   C.brasas = function (x, y, n, colores) {
     colores = colores || ['#ffcf5a', '#ff8a2a', '#ff4a1f'];
@@ -388,7 +390,7 @@
       reyes: [['De noche, toca la estrella más grande del cielo ⭐ (suena "Noche de paz")', 'At night, tap the biggest star in the sky ⭐ ("Silent Night" plays)'], ['Toca la corona del logo', 'Tap the crown on the logo']],
       sanvalentin: [['Toca el corazón del logo 💘', 'Tap the heart on the logo 💘']],
       feria: [['Toca la rueda de la fortuna 🎡 (suena el Son de la Feria, hecho para Olimpo)', 'Tap the Ferris wheel 🎡 (the Fair Song plays, made for Olympus)'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],
-      patrias: [['Toca la bandera a lo lejos en las dunas 🇲🇽 (se ilumina y suena el requinto)', 'Tap the distant flag on the dunes 🇲🇽 (it lights up and the requinto plays)'], ['Toca la bandera del logo', 'Tap the flag on the logo'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],
+      patrias: [['Toca la bandera a lo lejos en las dunas 🇲🇽 (se ilumina y suena el mariachi)', 'Tap the distant flag on the dunes 🇲🇽 (it lights up and the mariachi plays)'], ['Toca la bandera del logo', 'Tap the flag on the logo'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],
       muertos: [['Toca al xolo 🐕 y te explica el altar nivel por nivel', 'Tap the xolo 🐕 and it explains the altar level by level'], ['Toca el altar (suena el vals)', 'Tap the altar (the waltz plays)'], ['Toca la calaverita del logo 💀', 'Tap the sugar skull on the logo 💀']],
       halloween: [['Toca la calabaza del logo 🎃', 'Tap the pumpkin on the logo 🎃'], ['Toca al xolo 🐕 y el altar', 'Tap the xolo 🐕 and the altar']]
     };

@@ -1,9 +1,11 @@
-/* Olimpo · sonidos hechos con código (Web Audio), sin archivos de nadie, buscando que suenen reales:
-   ruido café para viento, mar y truenos; cuerdas pulsadas de verdad (Karplus-Strong) para la lira y el arpa;
-   campanas y metales con armónicos inarmónicos, como los reales. Arranca tras el primer gesto (botón 🔇/🔊). */
+/* Olimpo · sonidos. Dos mundos juntos:
+   1) GRABACIONES REALES (Mixkit y Pixabay, con licencia libre) para lo que un sintetizador no logra: música de fiesta,
+      cohetes, viento del desierto y grillos. Ver "Agradecimientos" en el pie de la página.
+   2) Sonidos hechos con código (Web Audio): la lira de Apolo, campanas, truenos y efectos de los dioses.
+   Todo pasa por un limitador final para que nunca se sature. Arranca tras el primer gesto (botón 🔇/🔊). */
 (function () {
   var S = window.Sonido = { on: false };
-  var ctx, blanco, cafe, maestro, reverb, amb = [], tGrillos, tRafaga, cuerdas = {};
+  var ctx, blanco, cafe, maestro, reverb, amb = [], cuerdas = {};
 
   // En celulares todo es más ligero: ecos más cortos y menos chasquidos, para que el audio no truene
   var LIGERO = innerWidth < 760 || (navigator.hardwareConcurrency || 8) <= 4 || /iPhone|iPad|Android/i.test(navigator.userAgent);
@@ -11,7 +13,9 @@
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return true; }
     try {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
-      maestro = ctx.createGain(); maestro.gain.value = .82; maestro.connect(ctx.destination);
+      // Limitador final: si varios sonidos coinciden (cohetes + música + viento), los contiene en vez de saturar o tronar
+      var limite = ctx.createDynamicsCompressor(); limite.threshold.value = -9; limite.knee.value = 6; limite.ratio.value = 16; limite.attack.value = .003; limite.release.value = .25;
+      maestro = ctx.createGain(); maestro.gain.value = .82; maestro.connect(limite); limite.connect(ctx.destination);
       var n = ctx.sampleRate * 3;
       blanco = ctx.createBuffer(1, n, ctx.sampleRate); cafe = ctx.createBuffer(1, n, ctx.sampleRate);
       var b = blanco.getChannelData(0), c = cafe.getChannelData(0), ult = 0;
@@ -64,74 +68,69 @@
       [698, 1], [698, 1], [698, 1.5], [698, .5], [698, 1], [659, 1], [659, 1], [659, .5], [659, .5], [659, 1], [587, 1], [587, 1], [659, 1], [587, 2], [784, 2]];
     notas.slice(0, cuantas || notas.length).forEach(function (n) { campanita(n[0], .075, t + .05); t += n[1] * q; });
   }
-  // Guitarra de verdad (para el requinto, el vals y los rasgueos): la uña ataca la cuerda (golpecito de ruido),
-  // la cuerda vibra con su "posición de pulsado" (filtro de peine) y se apaga como una cuerda real; la caja de madera
-  // le da cuerpo (resonancias graves de 100 y 210 Hz) y se le quita el brillo metálico de arriba.
-  var cajaGuitarra = null;
-  function guitarra(f, vol, retraso) {
-    var clave = 'gt' + Math.round(f), buf = cuerdas[clave];
-    if (!buf) {
-      var sr = ctx.sampleRate, n = Math.floor(sr * 1.7), per = Math.max(2, Math.round(sr / f)), linea = new Float32Array(per), prev = 0;
-      for (var i = 0; i < per; i++) { var r = Math.random() * 2 - 1; prev = prev * .45 + r * .55; linea[i] = prev; }   // ruido suavizado: uña, no púa
-      var corte = Math.max(1, Math.round(per * .13)), exc = Float32Array.from(linea);
-      for (var i2 = 0; i2 < per; i2++) linea[i2] = exc[i2] - exc[(i2 + corte) % per] * .9;                          // pulsada cerca del puente
-      buf = ctx.createBuffer(1, n, sr); var d = buf.getChannelData(0), p = 0;
-      for (var j = 0; j < n; j++) { var sig = (p + 1) % per; var v = (linea[p] * .5 + linea[sig] * .5) * .9935; d[j] = linea[p]; linea[p] = v; p = sig; }
-      cuerdas[clave] = buf;
-    }
-    // Una sola 'caja de guitarra' (filtros) compartida por todas las notas: así no se satura el audio ni se corta
-    if (!cajaGuitarra) {
-      var c1 = ctx.createBiquadFilter(), c2 = ctx.createBiquadFilter(), c3 = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(); cajaGuitarra = ctx.createGain(); cajaGuitarra.gain.value = 1;
-      c1.type = 'peaking'; c1.frequency.value = 100; c1.Q.value = 1; c1.gain.value = 6;
-      c2.type = 'peaking'; c2.frequency.value = 210; c2.Q.value = 1.3; c2.gain.value = 5;
-      c3.type = 'peaking'; c3.frequency.value = 2600; c3.Q.value = 1; c3.gain.value = 2.5;
-      lp.type = 'lowpass'; lp.frequency.value = 4200; lp.Q.value = .5;
-      cajaGuitarra.connect(c1); c1.connect(c2); c2.connect(c3); c3.connect(lp); salida(lp);
-    }
-    var t = ctx.currentTime + (retraso || 0), s = ctx.createBufferSource(), g = ctx.createGain();
-    s.buffer = buf; g.gain.setValueAtTime(vol, t); g.gain.setTargetAtTime(.0001, t + .9, .35);
-    s.connect(g); g.connect(cajaGuitarra); s.start(t); s.stop(t + 1.75);
-    if (!LIGERO) siseo(3200, 2000, vol * .07, .02, retraso || 0, 1.2, .001);   // el toque de la uña (en celular se omite, para no saturar)
+  // ---------- GRABACIONES REALES ----------
+  // Lo que un sintetizador no logra (guitarras, mariachi, banda, cohetes, viento, grillos) suena con grabaciones de verdad,
+  // con licencia libre (Mixkit y Pixabay; los créditos están en "Agradecimientos", en el pie de la página).
+  // Cada archivo se descarga solo cuando hace falta, una sola vez, y se guarda ya decodificado.
+  var grabados = {};
+  function grabacion(nombre) {
+    if (!grabados[nombre]) grabados[nombre] = fetch('sonidos/' + nombre + '.mp3')
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+      .then(function (b) { return new Promise(function (ok, no) { var p = ctx.decodeAudioData(b, ok, no); if (p && p.catch) p.catch(function () {}); }); })
+      .catch(function () { delete grabados[nombre]; return null; });
+    return grabados[nombre];
   }
-  // ---------- Guitarra GRABADA (no sintetizada) ----------
-  // Notas reales de guitarra de nylon del banco FluidR3 GM (Frank Wen), vía MIDI.js Soundfonts. Licencia CC BY 3.0
-  // (el crédito va en el pie de la página). Solo se descargan cuando hace falta y se guardan para no volver a pedirlas.
-  var NOTAS_GUITARRA = 'E2 G2 A2 B2 C3 D3 E3 F3 G3 Ab3 A3 B3 C4 D4 E4 F4 G4 Ab4 A4 B4 C5 D5 E5 F5 G5 A5'.split(' ');
-  var NOMBRES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'], muestras = {};
-  function notaDe(f) { var m = Math.round(12 * Math.log(f / 440) / Math.LN2) + 69; return NOMBRES[m % 12] + (Math.floor(m / 12) - 1); }
-  function muestra(nombre) {
-    if (!muestras[nombre]) muestras[nombre] = fetch('sonidos/guitarra/' + nombre + '.mp3').then(function (r) { return r.arrayBuffer(); })
-      .then(function (b) { return new Promise(function (ok, no) { var p = ctx.decodeAudioData(b, ok, no); if (p && p.catch) p.catch(function () {}); }); }).catch(function () { return null; });
-    return muestras[nombre];
-  }
-  S.precargarGuitarra = function () { if (ctx) NOTAS_GUITARRA.forEach(muestra); };
-  function guitarraReal(f, vol, retraso) {
-    var nombre = notaDe(f), cuando = ctx.currentTime + (retraso || 0);
-    if (NOTAS_GUITARRA.indexOf(nombre) < 0) return guitarra(f, vol, retraso);
-    muestra(nombre).then(function (buf) {
-      if (!buf) return guitarra(f, vol, Math.max(0, cuando - ctx.currentTime));
-      var s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = buf; g.gain.value = vol * 1.5;
-      s.connect(g); salida(g); s.start(Math.max(cuando, ctx.currentTime));
+  S.precargar = function (lista) { if (ctx) lista.forEach(grabacion); };
+  // Reproduce una grabación con entrada y salida suaves (nada de "clics" ni cortes en seco).
+  // o: { vol, retraso, desde, dura, vel (velocidad/tono), entra, sale (segundos de fundido), pan (-1 a 1), lejos (0 a 1: más apagado y con eco), destino }
+  var voces = 0;
+  function sonar(nombre, o) {
+    o = o || {};
+    var cuando = ctx.currentTime + (o.retraso || 0);
+    return grabacion(nombre).then(function (buf) {
+      if (!buf) return null;
+      var vel = o.vel || 1, desde = o.desde || 0, dura = Math.min(o.dura || buf.duration, buf.duration - desde), real = dura / vel;
+      var t = Math.max(cuando, ctx.currentTime + .01), vol = o.vol == null ? 1 : o.vol, entra = o.entra || .006, sale = Math.min(o.sale || .08, real / 2);
+      var s = ctx.createBufferSource(), g = ctx.createGain(), ultimo = g;
+      s.buffer = buf; s.playbackRate.value = vel;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + entra);
+      g.gain.setValueAtTime(vol, t + real - sale); g.gain.linearRampToValueAtTime(0, t + real);
+      s.connect(g);
+      if (o.lejos) { var f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 9000 - o.lejos * 7000; ultimo.connect(f); ultimo = f; }
+      if (o.pan && ctx.createStereoPanner) { var p = ctx.createStereoPanner(); p.pan.value = o.pan; ultimo.connect(p); ultimo = p; }
+      if (o.destino) ultimo.connect(o.destino); else salida(ultimo, o.eco);
+      voces++; s.onended = function () { voces--; };
+      s.start(t, desde, dura + .02); s.stop(t + real + .05);
+      return s;
     });
   }
-  // Rasgueo de guitarra: las cuerdas suenan una tras otra, muy rápido, como con la mano
-  function rasgueo(notas, vol, retraso, haciaArriba) {
-    var orden = haciaArriba ? notas.slice().reverse() : notas;
-    orden.forEach(function (f, i) { guitarraReal(f, vol * (1 - i * .08) * 1.3, retraso + i * .016); });
+  // Bucle sin costuras: cada vuelta entra mientras la anterior se desvanece (fundido cruzado), así no se nota dónde empieza
+  function bucle(nombre, vol, cruce, destino) {
+    var b = { g: ctx.createGain(), fuentes: [], parar: false, timer: 0 };
+    b.g.gain.value = 0; b.g.gain.setTargetAtTime(vol, ctx.currentTime, 1.2); b.g.connect(destino || maestro);
+    grabacion(nombre).then(function (buf) {
+      if (!buf || b.parar) return;
+      var dur = buf.duration, c = Math.min(cruce || 4, dur / 4);
+      (function vuelta(t0) {
+        if (b.parar) return;
+        var s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = buf; s.connect(g); g.connect(b.g);
+        g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(1, t0 + c); g.gain.setValueAtTime(1, t0 + dur - c); g.gain.linearRampToValueAtTime(0, t0 + dur);
+        s.start(t0); s.stop(t0 + dur + .05); b.fuentes.push(s); if (b.fuentes.length > 3) b.fuentes.shift();
+        b.timer = setTimeout(function () { vuelta(t0 + dur - c); }, Math.max(100, (t0 + dur - c - ctx.currentTime - 1.5) * 1000));
+      })(ctx.currentTime + .05);
+    });
+    b.alto = function () {
+      b.parar = true; clearTimeout(b.timer);
+      b.g.gain.setTargetAtTime(0, ctx.currentTime, .4);
+      setTimeout(function () { b.fuentes.forEach(function (s) { try { s.stop(); } catch (e) {} }); b.g.disconnect(); }, 2500);
+    };
+    return b;
   }
-  // Órgano de carrusel: tubos (fundamental, octava y quinta) un poquito desafinados entre sí, que "laten" como los de verdad
-  function organo(f, vol, dura, retraso) {
-    [[1, 1], [1.004, .6], [2, .45], [3, .2]].forEach(function (p) { tono(f * p[0], 'sine', vol * p[1], dura, retraso, 0, .03); });
-    siseo(f * 2, f * 2, vol * .05, dura * .6, retraso, 2, .02);   // el aire de los tubos
-  }
-  // Trompeta de mariachi: metal brillante que se abre al soplar, con vibrato
-  function trompeta(f, vol, dura, retraso) {
-    var t = ctx.currentTime + (retraso || 0), o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), g = ctx.createGain(), vib = ctx.createOscillator(), vg = ctx.createGain();
-    o.type = 'sawtooth'; o.frequency.setValueAtTime(f * .985, t); o.frequency.exponentialRampToValueAtTime(f, t + .05);
-    vib.frequency.value = 5.5; vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(f * .012, t + dura * .6); vib.connect(vg); vg.connect(o.frequency);
-    fl.type = 'lowpass'; fl.Q.value = 1.2; fl.frequency.setValueAtTime(f * 1.5, t); fl.frequency.exponentialRampToValueAtTime(f * 7, t + .06); fl.frequency.exponentialRampToValueAtTime(f * 4, t + dura);
-    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .04); g.gain.setValueAtTime(vol * .85, t + dura * .7); g.gain.exponentialRampToValueAtTime(.0001, t + dura + .08);
-    o.connect(fl); fl.connect(g); salida(g); o.start(t); vib.start(t); o.stop(t + dura + .12); vib.stop(t + dura + .12);
+  // Música de fiesta grabada: un fragmento que entra suave y se despide con un fundido largo. Solo una a la vez.
+  var cancion = null;
+  function musica(nombre, vol) {
+    if (cancion) { try { cancion.stop(ctx.currentTime + .3); } catch (e) {} }
+    sonar('musica/' + nombre, { vol: vol, entra: .25, sale: 3, eco: false }).then(function (s) { cancion = s; });
   }
   // Toca una melodía: [frecuencia (0 = silencio), duración en tiempos], con el instrumento que se le pase
   function tocar(notas, q, instrumento, desde) {
@@ -283,62 +282,30 @@
       [1568, 2093, 2637].forEach(function (f, i) { tono(f, 'sine', .04, 1.5, 1.2 + i * .15, 0, .01); });
     },
     // ---- Fiestas ----
-    // Cohete: silbido que sube; estallido: golpe grave lejano y chisporroteo que cae
-    cohete: function () { var t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(900, t); o.frequency.exponentialRampToValueAtTime(2600, t + 1.1); env(g, t, .05, .04, 1.2); o.connect(g); salida(g); o.start(t); o.stop(t + 1.25); siseo(3000, 6000, .05, 1.1, 0, 1.2, .2); },
-    estallido: function () { enElCielo = true; try { soplo('lowpass', 900, 120, .9, 1.4, 0, .6, .004); tono(55, 'sine', .7, 1, 0, 32, .004); crujido(30, 1.6, .15, .22); } finally { enElCielo = false; } },
+    // Cohetes GRABADOS: el "fiuuu" al subir y el trueno al reventar. Los que lanza el visitante suenan cerca y claros;
+    // los que salen solos suenan lejanos y suaves (como fuegos de otro barrio), para acompañar sin cansar.
+    cohete: function (o) {
+      o = o || {}; if (voces > 12) return;
+      sonar('fuegos/cohete', { desde: 0, dura: .8, sale: .3, vol: o.cerca ? .55 : .14, vel: .9 + Math.random() * .25, pan: o.pan || 0, lejos: o.cerca ? 0 : .7 });
+    },
+    estallido: function (o) {
+      o = o || {}; if (voces > 12) return;
+      // Solo tomas que el "oído" de IA (YAMNet) reconoce como fuegos artificiales y NO como disparos
+      var tomas = [['fuegos/estallido-eco', .82, 2.6], ['fuegos/estallido-2', 0, 0], ['fuegos/estallido-silbido', 0, 2.6]],
+        x = tomas[Math.floor(Math.random() * tomas.length)];
+      sonar(x[0], { desde: x[1], dura: x[2] || 0, sale: .6, vol: o.cerca ? .7 : .2, vel: .8 + Math.random() * .18, pan: o.pan || 0, lejos: o.cerca ? 0 : .75, retraso: o.cerca ? 0 : .25 + Math.random() * .3 });
+    },
     // Navidad: la melodía de "Jingle Bells" (tradicional, de 1857) con timbre de campanitas.
     // Al tocar algo suena solo el inicio; cuando pasa Santa suena el coro completo.
     cascabeles: function () { melodiaNavidad(11); },
     trineo: function () { melodiaNavidad(); },
-    // Día de Muertos: un vals en La menor con guitarra (bajo + rasgueo) y una melodía de requinto; al final, una campana lejana
-    muertos: function () {
-      var q = .32, A = [N.A3, N.C4, N.E4], Dm = [N.D4, N.F4, N.A4], E = [N.Gs3, N.B3, N.E4], bajos = [N.A2, N.D3, N.E2, N.A2], acordes = [A, Dm, E, A];
-      for (var c = 0; c < 4; c++) { var r = c * 3 * q; guitarraReal(bajos[c], .65, r); rasgueo(acordes[c], .22, r + q); rasgueo(acordes[c], .18, r + 2 * q, true); }
-      tocar([[N.E5, 1], [N.A4, 1], [N.C5, 1], [N.D5, 1.5], [N.C5, .5], [N.A4, 1], [N.B4, 1], [N.Gs4, 1], [N.B4, 1], [N.A4, 3]], q, function (f, d, t) { guitarraReal(f, .5, t); });
-      campana(N.A4, .1, 3.5, 12 * q);
-    },
-    // Feria: el vals del carrusel, con órgano de tubos, "um-pa-pa" en el bajo y la melodía arriba
-    // Feria de San Marcos: "Son de la Feria", una melodía original de Olimpo (solo nuestra), con estilo de banda:
-    // dos trompetas en terceras, tuba haciendo "um-pa", tambora en el tiempo fuerte y platillo a contratiempo
-    feria: function () {
-      var q = .17, Bb4 = 466.2, Bb2 = 116.5, F2 = 87.3, C2 = 65.4, A5 = 880, C6 = 1046.5;
-      var mel = [[N.C5, 1], [N.A4, 1], [N.C5, 1], [N.F5, 1], [A5, 1], [N.G5, 1], [N.F5, 1], [N.E5, 1],
-        [N.D5, 1], [Bb4, 1], [N.D5, 1], [N.G5, 1], [N.F5, 1], [N.E5, 1], [N.D5, 1], [N.C5, 1],
-        [N.C5, 1], [N.A4, 1], [N.C5, 1], [N.F5, 1], [A5, 1], [C6, 1], [A5, 1], [N.F5, 1],
-        [N.G5, 1], [N.E5, 1], [N.C5, 1], [N.E5, 1], [N.F5, 2], [0, 2]];
-      var tercera = { 523.3: N.A4, 440: N.F4, 698.5: N.D5, 880: N.F5, 784: N.E5, 659.3: N.C5, 587.3: Bb4, 466.2: N.G4, 1046.5: A5, 392: N.E4 };
-      tocar(mel, q, function (f, d, t) { trompeta(f, .055, d * .8, t); });
-      tocar(mel.map(function (n) { return [n[0] ? (tercera[n[0]] || n[0] * .8) : 0, n[1]]; }), q, function (f, d, t) { trompeta(f, .036, d * .8, t); });
-      // Armonía por compás (4 corcheas): Fa, Fa, Si bemol, Do, Fa, Fa, Do, Fa
-      var raices = [[F2, N.C3], [F2, N.C3], [Bb2, F2], [N.C3, N.G2], [F2, N.C3], [F2, N.C3], [N.C3, N.G2], [F2, N.C3]];
-      raices.forEach(function (rz, i) {
-        var r = i * 4 * q;
-        trompeta(rz[0], .07, q * 1.4, r); trompeta(rz[1], .06, q * 1.4, r + 2 * q);     // tuba: um… pa
-        tono(70, 'sine', .55, .22, r, 45, .003); soplo('lowpass', 260, 90, .3, .18, r, .7, .003);   // tambora
-        [1, 3].forEach(function (b) { siseo(6000, 8000, .05, .14, r + b * q, 1.2, .003); });        // platillo
-      });
-    },
-    // Fiestas Patrias: fanfarria de mariachi, dos trompetas en terceras, guitarrón y vihuela
-    patrias: function () {
-      // El tema más famoso del Jarabe Tapatío (son tradicional de Jalisco, dominio público) tocado con REQUINTO:
-      // la guitarrita aguda y brillante de los tríos, en dos voces, con guitarrón y vihuela de fondo
-      var q = .16,
-        t1 = [[N.G4, 1], [N.C5, 2], [0, 1], [N.G4, 1], [N.C5, 2], [0, 1], [N.G4, 1], [N.C5, 1], [N.D5, 1], [N.C5, 1], [N.B4, 1], [N.C5, 1], [N.D5, 2],
-          [N.G4, 1], [N.B4, 2], [0, 1], [N.G4, 1], [N.B4, 2], [0, 1], [N.G4, 1], [N.B4, 1], [N.C5, 1], [N.B4, 1], [N.A4, 1], [N.B4, 1], [N.C5, 3]],
-        baja = { 523.3: N.A4 || 440, 587.3: N.B4, 493.9: N.G4, 392: N.E4, 440: N.F4 };
-      var t2 = t1.map(function (n) { return [n[0] ? (baja[n[0]] || n[0] * .8) : 0, n[1]]; });
-      // Requinto: una octava arriba, cuerda brillante; las notas largas se "trémolo" (punteo rápido), como lo hacen los requintistas
-      var requinto = function (vol) { return function (f, d, t) {
-        // cuerda pulsada sobre caja de madera (como guitarra); solo las notas largas llevan trémolo
-        var veces = d >= 3 * q ? Math.round(d / (q / 2)) : 1;
-        for (var k = 0; k < veces; k++) guitarraReal(f, vol * (k ? .65 : 1), t + k * (d / veces));
-      }; };
-      tocar(t1, q, requinto(.5)); tocar(t2, q, requinto(.3));
-      // Guitarrón y vihuela: "um-pa" en Do y en Sol, como lleva el son
-      var C = [N.C4, N.E4, N.G4], G = [N.B3, N.D4, N.G4];
-      for (var b = 0; b < 8; b++) { var ac = b < 4 ? C : G, raiz = b < 4 ? N.C3 : N.G2, r = b * 4 * q; guitarraReal(raiz, .7, r); rasgueo(ac, .18, r + 2 * q); }
-      guitarraReal(N.C3, .7, 32 * q); rasgueo(C, .2, 32 * q);
-    },
+    // Día de Muertos, Feria y Fiestas Patrias: música GRABADA por músicos (Pixabay), no sintetizada.
+    // Muertos: guitarra acústica mexicana, tranquila; al final, una campana lejana de templo.
+    muertos: function () { musica('muertos', .5); campana(N.A4, .06, 3.5, 20); },
+    // Feria de San Marcos: banda con metales (huapango)
+    feria: function () { musica('feria', .85); },
+    // Fiestas Patrias: mariachi con trompetas y guitarras
+    patrias: function () { musica('patrias', .36); },
     // Reyes: "Noche de paz" (de 1818, dominio público) con campanitas, y una campana grave al empezar
     reyes: function () {
       campana(N.C4, .08, 4);
@@ -352,41 +319,42 @@
     victoria: function () { campana(220, .45, 5); campana(330, .25, 4.5, .9); [392, 494, 587, 784, 988].forEach(function (f, i) { cuerda(f, .4, 1.4 + i * .1, .6); }); }
   };
   S.nota = function (f) { if (!S.on || !iniciar()) return false; lira(f, .42, 0); return true; };
-  S.play = function (n) { if (!S.on || !EF[n] || !iniciar()) return; try { EF[n](); } catch (e) { if (window.console) console.warn('Sonido ' + n + ':', e); } };
+  S.play = function (n, o) { if (!S.on || !EF[n] || !iniciar()) return; try { EF[n](o); } catch (e) { if (window.console) console.warn('Sonido ' + n + ':', e); } };
 
-  // ---------- Ambiente del desierto ----------
+  // ---------- Ambiente del desierto (grabado) ----------
   function lazo(tipo, f, q, vol, buffer) {
     var s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), g = ctx.createGain();
     s.buffer = buffer || cafe; s.loop = true; fl.type = tipo; fl.frequency.value = f; fl.Q.value = q; g.gain.value = vol;
     s.connect(fl); fl.connect(g); g.connect(maestro); s.start(); amb.push(s); return { f: fl, g: g };
   }
+  var vientoVivo = null, grillosVivos = null, tSigue = 0;
   function ambiente() {
     pararAmbiente(); if (!S.on || !iniciar()) return;
     var cl = (window.Cielo && Cielo.clima) || 'despejado', noche = window.Cielo && Cielo.modo === 'noche';
-    // Viento: ráfagas que suben y bajan. Más fuerte en la mañana y en la tarde, y arrecia con el viento real.
+    // Viento real del desierto. Más fuerte en la mañana y en la tarde, arrecia con el viento real de la ciudad del visitante
+    // y, sobre todo, sube y baja AL MISMO TIEMPO que las ráfagas de arena que se ven en la pantalla (Cielo.rafaga).
     var fase = (window.Cielo && Cielo.fase) || 'dia', km = (window.Cielo && Cielo.viento) || 8;
-    var base = { amanecer: .1, atardecer: .1, dia: .07, noche: .045 }[fase] || .07;
-    var fuerza = Math.min(3, Math.max(.7, km / 12)) * (cl === 'arena' ? 1.8 : 1);
-    (function rafaga() {
-      tRafaga = setTimeout(function () {
-        if (!S.on) return;
-        soplo('bandpass', 250 + Math.random() * 150, 500 + Math.random() * 300, base * fuerza, 4 + Math.random() * 3, 0, 1.2, 1.6);
-        rafaga();
-      }, Math.max(1500, 7000 / fuerza) + Math.random() * 4000);
+    var base = ({ amanecer: 1.3, atardecer: 1.3, dia: 1, noche: .7 }[fase] || 1) * Math.min(1.8, Math.max(.75, km / 14)) * (cl === 'arena' ? 1.9 : 1);
+    var brillo = ctx.createBiquadFilter(); brillo.type = 'lowpass'; brillo.frequency.value = 2500; brillo.connect(maestro);
+    vientoVivo = bucle('ambiente/viento', 2.2 * base, 4, brillo);
+    (function seguir() {
+      tSigue = setTimeout(function () {
+        if (!vientoVivo) return;
+        var r = (window.Cielo && Cielo.rafaga) || 1, t = ctx.currentTime;   // 1 = calma, hasta ~3.8 = ráfaga fuerte
+        vientoVivo.g.gain.setTargetAtTime(2.2 * base * (.6 + .32 * r), t, .5);
+        brillo.frequency.setTargetAtTime(1600 + r * 1500, t, .5);              // en la ráfaga, el viento silba más brillante
+        seguir();
+      }, 250);
     })();
-    if (cl === 'arena') lazo('lowpass', 320, .5, .05);
     if (cl === 'lluvia' || cl === 'tormenta') lazo('bandpass', 2400, .4, .05, blanco);
-    // Grillos en las noches tranquilas
-    if (noche && cl !== 'lluvia' && cl !== 'tormenta' && cl !== 'arena') (function grillo() {
-      tGrillos = setTimeout(function () {
-        if (!S.on) return;
-        var f = 4100 + Math.random() * 500;
-        for (var i = 0; i < 4; i++) tono(f, 'sine', .016, .018, i * .032, 0, .002, false);   // 4 pulsitos muy rápidos: así frota las alas un grillo
-        grillo();
-      }, 700 + Math.random() * 1500);
-    })();
+    // Grillos de verdad en las noches tranquilas
+    if (noche && cl !== 'lluvia' && cl !== 'tormenta' && cl !== 'arena') grillosVivos = bucle('ambiente/grillos', .45, 3);
   }
-  function pararAmbiente() { amb.forEach(function (n) { try { n.stop(); } catch (e) {} }); amb = []; clearTimeout(tGrillos); clearTimeout(tRafaga); }
+  function pararAmbiente() {
+    amb.forEach(function (n) { try { n.stop(); } catch (e) {} }); amb = []; clearTimeout(tSigue);
+    if (vientoVivo) { vientoVivo.alto(); vientoVivo = null; }
+    if (grillosVivos) { grillosVivos.alto(); grillosVivos = null; }
+  }
   S.actualizarAmbiente = function () { if (S.on) ambiente(); };
 
   // Empieza ENCENDIDO. Los navegadores no dejan sonar nada hasta que el visitante toca la página,
@@ -400,7 +368,7 @@
     if (despertado) return; despertado = true;
     ['pointerdown', 'keydown', 'touchstart', 'touchend', 'click'].forEach(function (t) { removeEventListener(t, despertar, true); });
     if (e && btn && btn.contains(e.target)) return;   // si su primer toque fue para apagarlo, no suena nada
-    if (S.on && iniciar()) { ambiente(); var fi = window.Cielo && Cielo.fiesta; if (fi === 'patrias' || fi === 'muertos') S.precargarGuitarra(); }
+    if (S.on && iniciar()) { ambiente(); var fi = window.Cielo && Cielo.fiesta; if (fi === 'patrias' || fi === 'muertos' || fi === 'feria') S.precargar(['musica/' + fi]); if (fi === 'patrias' || fi === 'feria' || fi === 'anonuevo') S.precargar(['fuegos/cohete', 'fuegos/estallido-silbido', 'fuegos/estallido-2', 'fuegos/estallido-eco']); }
   }
   // iPhone a veces crea el audio "dormido": se despierta en cualquier toque o clic
   ['touchend', 'click'].forEach(function (t) { addEventListener(t, function () { if (ctx && ctx.state !== 'running') ctx.resume(); }, true); });
