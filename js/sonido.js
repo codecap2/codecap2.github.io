@@ -58,6 +58,44 @@
     [[1, 1], [2.76, .5], [5.4, .25], [8.93, .12], [13.3, .06]].forEach(function (p, i) { tono(f * p[0], 'sine', vol * p[1], dura / (1 + i * .6), retraso, 0, .002); });
     siseo(f * 3, f * 2, vol * .5, .05, retraso, 1.5, .002);
   }
+  // El coro de "Jingle Bells" (dominio público); con "cuantas" se toca solo el principio
+  function melodiaNavidad(cuantas) {
+    var q = .27, t = 0, notas = [[659, 1], [659, 1], [659, 2], [659, 1], [659, 1], [659, 2], [659, 1], [784, 1], [523, 1.5], [587, .5], [659, 4],
+      [698, 1], [698, 1], [698, 1.5], [698, .5], [698, 1], [659, 1], [659, 1], [659, .5], [659, .5], [659, 1], [587, 1], [587, 1], [659, 1], [587, 2], [784, 2]];
+    notas.slice(0, cuantas || notas.length).forEach(function (n) { campanita(n[0], .075, t + .05); t += n[1] * q; });
+  }
+  // Rasgueo de guitarra: las cuerdas suenan una tras otra, muy rápido, como con la mano
+  function rasgueo(notas, vol, retraso, haciaArriba) {
+    var orden = haciaArriba ? notas.slice().reverse() : notas;
+    orden.forEach(function (f, i) { cuerda(f, vol * (1 - i * .08), retraso + i * .014, .45); });
+  }
+  // Órgano de carrusel: tubos (fundamental, octava y quinta) un poquito desafinados entre sí, que "laten" como los de verdad
+  function organo(f, vol, dura, retraso) {
+    [[1, 1], [1.004, .6], [2, .45], [3, .2]].forEach(function (p) { tono(f * p[0], 'sine', vol * p[1], dura, retraso, 0, .03); });
+    siseo(f * 2, f * 2, vol * .05, dura * .6, retraso, 2, .02);   // el aire de los tubos
+  }
+  // Trompeta de mariachi: metal brillante que se abre al soplar, con vibrato
+  function trompeta(f, vol, dura, retraso) {
+    var t = ctx.currentTime + (retraso || 0), o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), g = ctx.createGain(), vib = ctx.createOscillator(), vg = ctx.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(f * .985, t); o.frequency.exponentialRampToValueAtTime(f, t + .05);
+    vib.frequency.value = 5.5; vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(f * .012, t + dura * .6); vib.connect(vg); vg.connect(o.frequency);
+    fl.type = 'lowpass'; fl.Q.value = 1.2; fl.frequency.setValueAtTime(f * 1.5, t); fl.frequency.exponentialRampToValueAtTime(f * 7, t + .06); fl.frequency.exponentialRampToValueAtTime(f * 4, t + dura);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .04); g.gain.setValueAtTime(vol * .85, t + dura * .7); g.gain.exponentialRampToValueAtTime(.0001, t + dura + .08);
+    o.connect(fl); fl.connect(g); salida(g); o.start(t); vib.start(t); o.stop(t + dura + .12); vib.stop(t + dura + .12);
+  }
+  // Toca una melodía: [frecuencia (0 = silencio), duración en tiempos], con el instrumento que se le pase
+  function tocar(notas, q, instrumento, desde) {
+    var t = desde || 0;
+    notas.forEach(function (n) { if (n[0]) instrumento(n[0], n[1] * q, t); t += n[1] * q; });
+    return t;
+  }
+  // Notas (Hz) para escribir las melodías de forma legible
+  var N = { G2: 98, A2: 110, B2: 123.5, C3: 130.8, D3: 146.8, E3: 164.8, F3: 174.6, G3: 196, A3: 220, B3: 246.9, C4: 261.6, D4: 293.7, E4: 329.6, F4: 349.2, G4: 392, Gs4: 415.3, A4: 440, B4: 493.9,
+    C5: 523.3, D5: 587.3, E5: 659.3, F5: 698.5, G5: 784, A5: 880, B5: 987.8, C6: 1046.5, Gs3: 207.7, E2: 82.4, D2: 73.4 };
+  // Campanita tipo celesta (más dulce que la campana grande), para melodías
+  function campanita(f, vol, retraso) {
+    [[1, 1], [2, .28], [3.01, .1], [4.1, .05]].forEach(function (p, i) { tono(f * p[0], 'sine', vol * p[1], .9 / (1 + i * .8), retraso, 0, .003); });
+  }
   function campana(f, vol, dura, retraso) { [[1, 1], [2, .55], [2.4, .4], [3, .3], [4.2, .2], [5.4, .12]].forEach(function (p) { tono(f * p[0], 'sine', vol * p[1], dura * (1.2 - p[0] * .1), retraso, 0, .004); }); }
   // Cuerda pulsada (Karplus-Strong): suena a lira o arpa de verdad
   function cuerda(f, vol, retraso, brillo) {
@@ -147,7 +185,8 @@
     sol: function () { soplo('bandpass', 300, 600, .25, 3, 0, .6, 1.2); [196, 247, 294, 392].forEach(function (f, i) { cuerda(f, .5, .3 + i * .18, .3); }); },
     // Selene: noche serena, notas de arpa altas y suaves
     luna: function () { [784, 988, 1175, 1568].forEach(function (f, i) { cuerda(f, .3, i * .28, .7); }); },
-    lira: function () { [262, 294, 330, 392, 440, 523].forEach(function (f, i) { lira(f, .38, i * .13); }); },
+    // Apolo: una frase corta en la lira, que sube, respira y se resuelve (ya no una escala de práctica)
+    lira: function () { [[262, 0], [330, .14], [392, .28], [523, .42], [494, .7], [392, .88], [440, 1.12]].forEach(function (n) { lira(n[0], .38, n[1]); }); },
     // Artemisa: la cuerda del arco vibra y la flecha corta el aire
     arco: function () { cuerda(98, .9, 0, .2); siseo(2500, 6000, .25, .45, .04, .8, .02); },
     espada: function () { siseo(4000, 9000, .25, .5, 0, 2, .02); metal(1700, .14, 1.4, .05); },
@@ -164,6 +203,18 @@
       [392, 494, 587, 784].forEach(function (f, i) { cuerda(f, .35, 1.6 + i * .06, .6); });
     },
     hades: function () { soplo('lowpass', 120, 60, .7, 4, 0, .6, 1.2); tono(41, 'sine', .35, 4, .1, 34, 1); siseo(300, 200, .05, 3, .5, 4, 1); },
+    // Halloween: un theremín de película de terror que se desliza entre notas, sobre un zumbido grave y una campana lejana
+    halloween: function () {
+      var t = ctx.currentTime, o = ctx.createOscillator(), vib = ctx.createOscillator(), vg = ctx.createGain(), g = ctx.createGain();
+      o.type = 'sine'; vib.frequency.value = 6; vg.gain.value = 7; vib.connect(vg); vg.connect(o.frequency);
+      var notas = [[N.E4, 0], [N.B4, .5], [N.A4, 1.1], [N.F4, 1.6], [N.E4, 2.2], [N.Gs3 * 2, 2.8]];
+      o.frequency.setValueAtTime(notas[0][0], t);
+      notas.forEach(function (n, i) { if (i) o.frequency.exponentialRampToValueAtTime(n[0], t + n[1]); });   // se desliza de una nota a otra
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.09, t + .3); g.gain.setValueAtTime(.08, t + 2.6); g.gain.exponentialRampToValueAtTime(.0001, t + 3.6);
+      o.connect(g); salida(g); o.start(t); vib.start(t); o.stop(t + 3.7); vib.stop(t + 3.7);
+      tono(N.E2, 'sine', .25, 3.5, 0, 0, .8); soplo('lowpass', 150, 90, .25, 3.5, 0, .6, 1);
+      campana(N.E3 * 2, .06, 3, 2.4);
+    },
     zumbido: function () { soplo('bandpass', 400, 1600, .55, .5, 0, 1.2, .1); },
     hielo: function () { crujido(20, .5, 0, .3); [3100, 4300, 5600].forEach(function (f, i) { tono(f, 'sine', .05, 1.2, i * .05, 0, .002); }); siseo(5000, 8000, .12, .8, 0, 1, .05); },
     // Fuego real: un rugido grave con chasquidos de leña
@@ -185,18 +236,68 @@
     // Cohete: silbido que sube; estallido: golpe grave lejano y chisporroteo que cae
     cohete: function () { var t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(900, t); o.frequency.exponentialRampToValueAtTime(2600, t + 1.1); env(g, t, .05, .04, 1.2); o.connect(g); salida(g); o.start(t); o.stop(t + 1.25); siseo(3000, 6000, .05, 1.1, 0, 1.2, .2); },
     estallido: function () { enElCielo = true; try { soplo('lowpass', 900, 120, .9, 1.4, 0, .6, .004); tono(55, 'sine', .7, 1, 0, 32, .004); crujido(30, 1.6, .15, .22); } finally { enElCielo = false; } },
-    // Cascabeles del trineo: muchos metalitos agudos sacudidos en ritmo
-    cascabeles: function () { for (var k = 0; k < 14; k++) { var r = k * .16; for (var j = 0; j < 3; j++) metal(2600 + Math.random() * 1400, .05, .25, r + j * .02 + Math.random() * .02); } },
-    // Muertos: una guitarra suave en tono menor y una campana lejana
-    muertos: function () { [220, 262, 330, 392, 330, 262].forEach(function (f, i) { cuerda(f, .4, i * .22, .4); }); campana(440, .12, 3, 1.4); },
-    // Feria: un organillo de feria en vals, alegre y lejano
-    feria: function () { var notas = [392, 494, 587, 494, 440, 523, 659, 523, 392, 494, 587, 784]; notas.forEach(function (f, i) { var r = i * .22, acento = i % 3 === 0; tono(f, 'triangle', acento ? .1 : .07, .2, r); tono(f * 2, 'square', .015, .15, r); if (acento) tono(f / 4, 'triangle', .1, .3, r); }); },
-    // Reyes: campanas suaves y brillo de estrella
-    reyes: function () { campana(523, .14, 3); campana(659, .1, 3, .35); campana(784, .09, 3, .7); },
+    // Navidad: la melodía de "Jingle Bells" (tradicional, de 1857) con timbre de campanitas.
+    // Al tocar algo suena solo el inicio; cuando pasa Santa suena el coro completo.
+    cascabeles: function () { melodiaNavidad(11); },
+    trineo: function () { melodiaNavidad(); },
+    // Día de Muertos: un vals en La menor con guitarra (bajo + rasgueo) y una melodía de requinto; al final, una campana lejana
+    muertos: function () {
+      var q = .32, A = [N.A3, N.C4, N.E4], Dm = [N.D4, N.F4, N.A4], E = [N.Gs3, N.B3, N.E4], bajos = [N.A2, N.D3, N.E2, N.A2], acordes = [A, Dm, E, A];
+      for (var c = 0; c < 4; c++) { var r = c * 3 * q; cuerda(bajos[c], .55, r, .3); rasgueo(acordes[c], .22, r + q); rasgueo(acordes[c], .18, r + 2 * q, true); }
+      tocar([[N.E5, 1], [N.A4, 1], [N.C5, 1], [N.D5, 1.5], [N.C5, .5], [N.A4, 1], [N.B4, 1], [N.Gs4, 1], [N.B4, 1], [N.A4, 3]], q, function (f, d, t) { cuerda(f, .42, t, .75); });
+      campana(N.A4, .1, 3.5, 12 * q);
+    },
+    // Feria: el vals del carrusel, con órgano de tubos, "um-pa-pa" en el bajo y la melodía arriba
+    // Feria de San Marcos: "Son de la Feria", una melodía original de Olimpo (solo nuestra), con estilo de banda:
+    // dos trompetas en terceras, tuba haciendo "um-pa", tambora en el tiempo fuerte y platillo a contratiempo
+    feria: function () {
+      var q = .17, Bb4 = 466.2, Bb2 = 116.5, F2 = 87.3, C2 = 65.4, A5 = 880, C6 = 1046.5;
+      var mel = [[N.C5, 1], [N.A4, 1], [N.C5, 1], [N.F5, 1], [A5, 1], [N.G5, 1], [N.F5, 1], [N.E5, 1],
+        [N.D5, 1], [Bb4, 1], [N.D5, 1], [N.G5, 1], [N.F5, 1], [N.E5, 1], [N.D5, 1], [N.C5, 1],
+        [N.C5, 1], [N.A4, 1], [N.C5, 1], [N.F5, 1], [A5, 1], [C6, 1], [A5, 1], [N.F5, 1],
+        [N.G5, 1], [N.E5, 1], [N.C5, 1], [N.E5, 1], [N.F5, 2], [0, 2]];
+      var tercera = { 523.3: N.A4, 440: N.F4, 698.5: N.D5, 880: N.F5, 784: N.E5, 659.3: N.C5, 587.3: Bb4, 466.2: N.G4, 1046.5: A5, 392: N.E4 };
+      tocar(mel, q, function (f, d, t) { trompeta(f, .055, d * .8, t); });
+      tocar(mel.map(function (n) { return [n[0] ? (tercera[n[0]] || n[0] * .8) : 0, n[1]]; }), q, function (f, d, t) { trompeta(f, .036, d * .8, t); });
+      // Armonía por compás (4 corcheas): Fa, Fa, Si bemol, Do, Fa, Fa, Do, Fa
+      var raices = [[F2, N.C3], [F2, N.C3], [Bb2, F2], [N.C3, N.G2], [F2, N.C3], [F2, N.C3], [N.C3, N.G2], [F2, N.C3]];
+      raices.forEach(function (rz, i) {
+        var r = i * 4 * q;
+        trompeta(rz[0], .07, q * 1.4, r); trompeta(rz[1], .06, q * 1.4, r + 2 * q);     // tuba: um… pa
+        tono(70, 'sine', .55, .22, r, 45, .003); soplo('lowpass', 260, 90, .3, .18, r, .7, .003);   // tambora
+        [1, 3].forEach(function (b) { siseo(6000, 8000, .05, .14, r + b * q, 1.2, .003); });        // platillo
+      });
+    },
+    // Fiestas Patrias: fanfarria de mariachi, dos trompetas en terceras, guitarrón y vihuela
+    patrias: function () {
+      // El tema más famoso del Jarabe Tapatío (son tradicional de Jalisco, dominio público), con dos trompetas en terceras,
+      // guitarrón en el bajo y vihuela rasgueando, como un mariachi
+      var q = .15,
+        t1 = [[N.G4, 1], [N.C5, 2], [0, 1], [N.G4, 1], [N.C5, 2], [0, 1], [N.G4, 1], [N.C5, 1], [N.D5, 1], [N.C5, 1], [N.B4, 1], [N.C5, 1], [N.D5, 2],
+          [N.G4, 1], [N.B4, 2], [0, 1], [N.G4, 1], [N.B4, 2], [0, 1], [N.G4, 1], [N.B4, 1], [N.C5, 1], [N.B4, 1], [N.A4, 1], [N.B4, 1], [N.C5, 3]],
+        baja = { 523.3: N.A4 || 440, 587.3: N.B4, 493.9: N.G4, 392: N.E4, 440: N.F4 };
+      var t2 = t1.map(function (n) { return [n[0] ? (baja[n[0]] || n[0] * .8) : 0, n[1]]; });
+      tocar(t1, q, function (f, d, t) { trompeta(f, .06, d * .85, t); });
+      tocar(t2, q, function (f, d, t) { trompeta(f, .04, d * .85, t); });
+      // Guitarrón y vihuela: "um-pa" en Do y en Sol, como lleva el son
+      var C = [N.C4, N.E4, N.G4], G = [N.B3, N.D4, N.G4];
+      for (var b = 0; b < 8; b++) { var ac = b < 4 ? C : G, raiz = b < 4 ? N.C3 : N.G2, r = b * 4 * q; cuerda(raiz, .6, r, .25); rasgueo(ac, .18, r + 2 * q); }
+      cuerda(N.C3, .6, 32 * q, .25); rasgueo(C, .2, 32 * q);
+    },
+    // Reyes: "Noche de paz" (de 1818, dominio público) con campanitas, y una campana grave al empezar
+    reyes: function () {
+      campana(N.C4, .08, 4);
+      tocar([[N.G4, 1.5], [N.A4, .5], [N.G4, 1], [N.E4, 3], [N.G4, 1.5], [N.A4, .5], [N.G4, 1], [N.E4, 3], [N.D5, 2], [N.D5, 1], [N.B4, 3], [N.C5, 2], [N.C5, 1], [N.G4, 3]], .36,
+        function (f, d, t) { campanita(f, .07, t + .05); });
+    },
+    // San Valentín: arpa en acordes románticos (Do, La menor, Fa, Sol), de abajo hacia arriba
+    sanvalentin: function () {
+      [[N.C4, N.E4, N.G4, N.C5], [N.A3, N.C4, N.E4, N.A4], [N.F3, N.A3, N.C4, N.F4], [N.G3, N.B3, N.D4, N.G4, N.B4, N.D5]].forEach(function (ac, i) { ac.forEach(function (f, j) { cuerda(f, .38, i * .55 + j * .07, .65); }); });
+    },
     victoria: function () { campana(220, .45, 5); campana(330, .25, 4.5, .9); [392, 494, 587, 784, 988].forEach(function (f, i) { cuerda(f, .4, 1.4 + i * .1, .6); }); }
   };
   S.nota = function (f) { if (!S.on || !iniciar()) return false; lira(f, .42, 0); return true; };
-  S.play = function (n) { if (!S.on || !EF[n] || !iniciar()) return; try { EF[n](); } catch (e) {} };
+  S.play = function (n) { if (!S.on || !EF[n] || !iniciar()) return; try { EF[n](); } catch (e) { if (window.console) console.warn('Sonido ' + n + ':', e); } };
 
   // ---------- Ambiente del desierto ----------
   function lazo(tipo, f, q, vol, buffer) {
@@ -225,7 +326,7 @@
       tGrillos = setTimeout(function () {
         if (!S.on) return;
         var f = 4100 + Math.random() * 500;
-        for (var i = 0; i < 3; i++) tono(f, 'sine', .022, .045, i * .065, 0, .004, false);
+        for (var i = 0; i < 4; i++) tono(f, 'sine', .016, .018, i * .032, 0, .002, false);   // 4 pulsitos muy rápidos: así frota las alas un grillo
         grillo();
       }, 700 + Math.random() * 1500);
     })();

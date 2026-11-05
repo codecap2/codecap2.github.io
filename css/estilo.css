@@ -407,7 +407,9 @@ html.en-templo #escenaFiesta { visibility: hidden; }
 .logo { position: relative; }
 .accesorio { position: absolute; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,.55)); line-height: 0; }
 .accesorio svg { width: 100%; height: auto; display: block; }
-.acc-navidad { width: 24px; left: -5px; top: -13px; transform: rotate(-20deg); }
+.acc-navidad { width: 21px; left: 40px; top: -9px; transform: rotate(16deg); transform-origin: 30% 90%; }   /* el gorro va en la O final de OLIMPO (JS lo acomoda) */
+.acc-navidad img { width: 100%; height: auto; display: block; }
+
 .acc-reyes { width: 22px; left: 5px; top: -15px; }
 .acc-sanvalentin { width: 15px; left: 25px; top: -5px; }
 .acc-muertos, .acc-feria, .acc-patrias { width: 22px; right: -30px; top: 50%; margin-top: -11px; }
@@ -443,13 +445,19 @@ body.noche .foquito { animation: foquito 1.2s steps(2) infinite; }
 @keyframes girarRueda { to { transform: rotate(360deg); } }
 @keyframes foquito { 50% { opacity: .35; } }
 /* Navidad: el trineo cruza el cielo */
-.trineo { left: -32vw; top: 9vh; width: clamp(170px, 26vw, 320px); aspect-ratio: 260 / 70; opacity: 0; }
+.trineo { left: -40vw; top: calc(var(--nav) + 7vh); width: clamp(170px, 24vw, 320px); aspect-ratio: 1216 / 260; opacity: 0; }
+.trineo .silueta { position: absolute; inset: 0; background: #2a1a14; -webkit-mask: url(../img/fiestas/trineo.svg) no-repeat left center / contain; mask: url(../img/fiestas/trineo.svg) no-repeat left center / contain; }
+body.noche .trineo .silueta, body.atardecer .trineo .silueta { background: rgba(230,220,200,.42); }   /* de noche, una sombra clarita contra el cielo: discreta */
+/* La nariz de Rodolfo, al frente de todos */
+.trineo .nariz { position: absolute; left: 96.6%; top: 25%; width: 1.6%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffb3a6 0%, #ff2410 45%, #d10a00 100%); box-shadow: 0 0 4px 2px rgba(255,40,20,.95), 0 0 12px 4px rgba(255,30,10,.7), 0 0 26px 8px rgba(255,20,0,.35); transform: translate(-50%, -50%); animation: narizRodolfo 1.2s ease-in-out infinite alternate; }   /* la nariz sí brilla de verdad; el trineo sigue discreto */
+@keyframes narizRodolfo { from { filter: brightness(.9); } to { filter: brightness(1.25); box-shadow: 0 0 6px 3px rgba(255,50,25,1), 0 0 18px 6px rgba(255,30,10,.8), 0 0 36px 12px rgba(255,20,0,.4); } }
+@media (prefers-reduced-motion: reduce) { .trineo .nariz { animation: none; } }
 .trineo.vuela-trineo { animation: trineo 9s linear; }
 @keyframes trineo { 0% { transform: translate(0, 0); opacity: 1; } 50% { transform: translate(70vw, -3vh); opacity: 1; } 100% { transform: translate(150vw, 2vh); opacity: 1; } }
 /* Reyes: la caravana camina sobre las dunas */
-.caravana { left: -26vw; bottom: 18vh; width: clamp(150px, 22vw, 260px); aspect-ratio: 200 / 60; animation: caravana 80s linear infinite; }
+.caravana { left: -30vw; bottom: 17vh; width: clamp(170px, 24vw, 320px); aspect-ratio: 615 / 270; animation: caravana 80s linear infinite; z-index: 2; }
 @keyframes caravana { from { transform: translateX(0); } to { transform: translateX(150vw); } }
-body.dia .caravana svg g { fill: #6b3d18; }
+
 @media (prefers-reduced-motion: reduce) { .trineo { opacity: 1; left: 60vw; } .caravana { left: 40vw; } }
 /* El enlace del aviso solo se puede tocar mientras el aviso se ve (antes quedaba invisible y "pegado" sobre la lira) */
 #aviso:not(.visible) .ver { pointer-events: none; visibility: hidden; }
@@ -499,8 +507,8 @@ body.noche .cempasuchil .petalo-c:nth-child(3n+1) { animation: titila 3.1s ease-
 .ropa-fiesta { position: absolute; inset: -22px; pointer-events: none; z-index: 1; }
 .ropa-fiesta .corona-flores { width: 100%; height: 100%; animation: girarRueda 90s linear infinite; filter: drop-shadow(0 0 8px rgba(255,159,28,.5)); }
 .ropa-fiesta .pin-foto { position: absolute; left: 14%; bottom: 8%; width: 46px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.6)); }
-.ropa-fiesta .pin-foto svg, .ropa-fiesta .gorro-foto svg { width: 100%; height: auto; display: block; }
-.ropa-fiesta .gorro-foto { position: absolute; right: 12%; top: 0; width: 82px; transform: rotate(18deg); filter: drop-shadow(0 4px 6px rgba(0,0,0,.6)); }
+.ropa-fiesta .pin-foto svg, .ropa-fiesta .gorro-foto svg, .ropa-fiesta .gorro-foto img { width: 100%; height: auto; display: block; }
+.ropa-fiesta .gorro-foto { position: absolute; right: 10%; top: -4%; width: 96px; transform: rotate(8deg); filter: drop-shadow(0 4px 6px rgba(0,0,0,.6)); }
 .ropa-fiesta .corona-foto { right: auto; left: 50%; top: -6px; width: 70px; transform: translateX(-50%); }
 /* Más contraste de día (y menos letras delgadas sobre el cielo claro) */
 body.dia .antetitulo { color: #3a1d08; font-weight: 700; text-shadow: 0 1px 0 rgba(255,240,210,.7); }
@@ -550,3 +558,77 @@ body.dia .detalle .probar:hover { background: #6b1a10; color: #fff; }
 /* El camino y la escena viven en su propia capa: al bajar, el navegador solo la mueve, no la vuelve a pintar */
 .cempasuchil { contain: strict; }
 body.noche .cempasuchil svg { will-change: opacity; }
+/* Letrero de vista previa (Ver Navidad, Ver una tormenta…): explica cómo volver a la página en vivo */
+#previa { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 79; width: max-content; max-width: calc(100% - 24px);
+  background: rgba(18,16,13,.95); border: 1px solid var(--oro); color: var(--marmol); border-radius: 14px; padding: .6rem 1rem; font-size: .88rem; line-height: 1.4; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.45); text-wrap: pretty; }
+#previa a { color: var(--oro2); font-weight: 600; white-space: nowrap; text-underline-offset: 3px; }
+#previa a:hover { color: #fff; }
+/* Con el letrero abajo, el aviso de los dioses y las fiestas sale arriba para no encimarse */
+html.con-previa #aviso { top: calc(var(--nav) + 10px); bottom: auto; }
+/* Letrero de vista previa: qué fiesta es, menú para cambiar, recorrido de qué tocar y cómo volver */
+#previa { width: min(640px, calc(100% - 24px)); text-align: left; padding: .7rem 1rem .6rem; }
+#previa .fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; font-weight: 600; text-align: center; }
+#previa select { font: inherit; font-size: .85rem; color: var(--marmol); background: rgba(255,255,255,.06); border: 1px solid var(--oro); border-radius: 999px; padding: .28rem .7rem; cursor: pointer; }
+#previa select option { color: #12100d; }
+#previa .recorrido { margin: .35rem auto 0; padding: 0; list-style: none; font-size: .82rem; color: var(--marmol); text-align: center; line-height: 1.45; }
+#previa .recorrido li { display: inline; }
+#previa .recorrido li + li::before { content: ' · '; color: var(--oro2); }
+#previa .pista { margin-top: .25rem; font-size: .74rem; color: var(--gris); text-align: center; }
+#previa .cambiar { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+#previa .cambiar .oculto { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: .82rem; color: var(--oro2); }
+.oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 520px) { #previa { font-size: .82rem; padding: .6rem .8rem .5rem; } #previa .recorrido { font-size: .78rem; } }
+/* En celular, la calaverita y la calabaza del logo más juntitas, para no encimarse con el chip del clima */
+@media (max-width: 520px) { .acc-muertos, .acc-feria, .acc-patrias { width: 18px; right: -25px; margin-top: -9px; } .acc-halloween { width: 17px; right: -41px; margin-top: -8.5px; } }
+
+/* Letrero de vista previa, v2: encogido es una píldora; al pasar el cursor o tocarlo muestra todo */
+#previa { transition: width .25s cubic-bezier(.23,1,.32,1), padding .25s cubic-bezier(.23,1,.32,1), border-radius .25s; }
+#previa:not(.abierto) { width: max-content; max-width: calc(100% - 24px); padding: .45rem .95rem; border-radius: 999px; cursor: pointer; }
+#previa:not(.abierto) .cambiar, #previa:not(.abierto) .volver, #previa:not(.abierto) .detalle-previa { display: none; }
+#previa:not(.abierto) .titulo-previa::after { content: ' ▴'; color: var(--oro2); }
+#previa .etq { font-size: .82rem; color: var(--oro2); font-weight: 500; }
+#previa .elegir { font: inherit; font-size: .85rem; font-weight: 600; color: var(--marmol); background: rgba(255,255,255,.06); border: 1px solid var(--oro); border-radius: 999px; padding: .3rem .85rem; cursor: pointer; transition: background .15s ease, transform .16s ease-out; }
+#previa .elegir:hover, #previa .elegir[aria-expanded="true"] { background: rgba(212,175,90,.18); }
+#previa .elegir:active { transform: scale(.97); }
+#previa .cambiar { position: relative; }
+/* La lista se abre hacia arriba (el letrero vive abajo), con el estilo de Olimpo */
+#previa .lista-fiestas { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 2; margin: 0; padding: 6px; list-style: none; min-width: 210px;
+  background: rgba(18,16,13,.97); border: 1px solid var(--oro); border-radius: 14px; box-shadow: 0 14px 40px rgba(0,0,0,.55); transform-origin: 50% 100%; animation: listaSube .18s cubic-bezier(.23,1,.32,1); }
+@keyframes listaSube { from { opacity: 0; transform: translateX(-50%) translateY(6px) scale(.97); } }
+#previa .lista-fiestas button { display: block; width: 100%; text-align: left; font: inherit; font-size: .88rem; color: var(--marmol); background: none; border: 0; border-radius: 9px; padding: .45rem .75rem; cursor: pointer; transition: background .12s ease; }
+#previa .lista-fiestas button:hover, #previa .lista-fiestas button:focus-visible { background: rgba(212,175,90,.18); outline: none; }
+#previa .lista-fiestas button.actual { color: var(--oro2); font-weight: 700; }
+#previa .lista-fiestas button.actual::before { content: '✓ '; }
+@media (prefers-reduced-motion: reduce) { #previa, #previa .lista-fiestas { transition: none; animation: none; } }
+/* Reyes: los tres Reyes en camello (silueta) y la estrella que marca el camino, a lo lejos */
+.caravana .silueta, .estrella-camino .silueta { position: absolute; inset: 0; }
+.caravana .silueta { background: #4a2c14; -webkit-mask: url(../img/fiestas/reyes-camellos.svg) no-repeat center bottom / contain; mask: url(../img/fiestas/reyes-camellos.svg) no-repeat center bottom / contain; }
+body.noche .caravana .silueta, body.atardecer .caravana .silueta { background: rgba(230,220,200,.45); }
+.estrella-camino { right: 9vw; bottom: 30vh; width: clamp(46px, 5.5vw, 80px); aspect-ratio: 166 / 236; z-index: 2; filter: drop-shadow(0 0 6px rgba(255,236,170,.75)) drop-shadow(0 0 18px rgba(255,220,130,.35)); }
+.estrella-camino .silueta { background: linear-gradient(#fff8d8, #f1d48a 55%, rgba(241,212,138,.15)); -webkit-mask: url(../img/fiestas/estrella-camino.svg) no-repeat center top / contain; mask: url(../img/fiestas/estrella-camino.svg) no-repeat center top / contain; animation: latidoEstrella 3.2s ease-in-out infinite alternate; }
+@keyframes latidoEstrella { to { opacity: .82; } }
+body.dia .estrella-camino { filter: drop-shadow(0 0 4px rgba(255,236,170,.6)); }
+body.dia .estrella-camino .silueta { background: linear-gradient(#fffbe8, #e0b44e 60%, rgba(224,180,78,.1)); }
+
+/* Búho y fénix: siluetas de verdad que aletean */
+.sil { display: block; width: 100%; height: 100%; }
+.sil-buho { background: linear-gradient(#8a5c32, #4a2e16); -webkit-mask: url(../img/fiestas/buho.svg) no-repeat center / contain; mask: url(../img/fiestas/buho.svg) no-repeat center / contain; }
+.sil-fenix { background: linear-gradient(160deg, #fff0a8 0%, #ffb02e 30%, #ff4a1f 65%, #a3201d 100%); -webkit-mask: url(../img/fiestas/fenix.svg) no-repeat center / contain; mask: url(../img/fiestas/fenix.svg) no-repeat center / contain; }
+.ave .sil { animation: aleteo .42s ease-in-out infinite alternate; transform-origin: 50% 42%; }
+@keyframes aleteo { to { transform: scaleY(.68) scaleX(1.05); } }
+
+/* Murciélagos de Halloween: salen en arco, aleteando rápido */
+.murcielago { position: fixed; z-index: 55; pointer-events: none; aspect-ratio: 98.5 / 66; animation: vuelaMurcielago 3.2s cubic-bezier(.45,.05,.55,.95) forwards; }
+.murcielago span { display: block; width: 100%; height: 100%; background: #1a1418; -webkit-mask: url(../img/fiestas/murcielago.svg) no-repeat center / contain; mask: url(../img/fiestas/murcielago.svg) no-repeat center / contain; animation: aleteoRapido .16s ease-in-out infinite alternate; transform-origin: 50% 35%; }
+body.noche .murcielago span { background: #2a1f2c; }
+body.noche .murcielago { filter: drop-shadow(0 0 3px rgba(255,140,40,.5)); }
+@keyframes aleteoRapido { to { transform: scaleY(.45) scaleX(1.08); } }
+@keyframes vuelaMurcielago { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 10% { opacity: 1; } 50% { transform: translate(calc(var(--dx) * .45), calc(var(--dy) * .6)) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.7); } }
+@media (prefers-reduced-motion: reduce) { .ave .sil, .murcielago span, .estrella-camino .silueta { animation: none; } }
+.dios .em .sil { width: 1.6em; height: 1.6em; margin: 0 auto; }
+
+/* El fénix que te acompaña después de renacer */
+.fenix-amigo { position: fixed; left: 0; top: 0; z-index: 58; width: 48px; height: 48px; padding: 0; border: 0; background: none; cursor: pointer; will-change: transform;
+  filter: drop-shadow(0 0 6px rgba(255,120,30,.8)) drop-shadow(0 0 16px rgba(255,60,10,.45)); }
+.fenix-amigo .sil { animation: aleteo .55s ease-in-out infinite alternate; transform-origin: 50% 42%; }
+@media (max-width: 760px) { .fenix-amigo { width: 38px; height: 38px; } }

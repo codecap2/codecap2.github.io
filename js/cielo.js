@@ -3,6 +3,13 @@
    ?fiesta=navidad|anonuevo|reyes|muertos|patrias|sanvalentin|feria|ninguna  ?estacion=primavera|verano|otono|invierno */
 (function () {
   var q = new URLSearchParams(location.search);
+  // ¿Es una vista previa (por ejemplo "Ver Navidad")? Si la persona recarga, regresa directo a la página normal.
+  var PREVIA = ['fiesta', 'hora', 'clima', 'estacion', 'pico', 'halloween'];
+  var esPrevia = PREVIA.some(function (k) { return q.has(k); });
+  if (esPrevia) {
+    var nav0 = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+    if (nav0 && nav0.type === 'reload') { location.replace(location.pathname); return; }
+  }
   document.documentElement.classList.add('arranque');   // sin transiciones en el primer cuadro
   var calma = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var body = document.body;
@@ -213,18 +220,21 @@
   C.paletaFuegos = function () {
     return C.fiesta === 'patrias' ? ['#0b8a3e', '#ffffff', '#ce1126'] : C.fiesta === 'feria' ? ['#ff4fa3', '#ffd34d', '#4fd1ff', '#9bff6a', '#ff7a3d'] : ['#f1d48a', '#ff5a4a', '#ffffff', '#ffb347', '#8fd3ff'];
   };
+  // Los fuegos artificiales solo suenan la primera tanda de cada visita (después se ven, pero en silencio, para no cansar)
+  var finSonidoFuegos = 0;
+  function fuegosSuenan() { var ahora = performance.now(); if (!finSonidoFuegos) finSonidoFuegos = ahora + 2500; return ahora < finSonidoFuegos; }
   C.cohete = function (x, ty, colores) {
     var dist = Math.max(80, H - ty), v = Math.sqrt(2 * .05 * dist);
-    agregar({ t: 'cohete', x: x, y: H + 10, vx: azar(-.4, .4), vy: -v, ty: ty, vida: 400, c: colores || C.paletaFuegos() });
-    if (window.Sonido) Sonido.play('cohete');
+    agregar({ t: 'cohete', x: x, y: H + 10, vx: azar(-.4, .4), vy: -v, ty: ty, vida: 400, c: colores || C.paletaFuegos(), suena: fuegosSuenan() });
+    if (window.Sonido && fuegosSuenan()) Sonido.play('cohete');
   };
-  function estallar(x, y, cols) {
+  function estallar(x, y, cols, sonar) {
     var n = Math.round(80 * F), forma = Math.random();
     for (var i = 0; i < n; i++) {
       var a = i / n * 6.28 + Math.random() * .1, s = forma < .5 ? azar(2.5, 4.2) : azar(.8, 4.5);
       agregar({ t: 'chispa', g: .035, tam: 2.2, x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, vida: azar(60, 100), c: cols[i % cols.length] });
     }
-    if (window.Sonido) Sonido.play('estallido');
+    if (window.Sonido && sonar) Sonido.play('estallido');
   }
   C.brasas = function (x, y, n, colores) {
     colores = colores || ['#ffcf5a', '#ff8a2a', '#ff4a1f'];
@@ -297,7 +307,7 @@
       if (a.t === 'brasa') { a.vy -= .02; a.vx *= .97; }
       if (a.t === 'cohete') {
         a.vy += .05;
-        if (a.vy >= -.4 || a.y <= a.ty) { estallar(a.x, a.y, a.c); parts.splice(p, 1); continue; }
+        if (a.vy >= -.4 || a.y <= a.ty) { estallar(a.x, a.y, a.c, a.suena); parts.splice(p, 1); continue; }
         if (!pausa) { ctx.globalAlpha = 1; ctx.fillStyle = '#fff6d0'; ctx.fillRect(a.x - 1.2, a.y - 1.2, 2.4, 2.4); ctx.globalAlpha = .45; ctx.fillStyle = '#ffd27a'; ctx.fillRect(a.x - .6, a.y, 1.2, 14); }
         continue;
       }
@@ -323,6 +333,78 @@
   }
   requestAnimationFrame(pintar);
   if (calma) addEventListener('resize', function () { pintar(0); });
+
+  // Letrero de vista previa: dice qué se está viendo y cómo volver (flecha de atrás, recargar o el botón)
+  if (esPrevia) {
+    var nomFiesta = { navidad: ['Navidad', 'Christmas'], anonuevo: ['Año Nuevo', 'New Year'], reyes: ['Día de Reyes', 'Three Kings Day'], muertos: ['Día de Muertos', 'Day of the Dead'],
+      patrias: ['Fiestas Patrias', 'Mexican Independence'], sanvalentin: ['San Valentín', 'Valentine’s Day'], feria: ['Feria de San Marcos', 'San Marcos Fair'] };
+    var nomHora = { amanecer: ['al amanecer', 'at dawn'], dia: ['de día', 'by day'], atardecer: ['al atardecer', 'at sunset'], noche: ['de noche', 'at night'] };
+    var nomClima = { despejado: ['despejado', 'clear'], nublado: ['nublado', 'cloudy'], lluvia: ['con lluvia', 'rainy'], tormenta: ['con tormenta', 'stormy'], arena: ['con viento de arena', 'with a sandstorm'], niebla: ['con niebla', 'foggy'] };
+    var nomEst = { primavera: ['en primavera', 'in spring'], verano: ['en verano', 'in summer'], otono: ['en otoño', 'in autumn'], invierno: ['en invierno', 'in winter'] };
+    var clave = C.halloween ? 'halloween' : C.fiesta;
+    nomFiesta.halloween = ['Halloween', 'Halloween'];
+    var partes = function (i) {
+      var p = [];
+      if (clave && nomFiesta[clave]) p.push(nomFiesta[clave][i]);
+      if (C.manual && nomHora[C.modo]) p.push(nomHora[C.modo][i]);
+      if (q.has('clima') && nomClima[q.get('clima')]) p.push(nomClima[q.get('clima')][i]);
+      if (q.has('estacion') && nomEst[q.get('estacion')]) p.push(nomEst[q.get('estacion')][i]);
+      return p.length ? ': ' + p.join(', ') : '';
+    };
+    // Un mini recorrido: qué tiene cada fiesta y qué tocar
+    var QUE = {
+      navidad: [['Toca a Santa cuando cruce el cielo 🎅 (suena su melodía)', 'Tap Santa when he crosses the sky 🎅 (his melody plays)'], ['Toca el gorrito del logo', 'Tap the hat on the logo'], ['Mira la nieve y los foquitos del menú', 'Watch the snow and the menu lights']],
+      anonuevo: [['Toca el cielo para lanzar fuegos artificiales 🎆', 'Tap the sky to launch fireworks 🎆']],
+      reyes: [['Toca a los Reyes Magos en las dunas 👑 (suena "Noche de paz")', 'Tap the Three Kings on the dunes 👑 ("Silent Night" plays)'], ['Toca la corona del logo', 'Tap the crown on the logo'], ['Toca la estrella que les marca el camino ⭐', 'Tap the star that shows them the way ⭐']],
+      sanvalentin: [['Toca el corazón del logo 💘', 'Tap the heart on the logo 💘']],
+      feria: [['Toca la rueda de la fortuna 🎡 (suena el Son de la Feria, hecho para Olimpo)', 'Tap the Ferris wheel 🎡 (the Fair Song plays, made for Olympus)'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],
+      patrias: [['Toca la bandera del logo 🇲🇽 (suena el mariachi)', 'Tap the flag on the logo 🇲🇽 (mariachi plays)'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],
+      muertos: [['Toca al xolo 🐕 y te explica el altar nivel por nivel', 'Tap the xolo 🐕 and it explains the altar level by level'], ['Toca el altar (suena el vals)', 'Tap the altar (the waltz plays)'], ['Toca la calaverita del logo 💀', 'Tap the sugar skull on the logo 💀']],
+      halloween: [['Toca la calabaza del logo 🎃', 'Tap the pumpkin on the logo 🎃'], ['Toca al xolo 🐕 y el altar', 'Tap the xolo 🐕 and the altar']]
+    };
+    var lista = function (i) { return (QUE[clave] || []).map(function (x) { return '<li>' + x[i] + '</li>'; }).join(''); };
+    var ORDEN = ['navidad', 'anonuevo', 'reyes', 'sanvalentin', 'feria', 'patrias', 'halloween', 'muertos'];
+    var ingles = window.Idioma && Idioma.lang === 'en' ? 1 : 0;
+    // Menú propio (no el del navegador): un botón con la fiesta actual y una lista con el estilo de Olimpo
+    var opciones = ORDEN.map(function (k) { return '<li role="option" aria-selected="' + (k === clave) + '"><button type="button" data-fiesta="' + k + '"' + (k === clave ? ' class="actual"' : '') + '>' + nomFiesta[k][ingles] + '</button></li>'; }).join('');
+    var actual = clave && nomFiesta[clave] ? nomFiesta[clave][ingles] : (ingles ? 'Choose' : 'Elige');
+    var letrero = document.createElement('div'); letrero.id = 'previa'; letrero.setAttribute('role', 'region'); letrero.setAttribute('aria-label', ingles ? 'Preview' : 'Vista previa');
+    letrero.innerHTML = '<div class="fila"><span class="titulo-previa" data-en="👀 Preview' + partes(1) + '">👀 Vista previa' + partes(0) + '</span>' +
+      '<div class="cambiar"><span class="etq" data-en="Another holiday:">Otra fiesta:</span><button type="button" class="elegir" aria-haspopup="listbox" aria-expanded="false">' + actual + ' <span aria-hidden="true">▾</span></button>' +
+      '<ul class="lista-fiestas" role="listbox" hidden>' + opciones + '</ul></div>' +
+      '<a class="volver" href="' + location.pathname + '" data-en="Back to live">Volver a la página en vivo</a></div>' +
+      '<div class="detalle-previa">' +
+      (QUE[clave] ? '<ul class="recorrido" data-en="' + lista(1).replace(/"/g, '&quot;') + '">' + lista(0) + '</ul>' : '') +
+      '<div class="pista" data-en="The ← back arrow or reloading also takes you back.">La flecha ← o recargar también te regresan.</div></div>';
+    document.body.appendChild(letrero);
+    var elegir = letrero.querySelector('.elegir'), listaF = letrero.querySelector('.lista-fiestas');
+    function abrirLista(si) { listaF.hidden = !si; elegir.setAttribute('aria-expanded', si); letrero.classList.toggle('menu-abierto', si); }
+    elegir.addEventListener('click', function (e) { e.stopPropagation(); abrirLista(listaF.hidden); if (!listaF.hidden) { var a = listaF.querySelector('.actual'); if (a) a.focus(); } });
+    listaF.addEventListener('keydown', function (e) {
+      var bs = [].slice.call(listaF.querySelectorAll('button')), i = bs.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); bs[Math.min(bs.length - 1, i + 1)].focus(); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); bs[Math.max(0, i - 1)].focus(); }
+      if (e.key === 'Escape') { abrirLista(false); elegir.focus(); }
+    });
+    document.addEventListener('click', function (e) { if (!letrero.contains(e.target)) abrirLista(false); });
+    // Cambiar de fiesta sin llenar el historial: así la flecha de atrás siempre regresa a la página en vivo
+    listaF.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-fiesta]'); if (!b) return;
+      var v = b.getAttribute('data-fiesta'), nq = new URLSearchParams(); if (q.has('hora')) nq.set('hora', q.get('hora'));
+      if (v === 'halloween') { nq.set('fiesta', 'muertos'); nq.set('halloween', '1'); } else nq.set('fiesta', v);
+      location.replace(location.pathname + '?' + nq.toString());
+    });
+    // Se abre al llegar, se encoge solito a los 6 segundos y se vuelve a abrir al pasar el cursor o al tocarlo
+    letrero.classList.add('abierto');
+    var tEncoger = setTimeout(function () { if (!letrero.matches(':hover') && !letrero.contains(document.activeElement)) letrero.classList.remove('abierto'); }, 6000);
+    letrero.addEventListener('mouseenter', function () { clearTimeout(tEncoger); letrero.classList.add('abierto'); });
+    letrero.addEventListener('mouseleave', function () { if (!letrero.classList.contains('menu-abierto')) letrero.classList.remove('abierto'); });
+    letrero.addEventListener('focusin', function () { letrero.classList.add('abierto'); });
+    letrero.addEventListener('click', function () { clearTimeout(tEncoger); letrero.classList.add('abierto'); });
+    document.addEventListener('click', function (e) { if (!letrero.contains(e.target)) { letrero.classList.remove('abierto'); abrirLista(false); } });
+    if (window.Idioma && Idioma.aplicar) Idioma.aplicar();
+    document.documentElement.classList.add('con-previa');
+  }
 
   // En celular el aviso sale abajo… salvo cuando los botones de "Ver mis trabajos" y "Platiquemos"
   // están en la parte baja de la pantalla: ahí sube arriba, para que nunca tape lo que trae clientes.

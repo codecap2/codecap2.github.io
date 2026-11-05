@@ -73,8 +73,11 @@
       '<div class="cara frente"><div class="em">' + aveSVG('fenix') + '</div><h3>' + T('El Fénix', 'The Phoenix') + '</h3><div class="dom">' + T('Criatura legendaria · carta secreta', 'Legendary creature · secret card') + '</div><p>' + T('Los griegos lo conocían por el historiador Heródoto: un ave sagrada que aparecía cada 500 años. Relatos posteriores cuentan que al morir arde en llamas y renace de sus propias cenizas.', 'The Greeks knew it from the historian Herodotus: a sacred bird that appeared every 500 years. Later tales say that when it dies it bursts into flames and is reborn from its own ashes.') + '</p><div class="voltear">' + T('↻ Voltéala para un dato curioso', '↻ Flip it for a fun fact') + '</div></div>' +
       '<div class="cara reverso"><h4>' + T('✨ Dato curioso', '✨ Fun fact') + '</h4><p>' + T('En griego se llamaba phoínix, una palabra que también nombraba al rojo púrpura, el color de su plumaje… o sea, un rojo intenso 😉.', 'In Greek it was called phoínix, a word that also named purple-red, the color of its feathers… an intense red 😉.') + '</p><div class="voltear">' + T('↻ Volver', '↻ Back') + '</div></div></div></div>';
   }
-  // Aves dibujadas con alas que aletean (en lugar de emojis tiesos)
+  // Aves con siluetas de verdad (Openclipart, dominio público) que aletean; el fénix va pintado de fuego
   function aveSVG(tipo) {
+    return '<span class="sil sil-' + (tipo === 'buho' ? 'buho' : 'fenix') + '" aria-hidden="true"></span>';
+  }
+  function aveSVGviejo(tipo) {
     if (tipo === 'buho') return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
       '<path class="ala-i" d="M44 50 C26 38 8 48 6 66 C18 62 30 64 44 66 Z" fill="#6b4524"/>' +
       '<path class="ala-d" d="M56 50 C74 38 92 48 94 66 C82 62 70 64 56 66 Z" fill="#6b4524"/>' +
@@ -104,7 +107,28 @@
     for (var i = 0; i <= 12; i++) { var p = i / 12; marcos.push({ transform: 'translate(' + (p * (W + tam * 2)) + 'px,' + (-Math.sin(p * Math.PI) * H * .45 + Math.sin(p * Math.PI * 4) * 18) + 'px) rotate(' + (Math.cos(p * Math.PI) * -14) + 'deg) scale(' + (.8 + Math.sin(p * Math.PI) * .5) + ')' }); }
     var anim = f.animate(marcos, { duration: 3600, easing: 'linear' });
     var estela = setInterval(function () { var q = f.getBoundingClientRect(); C.brasas(q.left + q.width * .25, q.top + q.height * .75, 7); C.brasas(q.left + q.width * .25, q.top + q.height * .75, 2, ['#ffffff', '#fff3b0']); }, 30);
-    anim.onfinish = function () { clearInterval(estela); f.remove(); };
+    anim.onfinish = function () { clearInterval(estela); f.remove(); acompanarFenix(); };
+  }
+  C.acompanarFenix = function () { acompanarFenix(); };   // para probarlo sin encontrar a los 15 dioses
+  // Después de renacer, un fénix pequeñito te acompaña por toda la página: sigue tu cursor (o tus toques) con calma
+  function acompanarFenix() {
+    if (suave || $('.fenix-amigo')) return;
+    var a = document.createElement('button'); a.type = 'button'; a.className = 'fenix-amigo';
+    a.setAttribute('aria-label', T('El fénix que te acompaña', 'The phoenix keeping you company'));
+    a.innerHTML = '<span class="sil sil-fenix"></span>'; body.appendChild(a);
+    var x = innerWidth - 90, y = innerHeight - 120, mx = x, my = y, ultimaBrasa = 0;
+    var tactil = matchMedia('(hover: none)').matches;
+    addEventListener(tactil ? 'pointerdown' : 'pointermove', function (e) { mx = e.clientX + 26; my = e.clientY - 46; }, { passive: true });
+    (function paso(t) {
+      var dx = mx - x, dy = my - y; x += dx * .06; y += dy * .06;   // lo sigue con calma, como si planeara
+      a.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + Math.max(-18, Math.min(18, dx * .08)).toFixed(1) + 'deg)';
+      if (Math.abs(dx) + Math.abs(dy) > 30 && t - ultimaBrasa > 140) { ultimaBrasa = t; C.brasas(x + 10, y + 30, 2); }
+      requestAnimationFrame(paso);
+    })(0);
+    a.addEventListener('click', function () {
+      C.brasas(x + 22, y + 22, 18); S.play('fuego');
+      decir(T('🔥 El fénix renació y ahora te acompaña. Como tu negocio: siempre se levanta más fuerte.', '🔥 The phoenix was reborn and now keeps you company. Like your business: it always rises stronger.'), 4200);
+    });
   }
 
   // ---------- Códice: cada dios encontrado brilla y se puede voltear ----------
@@ -427,7 +451,7 @@
 
   // ---------- Contacto protegido (el número no está escrito en la página) ----------
   var n = ['52', '449', '125', '98', '64'].join(''), c = ['olimpo.web.ags', 'gmail.com'].join('@');
-  $('#btnWhats').addEventListener('click', function () { this.href = 'https://wa.me/' + n + '?text=' + encodeURIComponent(T('Hola Isaac, vi tu portafolio de Olimpo y me interesa una página', 'Hi Isaac, I saw your Olimpo portfolio and I’m interested in a website')); });
+  $('#btnWhats').addEventListener('click', function () { this.href = 'https://wa.me/' + n + '?text=' + encodeURIComponent(T('Hola, Isaac. Vi tu portafolio de Olimpo y me interesa una página.', 'Hi, Isaac. I saw your Olimpo portfolio and I’m interested in a website.')); });
   $('#btnCorreo').addEventListener('click', function () {
     this.href = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + c + '&su=' + encodeURIComponent(T('Quiero una página web', 'I want a website'));
     try { navigator.clipboard.writeText(c); decir(T('📋 Te abrí Gmail y además copié el correo: ', '📋 I opened Gmail for you and also copied the email: ') + c); } catch (e) {}
@@ -441,7 +465,8 @@
 
   // ---------- Bienvenida de temporada y mensaje para curiosos del código ----------
   pintarCodice();
-  if (C.saludos[C.fiesta]) setTimeout(function () { decir(T(C.saludos[C.fiesta], I.saludos[C.fiesta]), 4500); }, 1800);
+  if (C.halloween) setTimeout(function () { decir(T('🎃 Temporada de Halloween: calabazas y murciélagos invaden el Olimpo. Toca la calabaza del logo.', '🎃 Halloween season: pumpkins and bats take over Olympus. Tap the pumpkin on the logo.'), 4500); }, 1800);
+  else if (C.saludos[C.fiesta]) setTimeout(function () { decir(T(C.saludos[C.fiesta], I.saludos[C.fiesta]), 4500); }, 1800);
   I.alCambiar.push(function () { pintarCodice(); });
   console.log('%c⚡ Olimpo', 'font: 700 22px Georgia; color: #d4af5a');
   console.log('¿Revisando el código? Ya somos dos curiosos. Escríbeme: ' + c + '\nPista: en esta página se esconden ' + N + ' dioses. 🏛️');

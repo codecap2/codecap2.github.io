@@ -13,7 +13,7 @@
 
   // ---------- Accesorios junto al logo ----------
   var ACC = {
-    navidad: '<svg viewBox="0 0 40 34"><path d="M4 26 C8 10 20 2 32 6 C36 8 37 14 34 18 C28 14 20 16 14 26 Z" fill="#d8342c"/><path d="M2 24 Q18 20 30 26 Q31 32 18 32 Q4 32 2 24 Z" fill="#f4efe6"/><circle cx="35" cy="20" r="4" fill="#f4efe6"/></svg>',
+    navidad: '<img src="img/fiestas/gorro.svg" alt="">',   // gorro de Santa (Openclipart, dominio público)
     muertos: '<svg viewBox="0 0 40 40"><path d="M20 3 C9 3 4 11 4 19 C4 25 8 28 10 30 L10 36 L30 36 L30 30 C32 28 36 25 36 19 C36 11 31 3 20 3 Z" fill="#fbf4e6"/><circle cx="13.5" cy="19" r="5" fill="#ff4fa3"/><circle cx="26.5" cy="19" r="5" fill="#4fd1ff"/><circle cx="13.5" cy="19" r="2.2" fill="#1d1a17"/><circle cx="26.5" cy="19" r="2.2" fill="#1d1a17"/><path d="M20 23 L17.5 28 L22.5 28 Z" fill="#1d1a17"/><path d="M12 32 H28 M15 30 V34 M20 30 V34 M25 30 V34" stroke="#1d1a17" stroke-width="1.3"/><path d="M14 8 Q20 4 26 8" stroke="#ffb02e" stroke-width="2" fill="none"/><circle cx="20" cy="11" r="2" fill="#9bff6a"/></svg>',
     halloween: '<svg viewBox="0 0 40 40"><path d="M20 8 C26 2 30 4 30 4" stroke="#3d7a2a" stroke-width="3" fill="none"/><ellipse cx="13" cy="24" rx="10" ry="12" fill="#ff8a1f"/><ellipse cx="27" cy="24" rx="10" ry="12" fill="#ff8a1f"/><ellipse cx="20" cy="24" rx="8" ry="13" fill="#ffa33a"/><path d="M12 20 L16 24 L10 24 Z M28 20 L24 24 L30 24 Z" fill="#3b1a05"/><path d="M11 29 Q20 36 29 29 L26 30 L24 28 L20 31 L16 28 L14 30 Z" fill="#3b1a05"/></svg>',
     reyes: '<svg viewBox="0 0 40 30"><path d="M4 26 L6 8 L14 16 L20 4 L26 16 L34 8 L36 26 Z" fill="#f1d48a" stroke="#c8963c" stroke-width="1.5"/><circle cx="20" cy="18" r="3" fill="#d8342c"/><circle cx="11" cy="20" r="2" fill="#4fd1ff"/><circle cx="29" cy="20" r="2" fill="#9bff6a"/></svg>',
@@ -27,15 +27,28 @@
     T('💀 «Hades salió del abismo con su casco invisible, pero al ver tanto detalle irse se le hizo imposible.»', '💀 “Hades rose up from the abyss in his helmet, out of sight, but he saw so many details that he stayed here overnight.”'),
     T('💀 «Dicen que la Calaca no perdona a ningún mortal, pero a los negocios con página los deja en paz, ¡qué tal!»', '💀 “They say Death spares no mortal, no matter where they’re from, but businesses with websites? She says: those are too much fun!”')
   ];
+  // Murciélagos con silueta de verdad (Openclipart, dominio público): salen volando en arco, aleteando
+  function soltarMurcielagos(n) {
+    if (suave) return;
+    for (var i = 0; i < n; i++) (function (i) {
+      var m = document.createElement('div'); m.className = 'murcielago'; m.setAttribute('aria-hidden', 'true');
+      var tam = 26 + Math.random() * 30, x0 = innerWidth * (.15 + Math.random() * .7), y0 = innerHeight * (.55 + Math.random() * .3);
+      m.style.width = tam + 'px'; m.style.left = x0 + 'px'; m.style.top = y0 + 'px';
+      m.style.setProperty('--dx', ((Math.random() < .5 ? -1 : 1) * (120 + Math.random() * 260)) + 'px');
+      m.style.setProperty('--dy', (-(220 + Math.random() * 320)) + 'px');
+      m.style.animationDelay = (i * .12) + 's'; m.innerHTML = '<span></span>';
+      document.body.appendChild(m); setTimeout(function () { m.remove(); }, 3400 + i * 120);
+    })(i);
+  }
   var nCal = 0;
   var REACCION = {
     muertos: function (el) { el.classList.add('baila'); setTimeout(function () { el.classList.remove('baila'); }, 900); var r = el.getBoundingClientRect(); C.brasas(r.left + r.width / 2, r.top + r.height / 2, 14, ['#ff9f1c', '#ffd34d', '#ff4fa3']); S.play('muertos'); avisar(CALAVERITAS[nCal++ % CALAVERITAS.length] + T('  (Una calaverita literaria, tradición de Día de Muertos.)', '  (A “calaverita”: a playful Day of the Dead rhyme.)')); },
-    halloween: function (el) { el.classList.add('baila'); setTimeout(function () { el.classList.remove('baila'); }, 900); for (var b = 0; b < 6; b++) C.subir(['🦇'], innerWidth * Math.random(), innerHeight * .6, 1); S.play('hades'); avisar(T('🎃 ¡Dulce o truco! El Olimpo prefiere los dulces… y las páginas con sorpresas.', '🎃 Trick or treat! Olympus prefers treats… and websites full of surprises.')); },
+    halloween: function (el) { el.classList.add('baila'); setTimeout(function () { el.classList.remove('baila'); }, 900); soltarMurcielagos(7); S.play('halloween'); avisar(T('🎃 ¡Dulce o truco! El Olimpo prefiere los dulces… y las páginas con sorpresas.', '🎃 Trick or treat! Olympus prefers treats… and websites full of surprises.')); },
     navidad: function (el) { C.lluviaDe(['❄️', '⭐', '🎁'], 24); S.play('cascabeles'); avisar(T('🎅 El gorrito de Santa le queda bien al Olimpo, ¿no crees?', '🎅 Santa’s hat suits Olympus, doesn’t it?')); },
     reyes: function (el) { var r = el.getBoundingClientRect(); C.brasas(r.left + r.width / 2, r.top, 18, ['#fff6c8', '#f1d48a']); S.play('reyes'); avisar(T('👑 Una corona digna de un rey… o de tu negocio.', '👑 A crown fit for a king… or for your business.')); },
-    sanvalentin: function (el) { C.subir(['💗', '💘', '🌹'], innerWidth / 2, innerHeight * .7, 16); S.play('arpa'); avisar(T('💘 Afrodita aprueba este amor por los detalles.', '💘 Aphrodite approves of this love for details.')); },
+    sanvalentin: function (el) { C.subir(['💗', '💘', '🌹'], innerWidth / 2, innerHeight * .7, 16); S.play('sanvalentin'); avisar(T('💘 Afrodita aprueba este amor por los detalles.', '💘 Aphrodite approves of this love for details.')); },
     feria: function (el) { for (var n = 0; n < 3; n++) setTimeout(function () { C.cohete(innerWidth * (.2 + Math.random() * .6), innerHeight * (.12 + Math.random() * .2)); }, n * 260); S.play('feria'); avisar(T('🎡 ¡Que viva la Feria de San Marcos!', '🎡 Long live the San Marcos Fair!')); },
-    patrias: function (el) { for (var n = 0; n < 3; n++) setTimeout(function () { C.cohete(innerWidth * (.2 + Math.random() * .6), innerHeight * (.12 + Math.random() * .2)); }, n * 260); avisar(T('🇲🇽 ¡Viva México!', '🇲🇽 ¡Viva México!')); }
+    patrias: function (el) { for (var n = 0; n < 3; n++) setTimeout(function () { C.cohete(innerWidth * (.2 + Math.random() * .6), innerHeight * (.12 + Math.random() * .2)); }, n * 260); S.play('patrias'); avisar(T('🇲🇽 ¡Viva México!', '🇲🇽 ¡Viva México!')); }
   };
   var logo = $('.logo');
   function ponerAccesorio(tipo) {
@@ -45,6 +58,16 @@
     logo.appendChild(b);
   }
   if (logo && ACC[f]) { ponerAccesorio(f); if (C.halloween) ponerAccesorio('halloween'); }
+  // El gorro de Navidad se acomoda en la O final de "Olimpo" (se mide la palabra real, en cualquier pantalla)
+  var gorro = $('.acc-navidad'), palabra = $('#irInicio');
+  function acomodarGorro() {
+    if (!gorro || !palabra) return;
+    var lr = logo.getBoundingClientRect(), pr = palabra.getBoundingClientRect(), alto = pr.height, ancho = Math.round(alto * .78);
+    gorro.style.width = ancho + 'px';
+    gorro.style.left = Math.round(pr.right - lr.left - ancho * .95) + 'px';
+    gorro.style.top = Math.round(pr.top - lr.top - alto * .22) + 'px';
+  }
+  if (gorro) { acomodarGorro(); addEventListener('resize', acomodarGorro); if (document.fonts && document.fonts.ready) document.fonts.ready.then(acomodarGorro); }
 
   // ---------- Papel picado bajo la portada (Muertos, Feria y Patrias) ----------
   var COL_PAPEL = { muertos: ['#ff4fa3', '#ff8a1f', '#9b5cff', '#ffd34d', '#2fc58a'], feria: ['#ff4fa3', '#ffd34d', '#4fd1ff', '#9bff6a', '#ff7a3d'], patrias: ['#0b8a3e', '#ffffff', '#ce1126'] };
@@ -245,20 +268,26 @@
 
   // ---------- Navidad: Santa cruza el cielo de vez en cuando ----------
   if (f === 'navidad') {
-    var trineo = boton('<svg viewBox="0 0 260 70"><g fill="#2a2420"><path d="M8 40 L22 30 L28 36 L40 34 L44 40 L36 46 L18 46 Z"/><path d="M58 40 L72 30 L78 36 L90 34 L94 40 L86 46 L68 46 Z"/><path d="M108 40 L122 30 L128 36 L140 34 L144 40 L136 46 L118 46 Z"/><path d="M22 30 L18 20 M26 30 L30 22 M72 30 L68 20 M76 30 L80 22 M122 30 L118 20 M126 30 L130 22" stroke="#2a2420" stroke-width="2"/></g><circle cx="24" cy="34" r="2.6" fill="#ff2a12"/><path d="M44 40 H58 M94 40 H108 M144 40 H170" stroke="#c9b48a" stroke-width="1.2"/><path d="M170 30 H230 Q246 30 244 46 L238 52 H176 Q166 52 170 30 Z" fill="#b3120c"/><path d="M172 58 H246" stroke="#c9b48a" stroke-width="3" stroke-linecap="round"/><circle cx="205" cy="22" r="9" fill="#d8342c"/><circle cx="205" cy="16" r="5" fill="#f6d7b9"/><path d="M198 12 L212 12 L206 2 Z" fill="#d8342c"/><circle cx="206" cy="2" r="2.4" fill="#fff"/><rect x="218" y="18" width="16" height="14" fill="#2fc58a"/><rect x="222" y="16" width="8" height="18" fill="#ffd34d" opacity=".9"/></svg>', 'trineo', T('El trineo de Santa', 'Santa’s sleigh'), astros);
+    // Silueta de Santa y sus renos (Openclipart, dominio público). La nariz de Rodolfo brilla roja al frente.
+    var trineo = boton('<span class="silueta"></span><span class="nariz"></span>', 'trineo', T('El trineo de Santa', 'Santa’s sleigh'), astros);
     var vuelos = 0;
-    function pasar() { if (suave) return; trineo.classList.remove('vuela-trineo'); void trineo.offsetWidth; trineo.classList.add('vuela-trineo'); S.play('cascabeles'); vuelos++; }
+    function pasar() { if (suave) return; trineo.classList.remove('vuela-trineo'); void trineo.offsetWidth; trineo.classList.add('vuela-trineo'); vuelos++; }   // pasa en silencio: la melodía suena solo si lo tocan
     setTimeout(pasar, 2500); setInterval(pasar, C.pico ? 14000 : 26000);
     trineo.addEventListener('click', function () {
-      var r = trineo.getBoundingClientRect(); C.lluviaDe(['🎁', '⭐', '🎁'], 22); S.play('cascabeles');
+      var r = trineo.getBoundingClientRect(); C.lluviaDe(['🎁', '⭐', '🎁'], 22); S.play('trineo');
       avisar(T('🎅 ¡Jo, jo, jo! Santa te deja un regalo: una página que tus clientes no van a olvidar.', '🎅 Ho, ho, ho! Santa leaves you a gift: a website your customers won’t forget.'));
     });
   }
 
   // ---------- Reyes Magos: la caravana cruza las dunas ----------
   if (f === 'reyes') {
-    var rey = '<g fill="#2a2420"><path d="M10 50 Q14 36 26 36 Q32 30 38 36 L46 36 Q50 28 54 32 L52 40 L48 50 L44 50 L44 44 L22 44 L20 50 Z"/><path d="M24 36 L26 22 L34 22 L36 36 Z"/><circle cx="30" cy="18" r="4"/></g><path d="M26 14 L28 10 L30 13 L32 10 L34 14 Z" fill="#f1d48a"/>';
-    var car = boton('<svg viewBox="0 0 200 60"><g>' + rey + '</g><g transform="translate(60 2)">' + rey + '</g><g transform="translate(120 0)">' + rey + '</g></svg>', 'caravana', T('Los Reyes Magos', 'The Three Kings'));
+    // Siluetas de los tres Reyes en camello y la estrella que marca el camino (Openclipart, dominio público)
+    var car = boton('<span class="silueta"></span>', 'caravana', T('Los Reyes Magos', 'The Three Kings'));
+    var estrella = boton('<span class="silueta"></span>', 'estrella-camino', T('La estrella que guía a los Reyes', 'The star guiding the Kings'));
+    estrella.addEventListener('click', function () {
+      var r = estrella.getBoundingClientRect(); C.brasas(r.left + r.width / 2, r.top + r.height * .15, 22, ['#fff6c8', '#f1d48a', '#ffffff']);
+      avisar(T('⭐ La estrella de Belén guía a los Reyes Magos. Ellos la siguen a lo lejos por las dunas… y tú, ¿ya viste por dónde van?', '⭐ The Star of Bethlehem guides the Three Kings. They follow it across the dunes… can you spot them?'));
+    });
     car.addEventListener('click', function () {
       var r = car.getBoundingClientRect(); C.brasas(r.left + r.width / 2, r.top, 18, ['#fff6c8', '#f1d48a', '#ffffff']); S.play('reyes');
       avisar(T('👑 Melchor, Gaspar y Baltasar siguen la estrella. ¿Ya partiste la rosca?', '👑 Melchior, Caspar and Balthazar follow the star. Have you cut the rosca yet?'));
