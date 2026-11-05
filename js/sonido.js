@@ -126,11 +126,12 @@
     };
     return b;
   }
-  // Música de fiesta grabada: un fragmento que entra suave y se despide con un fundido largo. Solo una a la vez.
+  // Música de fiesta grabada: un fragmento corto (13 s) que entra suave y se despide con un fundido largo:
+  // impresiona y deja con ganas de más, sin cansar. Solo suena una a la vez.
   var cancion = null;
   function musica(nombre, vol) {
     if (cancion) { try { cancion.stop(ctx.currentTime + .3); } catch (e) {} }
-    sonar('musica/' + nombre, { vol: vol, entra: .25, sale: 3, eco: false }).then(function (s) { cancion = s; });
+    sonar('musica/' + nombre, { vol: vol, entra: .25, dura: 13, sale: 3.5, eco: false }).then(function (s) { cancion = s; });
   }
   // Toca una melodía: [frecuencia (0 = silencio), duración en tiempos], con el instrumento que se le pase
   function tocar(notas, q, instrumento, desde) {
@@ -301,7 +302,7 @@
     trineo: function () { melodiaNavidad(); },
     // Día de Muertos, Feria y Fiestas Patrias: música GRABADA por músicos (Pixabay), no sintetizada.
     // Muertos: guitarra acústica mexicana, tranquila; al final, una campana lejana de templo.
-    muertos: function () { musica('muertos', .5); campana(N.A4, .06, 3.5, 20); },
+    muertos: function () { musica('muertos', .5); campana(N.A4, .06, 3.5, 11); },
     // Feria de San Marcos: banda con metales (huapango)
     feria: function () { musica('feria', .85); },
     // Fiestas Patrias: mariachi con trompetas y guitarras
