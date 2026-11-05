@@ -274,7 +274,9 @@
     fuego: function () { soplo('lowpass', 250, 700, .7, 2.4, 0, .5, .3); crujido(40, 2.2, .1, .3); },
     golpe: function () { tono(48, 'sine', 1, 1, 0, 30, .003); soplo('lowpass', 400, 70, 1, .9, 0, .6, .003); crujido(16, .6, .05, .2); },
     arrastre: function () { soplo('lowpass', 180, 120, .45, 1.1, 0, 2, .2); crujido(10, 1, 0, .08); },
-    cadena: function () { for (var i = 0; i < 12; i++) metal(1700 + Math.random() * 1100, .07, .25, i * .06 + Math.random() * .03); },
+    // Cadenas de acero GRABADAS (Pixabay), elegidas con el oído de IA: tintineo y traqueteo metálico, nada de xilófono
+    cadena: function () { sonar('dioses/cadenas', { vol: .9, sale: .6 }).then(function (s) { if (!s) EF.cadenaCodigo(); }); },
+    cadenaCodigo: function () { for (var i = 0; i < 12; i++) metal(1700 + Math.random() * 1100, .07, .25, i * .06 + Math.random() * .03); },
     chispas: function () { crujido(25, .5, 0, .35); },
     impacto: function () { metal(820, .3, .8); tono(65, 'sine', .8, .4, 0, 38, .002); soplo('lowpass', 800, 140, .6, .3, 0, .7, .002); },
     // El fénix: llamarada que crece, un grito de ave lejano y destellos
@@ -374,7 +376,7 @@
     if (despertado) return; despertado = true;
     ['pointerdown', 'keydown', 'touchstart', 'touchend', 'click'].forEach(function (t) { removeEventListener(t, despertar, true); });
     if (e && btn && btn.contains(e.target)) return;   // si su primer toque fue para apagarlo, no suena nada
-    if (S.on && iniciar()) { ambiente(); S.precargar(['dioses/trueno']); var fi = window.Cielo && Cielo.fiesta; if (fi === 'patrias' || fi === 'muertos' || fi === 'feria') S.precargar(['musica/' + fi]); if (fi === 'patrias' || fi === 'feria' || fi === 'anonuevo') S.precargar(['fuegos/cohete', 'fuegos/estallido-silbido', 'fuegos/estallido-2', 'fuegos/estallido-eco']); }
+    if (S.on && iniciar()) { ambiente(); S.precargar(['dioses/trueno', 'dioses/cadenas']); var fi = window.Cielo && Cielo.fiesta; if (fi === 'patrias' || fi === 'muertos' || fi === 'feria') S.precargar(['musica/' + fi]); if (fi === 'patrias' || fi === 'feria' || fi === 'anonuevo') S.precargar(['fuegos/cohete', 'fuegos/estallido-silbido', 'fuegos/estallido-2', 'fuegos/estallido-eco']); }
   }
   // Si la página deja de verse (otra pestaña, ventana minimizada, pantalla bloqueada con Windows + L) o se cierra,
   // el sonido se pausa al instante; al volver, regresa solo donde iba.

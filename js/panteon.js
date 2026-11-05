@@ -399,41 +399,52 @@
       { transform: 'translate(0,0) rotate(-2160deg)' }
     ], { duration: 1900, easing: 'ease-in-out' }).onfinish = fin;
   };
-  // Las cadenas (ilustración de upklyak, Magnific): caen con peso, se balancean, sueltan chispas y se encienden en llamas
+  // Las cadenas (ilustración de upklyak, Magnific): una sola cadena larga cae en "U" desde arriba de la pantalla,
+  // como si alguien la sostuviera con las dos manos fuera de cuadro. Se balancea con peso, suelta chispas y arde al rojo vivo.
+  // Se dibuja en un lienzo: la foto de la cadena recta se "teje" eslabón por eslabón a lo largo de la curva.
   $('#cadenas').onclick = function () {
     S.play('cadena'); decir(T('⛓️ Unas cadenas viejas caen… y empiezan a arder.', '⛓️ Some old chains fall… and start to burn.'), 3600);
     if (suave) return;
-    var W = innerWidth, H = innerHeight, capa = document.createElement('div');
-    capa.className = 'capa-cadena'; body.appendChild(capa);
-    var ALTO = 490;   // alto de la imagen a 24 px de ancho
-    var cadenas = [W * .33, W * .67].map(function (x, i) {
-      var eje = document.createElement('div'), img = document.createElement('img');
-      eje.className = 'cadena-eje'; eje.style.left = x + 'px';
-      img.src = 'img/cadena.webp'; img.alt = ''; img.width = 24; img.height = ALTO; img.decoding = 'async';
-      eje.appendChild(img); capa.appendChild(eje);
-      return { x: x, largo: -40, vel: 0, meta: Math.min(H * (.5 + i * .06), ALTO - 20), ang: 0, vang: (i ? -1 : 1) * .02, eje: eje, img: img };
-    });
-    // Un punto al azar a lo largo de la cadena (para las chispas y el fuego)
-    function punto(k) { var s = Math.random() * Math.max(0, k.largo); return { x: k.x + Math.sin(k.ang) * s, y: Math.cos(k.ang) * s }; }
-    var t0 = performance.now(), chispeo = false, ardiendo = false;
+    var W = innerWidth, H = innerHeight, dpr = Math.min(2, window.devicePixelRatio || 1), cv = document.createElement('canvas'), g = cv.getContext('2d');
+    cv.className = 'capa-cadena'; cv.width = W * dpr; cv.height = H * dpr; body.appendChild(cv); g.scale(dpr, dpr);
+    var img = new Image(); img.src = 'img/cadena.webp';
+    var ANCHO = Math.max(16, Math.min(24, W / 40)), ESC = ANCHO / 64, PER = 170, Y0 = 300, PASO = PER * ESC;   // el eslabón se repite cada 170 px de la imagen
+    var A = { x: W * .16, y: -30 }, B = { x: W * .84, y: -30 }, cayo = { s: -80, v: 0, meta: Math.min(H * .62, W * .55) }, vaiven = { x: (Math.random() < .5 ? -1 : 1) * W * .12, v: 0 };
+    function punto(t) {   // curva de Bézier: el punto de control baja para que el centro llegue a "s"
+      var cx = (A.x + B.x) / 2 + vaiven.x, cy = 2 * cayo.s + 30, u = 1 - t;
+      return { x: u * u * A.x + 2 * u * t * cx + t * t * B.x, y: u * u * A.y + 2 * u * t * cy + t * t * B.y };
+    }
+    function trazo() {   // la curva en 160 puntos, con su largo acumulado
+      var pts = [], L = 0, ant = punto(0); pts.push({ p: ant, L: 0 });
+      for (var i = 1; i <= 160; i++) { var q = punto(i / 160); L += Math.hypot(q.x - ant.x, q.y - ant.y); pts.push({ p: q, L: L }); ant = q; }
+      return pts;
+    }
+    function pintar(pts) {
+      g.clearRect(0, 0, W, H); if (!img.complete || !img.naturalWidth) return;
+      var total = pts[pts.length - 1].L, j = 0;
+      for (var d = 0; d < total; d += PASO) {
+        while (j < pts.length - 2 && pts[j + 1].L < d) j++;
+        var a = pts[j].p, b = pts[j + 1].p, k = (d - pts[j].L) / Math.max(.001, pts[j + 1].L - pts[j].L);
+        var x = a.x + (b.x - a.x) * k, y = a.y + (b.y - a.y) * k, ang = Math.atan2(b.y - a.y, b.x - a.x) - Math.PI / 2;
+        if (y < -PASO || y > H + PASO) continue;
+        g.save(); g.translate(x, y); g.rotate(ang);
+        g.drawImage(img, 0, Y0, 64, PER + 2, -ANCHO / 2, 0, ANCHO, PASO + 2 * ESC);
+        g.restore();
+      }
+    }
+    function alAzar(pts) { var q = pts[Math.floor(Math.random() * pts.length)].p; return q; }
+    var t0 = performance.now(), chispeo = false, ardiendo = false, seVa = false;
     function paso(t) {
       var e = t - t0;
-      cadenas.forEach(function (k) {
-        k.vel += (k.meta - k.largo) * .05; k.vel *= .85; k.largo += k.vel;              // cae con peso y rebota al tensarse
-        k.vang += -k.ang * .02; k.vang *= .985; k.ang += k.vang;                        // se balancea como péndulo
-        k.eje.style.transform = 'rotate(' + (-k.ang * 57.3).toFixed(2) + 'deg)';
-        k.img.style.transform = 'translate3d(-50%,' + (k.largo - ALTO).toFixed(1) + 'px,0)';
-        k.px = k.x + Math.sin(k.ang) * k.largo; k.py = Math.cos(k.ang) * k.largo;
-      });
+      cayo.v += (cayo.meta - cayo.s) * .045; cayo.v *= .86; cayo.s += cayo.v;      // cae con peso y rebota al tensarse
+      vaiven.v += -vaiven.x * .018; vaiven.v *= .975; vaiven.x += vaiven.v;          // se mece de lado a lado y se va calmando
+      var pts = trazo(); pintar(pts);
       if (e > 650 && !chispeo) { chispeo = true; S.play('chispas'); }
-      if (chispeo && !ardiendo) cadenas.forEach(function (k) { var q = punto(k); C.brasas(q.x, q.y, 2, ['#ffffff', '#ffe08a']); });
-      if (e > 1100 && !ardiendo) { ardiendo = true; S.play('fuego'); body.classList.add('furia'); capa.classList.add('arde'); }
-      if (ardiendo) cadenas.forEach(function (k) {
-        for (var j = 0; j < 3; j++) { var p = punto(k); C.brasas(p.x, p.y, 1); }
-        C.brasas(k.px, k.py, 3);
-      });
-      if (e > 3400 && !capa.classList.contains('se-va')) { cadenas.forEach(function (k) { k.meta = -ALTO; }); capa.classList.add('se-va'); body.classList.remove('furia'); }
-      if (e < 4300) requestAnimationFrame(paso); else capa.remove();
+      if (chispeo && !ardiendo) for (var c = 0; c < 3; c++) { var q = alAzar(pts); C.brasas(q.x, q.y, 1, ['#ffffff', '#ffe08a']); }
+      if (e > 1100 && !ardiendo) { ardiendo = true; S.play('fuego'); body.classList.add('furia'); cv.classList.add('arde'); }
+      if (ardiendo && !seVa) for (var f2 = 0; f2 < 5; f2++) { var q2 = alAzar(pts); C.brasas(q2.x, q2.y, 1); }
+      if (e > 3400 && !seVa) { seVa = true; cayo.meta = -260; cv.classList.add('se-va'); body.classList.remove('furia'); }
+      if (e < 4300) requestAnimationFrame(paso); else cv.remove();
     }
     requestAnimationFrame(paso);
   };

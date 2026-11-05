@@ -225,6 +225,8 @@
   // El sonido sale del lado de la pantalla donde está el cohete.
   var ultimoToque = -9999, solosSonados = 0;
   addEventListener('pointerdown', function () { ultimoToque = performance.now(); }, true);
+  // Cuando el visitante acciona algo (cadenas, dioses, la rueda…), los cohetes guardan silencio 6 s para no robarle la escena
+  addEventListener('click', function (e) { if (e.target.closest && e.target.closest('button, a, .secreto, [role="button"]')) C.calma = performance.now() + 6000; }, true);
   function lado(x) { return Math.max(-.7, Math.min(.7, (x / (W || innerWidth)) * 1.4 - .7)); }
   C.cohete = function (x, ty, colores) {
     var dist = Math.max(80, H - ty), v = Math.sqrt(2 * .05 * dist), cerca = performance.now() - ultimoToque < 1500,
@@ -278,7 +280,7 @@
     }
     // Fuegos artificiales que salen de detrás de las dunas (de noche, o todo el día en el gran día)
     var ahora = performance.now(), cada = C.pico ? 1300 : 3200;
-    if ((C.fiesta === 'anonuevo' || C.fiesta === 'patrias' || C.fiesta === 'feria') && (C.modo === 'noche' || C.pico) && ahora - ultimoFuego > cada) {
+    if ((C.fiesta === 'anonuevo' || C.fiesta === 'patrias' || C.fiesta === 'feria') && (C.modo === 'noche' || C.pico) && ahora - ultimoFuego > cada && !(C.calma > ahora)) {
       ultimoFuego = ahora; C.cohete(azar(W * .1, W * .9), azar(H * .12, H * .4));
     }
     if (C.modo === 'noche' && !fugaz && Math.random() < .002) C.fugaz();

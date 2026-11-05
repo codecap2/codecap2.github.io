@@ -47,8 +47,8 @@
     navidad: function (el) { C.lluviaDe(['❄️', '⭐', '🎁'], 24); S.play('cascabeles'); avisar(T('🎅 El gorrito de Santa le queda bien al Olimpo, ¿no crees?', '🎅 Santa’s hat suits Olympus, doesn’t it?')); },
     reyes: function (el) { var r = el.getBoundingClientRect(); C.brasas(r.left + r.width / 2, r.top, 18, ['#fff6c8', '#f1d48a']); S.play('reyes'); avisar(T('👑 Una corona digna de un rey… o de tu negocio.', '👑 A crown fit for a king… or for your business.')); },
     sanvalentin: function (el) { C.subir(['💗', '💘', '🌹'], innerWidth / 2, innerHeight * .7, 16); S.play('sanvalentin'); avisar(T('💘 Afrodita aprueba este amor por los detalles.', '💘 Aphrodite approves of this love for details.')); },
-    feria: function (el) { for (var n = 0; n < 3; n++) setTimeout(function () { C.cohete(innerWidth * (.2 + Math.random() * .6), innerHeight * (.12 + Math.random() * .2)); }, n * 260); S.play('feria'); avisar(T('🎡 ¡Que viva la Feria de San Marcos!', '🎡 Long live the San Marcos Fair!')); },
-    patrias: function (el) { for (var n = 0; n < 3; n++) setTimeout(function () { C.cohete(innerWidth * (.2 + Math.random() * .6), innerHeight * (.12 + Math.random() * .2)); }, n * 260); S.play('patrias'); avisar(T('🇲🇽 ¡Viva México!', '🇲🇽 ¡Viva México!')); }
+    feria: function (el) { S.play('feria'); avisar(T('🎡 ¡Que viva la Feria de San Marcos!', '🎡 Long live the San Marcos Fair!')); },
+    patrias: function (el) { S.play('patrias'); avisar(T('🇲🇽 ¡Viva México!', '🇲🇽 ¡Viva México!')); }
   };
   var logo = $('.logo');
   function ponerAccesorio(tipo) {
@@ -264,7 +264,27 @@
   if (f === 'feria') {
     // La rueda gira con JS (no con CSS) para poder acelerar sin saltos, y cada canastita cuelga siempre derecha,
     // como en una rueda de verdad: gira la estructura, pero las canastas no se voltean.
-    var rueda = '<svg viewBox="-12 -12 224 244" style="overflow:visible"><path d="M70 228 L100 100 L130 228" stroke="#5a4030" stroke-width="6" fill="none"/><g class="giro-rueda"><circle cx="100" cy="100" r="88" fill="none" stroke="#c9b48a" stroke-width="4"/><circle cx="100" cy="100" r="70" fill="none" stroke="#c9b48a" stroke-width="2"/>';
+    // Base de acero de verdad: dos torres en "A" hechas de armadura (barras con diagonales), travesaños,
+    // el eje con su soporte y una plataforma con barandal, como las ruedas de feria reales (no dos palitos).
+    function baseRueda() {
+      var o = '<g class="base-rueda" stroke-linecap="round" fill="none">';
+      [[-1, '#4a3626'], [1, '#5c4430']].forEach(function (lado) {
+        var sx = lado[0], col = lado[1], afuera = function (t) { return [100 + sx * 54 * t, 100 + 128 * t]; }, adentro = function (t) { return [100 + sx * 36 * t, 104 + 124 * t]; };
+        var A = afuera(1), B = adentro(1);
+        o += '<path d="M100 100 L' + A + ' M100 104 L' + B + '" stroke="' + col + '" stroke-width="3.2"/>';
+        var zig = 'M100 102';
+        for (var k = 1; k <= 8; k++) { var t = k / 8, q = k % 2 ? afuera(t) : adentro(t); zig += ' L' + q[0].toFixed(1) + ' ' + q[1].toFixed(1); }
+        o += '<path d="' + zig + '" stroke="' + col + '" stroke-width="1.3" opacity=".9"/>';
+      });
+      // travesaños entre las dos torres y el eje
+      [[.5, 1.6], [.8, 1.8]].forEach(function (tr) { var t = tr[0]; o += '<path d="M' + (100 - 54 * t).toFixed(1) + ' ' + (100 + 128 * t).toFixed(1) + ' H' + (100 + 54 * t).toFixed(1) + '" stroke="#4a3626" stroke-width="' + tr[1] + '"/>'; });
+      o += '<circle cx="100" cy="100" r="11" fill="#3a2a1e" stroke="#8c7457" stroke-width="2"/>';
+      // plataforma con barandal
+      o += '<rect x="34" y="226" width="132" height="7" rx="2" fill="#3a2a1e" stroke="none"/>';
+      o += '<path d="M38 226 V216 H162 V226 M58 216 V226 M78 216 V226 M122 216 V226 M142 216 V226" stroke="#8c7457" stroke-width="1.2"/>';
+      return o + '</g>';
+    }
+    var rueda = '<svg viewBox="-12 -12 224 244" style="overflow:visible">' + baseRueda() + '<g class="giro-rueda"><circle cx="100" cy="100" r="88" fill="none" stroke="#c9b48a" stroke-width="4"/><circle cx="100" cy="100" r="70" fill="none" stroke="#c9b48a" stroke-width="2"/>';
     for (var g = 0; g < 12; g++) { var a = g * 30 * Math.PI / 180, gx = 100 + Math.cos(a) * 88, gy = 100 + Math.sin(a) * 88; rueda += '<line x1="100" y1="100" x2="' + gx.toFixed(1) + '" y2="' + gy.toFixed(1) + '" stroke="#c9b48a" stroke-width="1.6"/><circle class="foquito" cx="' + gx.toFixed(1) + '" cy="' + gy.toFixed(1) + '" r="5" fill="' + ['#ff4fa3', '#ffd34d', '#4fd1ff', '#9bff6a'][g % 4] + '"/>'; }
     rueda += '<circle cx="100" cy="100" r="8" fill="#f1d48a"/></g><g class="canastas">';
     for (var g2 = 0; g2 < 12; g2++) rueda += '<g class="canasta"><path d="M0 0 V4" stroke="#c9b48a" stroke-width="1.2"/><rect x="-7" y="4" width="14" height="10" rx="2" fill="#d8342c"/><rect x="-7" y="4" width="14" height="3" rx="1.5" fill="#ff6a4a"/></g>';
@@ -280,7 +300,6 @@
     })(0);
     rb.addEventListener('click', function () {
       velMeta = 110; setTimeout(function () { velMeta = 9; }, 2600); S.play('feria');
-      for (var n = 0; n < 4; n++) setTimeout(function () { C.cohete(innerWidth * (.15 + Math.random() * .7), innerHeight * (.12 + Math.random() * .25)); }, n * 280);
       avisar(T('🎡 ¡La Feria Nacional de San Marcos, la más grande de México, aquí en Aguascalientes!', '🎡 The San Marcos National Fair, the biggest in Mexico, right here in Aguascalientes!'));
     });
   }
@@ -333,7 +352,9 @@
   if (f === 'anonuevo' || f === 'feria' || f === 'patrias') {
     document.addEventListener('click', function (e) {
       if (document.documentElement.classList.contains('en-templo') || $('#codice.abierto')) return;
-      if (e.target.closest('a, button, input, nav, .vidrio, .servicio, .paso, h1, h2, h3, p, .reto, #codice')) return;
+      // Solo el cielo vacío lanza cohetes: nada de botones, secretos, adornos de la fiesta ni textos
+      if (e.target.closest('a, button, input, nav, svg, img, .secreto, .astro, .vidrio, .servicio, .paso, h1, h2, h3, p, .reto, #codice, #escenaFiesta, .papel-picado, .altar, .xolo, .bandera-dunas, [role="button"], [tabindex]')) return;
+      if (C.calma && performance.now() < C.calma) return;
       C.cohete(e.clientX, Math.max(innerHeight * .08, e.clientY));
     });
   }
