@@ -93,10 +93,31 @@
     s.connect(g); g.connect(cajaGuitarra); s.start(t); s.stop(t + 1.75);
     if (!LIGERO) siseo(3200, 2000, vol * .07, .02, retraso || 0, 1.2, .001);   // el toque de la uña (en celular se omite, para no saturar)
   }
+  // ---------- Guitarra GRABADA (no sintetizada) ----------
+  // Notas reales de guitarra de nylon del banco FluidR3 GM (Frank Wen), vía MIDI.js Soundfonts. Licencia CC BY 3.0
+  // (el crédito va en el pie de la página). Solo se descargan cuando hace falta y se guardan para no volver a pedirlas.
+  var NOTAS_GUITARRA = 'E2 G2 A2 B2 C3 D3 E3 F3 G3 Ab3 A3 B3 C4 D4 E4 F4 G4 Ab4 A4 B4 C5 D5 E5 F5 G5 A5'.split(' ');
+  var NOMBRES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'], muestras = {};
+  function notaDe(f) { var m = Math.round(12 * Math.log(f / 440) / Math.LN2) + 69; return NOMBRES[m % 12] + (Math.floor(m / 12) - 1); }
+  function muestra(nombre) {
+    if (!muestras[nombre]) muestras[nombre] = fetch('sonidos/guitarra/' + nombre + '.mp3').then(function (r) { return r.arrayBuffer(); })
+      .then(function (b) { return new Promise(function (ok, no) { var p = ctx.decodeAudioData(b, ok, no); if (p && p.catch) p.catch(function () {}); }); }).catch(function () { return null; });
+    return muestras[nombre];
+  }
+  S.precargarGuitarra = function () { if (ctx) NOTAS_GUITARRA.forEach(muestra); };
+  function guitarraReal(f, vol, retraso) {
+    var nombre = notaDe(f), cuando = ctx.currentTime + (retraso || 0);
+    if (NOTAS_GUITARRA.indexOf(nombre) < 0) return guitarra(f, vol, retraso);
+    muestra(nombre).then(function (buf) {
+      if (!buf) return guitarra(f, vol, Math.max(0, cuando - ctx.currentTime));
+      var s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = buf; g.gain.value = vol * 1.5;
+      s.connect(g); salida(g); s.start(Math.max(cuando, ctx.currentTime));
+    });
+  }
   // Rasgueo de guitarra: las cuerdas suenan una tras otra, muy rápido, como con la mano
   function rasgueo(notas, vol, retraso, haciaArriba) {
     var orden = haciaArriba ? notas.slice().reverse() : notas;
-    orden.forEach(function (f, i) { guitarra(f, vol * (1 - i * .08) * 1.3, retraso + i * .016); });
+    orden.forEach(function (f, i) { guitarraReal(f, vol * (1 - i * .08) * 1.3, retraso + i * .016); });
   }
   // Órgano de carrusel: tubos (fundamental, octava y quinta) un poquito desafinados entre sí, que "laten" como los de verdad
   function organo(f, vol, dura, retraso) {
@@ -272,8 +293,8 @@
     // Día de Muertos: un vals en La menor con guitarra (bajo + rasgueo) y una melodía de requinto; al final, una campana lejana
     muertos: function () {
       var q = .32, A = [N.A3, N.C4, N.E4], Dm = [N.D4, N.F4, N.A4], E = [N.Gs3, N.B3, N.E4], bajos = [N.A2, N.D3, N.E2, N.A2], acordes = [A, Dm, E, A];
-      for (var c = 0; c < 4; c++) { var r = c * 3 * q; guitarra(bajos[c], .65, r); rasgueo(acordes[c], .22, r + q); rasgueo(acordes[c], .18, r + 2 * q, true); }
-      tocar([[N.E5, 1], [N.A4, 1], [N.C5, 1], [N.D5, 1.5], [N.C5, .5], [N.A4, 1], [N.B4, 1], [N.Gs4, 1], [N.B4, 1], [N.A4, 3]], q, function (f, d, t) { guitarra(f, .5, t); });
+      for (var c = 0; c < 4; c++) { var r = c * 3 * q; guitarraReal(bajos[c], .65, r); rasgueo(acordes[c], .22, r + q); rasgueo(acordes[c], .18, r + 2 * q, true); }
+      tocar([[N.E5, 1], [N.A4, 1], [N.C5, 1], [N.D5, 1.5], [N.C5, .5], [N.A4, 1], [N.B4, 1], [N.Gs4, 1], [N.B4, 1], [N.A4, 3]], q, function (f, d, t) { guitarraReal(f, .5, t); });
       campana(N.A4, .1, 3.5, 12 * q);
     },
     // Feria: el vals del carrusel, con órgano de tubos, "um-pa-pa" en el bajo y la melodía arriba
@@ -310,13 +331,13 @@
       var requinto = function (vol) { return function (f, d, t) {
         // cuerda pulsada sobre caja de madera (como guitarra); solo las notas largas llevan trémolo
         var veces = d >= 3 * q ? Math.round(d / (q / 2)) : 1;
-        for (var k = 0; k < veces; k++) guitarra(f, vol * (k ? .65 : 1), t + k * (d / veces));
+        for (var k = 0; k < veces; k++) guitarraReal(f, vol * (k ? .65 : 1), t + k * (d / veces));
       }; };
       tocar(t1, q, requinto(.5)); tocar(t2, q, requinto(.3));
       // Guitarrón y vihuela: "um-pa" en Do y en Sol, como lleva el son
       var C = [N.C4, N.E4, N.G4], G = [N.B3, N.D4, N.G4];
-      for (var b = 0; b < 8; b++) { var ac = b < 4 ? C : G, raiz = b < 4 ? N.C3 : N.G2, r = b * 4 * q; guitarra(raiz, .7, r); rasgueo(ac, .18, r + 2 * q); }
-      guitarra(N.C3, .7, 32 * q); rasgueo(C, .2, 32 * q);
+      for (var b = 0; b < 8; b++) { var ac = b < 4 ? C : G, raiz = b < 4 ? N.C3 : N.G2, r = b * 4 * q; guitarraReal(raiz, .7, r); rasgueo(ac, .18, r + 2 * q); }
+      guitarraReal(N.C3, .7, 32 * q); rasgueo(C, .2, 32 * q);
     },
     // Reyes: "Noche de paz" (de 1818, dominio público) con campanitas, y una campana grave al empezar
     reyes: function () {
@@ -379,7 +400,7 @@
     if (despertado) return; despertado = true;
     ['pointerdown', 'keydown', 'touchstart', 'touchend', 'click'].forEach(function (t) { removeEventListener(t, despertar, true); });
     if (e && btn && btn.contains(e.target)) return;   // si su primer toque fue para apagarlo, no suena nada
-    if (S.on && iniciar()) ambiente();
+    if (S.on && iniciar()) { ambiente(); var fi = window.Cielo && Cielo.fiesta; if (fi === 'patrias' || fi === 'muertos') S.precargarGuitarra(); }
   }
   // iPhone a veces crea el audio "dormido": se despierta en cualquier toque o clic
   ['touchend', 'click'].forEach(function (t) { addEventListener(t, function () { if (ctx && ctx.state !== 'running') ctx.resume(); }, true); });
