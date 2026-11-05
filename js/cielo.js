@@ -364,7 +364,7 @@
       reyes: [['De noche, toca la estrella más grande del cielo ⭐ (suena "Noche de paz")', 'At night, tap the biggest star in the sky ⭐ ("Silent Night" plays)'], ['Toca la corona del logo', 'Tap the crown on the logo']],
       sanvalentin: [['Toca el corazón del logo 💘', 'Tap the heart on the logo 💘']],
       feria: [['Toca la rueda de la fortuna 🎡 (suena el Son de la Feria, hecho para Olimpo)', 'Tap the Ferris wheel 🎡 (the Fair Song plays, made for Olympus)'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],
-      patrias: [['Toca la bandera del logo 🇲🇽 (suena el mariachi)', 'Tap the flag on the logo 🇲🇽 (mariachi plays)'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],
+      patrias: [['Toca la bandera a lo lejos en las dunas 🇲🇽 (se ilumina y suena el requinto)', 'Tap the distant flag on the dunes 🇲🇽 (it lights up and the requinto plays)'], ['Toca la bandera del logo', 'Tap the flag on the logo'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],
       muertos: [['Toca al xolo 🐕 y te explica el altar nivel por nivel', 'Tap the xolo 🐕 and it explains the altar level by level'], ['Toca el altar (suena el vals)', 'Tap the altar (the waltz plays)'], ['Toca la calaverita del logo 💀', 'Tap the sugar skull on the logo 💀']],
       halloween: [['Toca la calabaza del logo 🎃', 'Tap the pumpkin on the logo 🎃'], ['Toca al xolo 🐕 y el altar', 'Tap the xolo 🐕 and the altar']]
     };

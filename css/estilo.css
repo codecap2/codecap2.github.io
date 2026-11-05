@@ -640,3 +640,14 @@ body.noche .murcielago { filter: drop-shadow(0 0 3px rgba(255,140,40,.5)); }
 /* El toque de la estrella grande de los Reyes (invisible, sigue a la estrella del cielo) */
 .toque-estrella { position: fixed; left: 0; top: 0; width: 52px; height: 52px; border-radius: 50%; z-index: 30; }
 .toque-estrella:focus-visible { outline: 2px solid var(--oro2); outline-offset: 2px; }
+
+/* Fiestas Patrias: la bandera ondea a lo lejos sobre las dunas (chiquita y un poco brumosa, por la distancia) */
+.bandera-dunas { right: 13vw; bottom: 19vh; width: clamp(34px, 3.6vw, 56px); aspect-ratio: 60 / 80; z-index: 1; opacity: .9; filter: saturate(.85) brightness(.92); transition: filter .4s ease; }
+body.noche .bandera-dunas { filter: saturate(.7) brightness(.55); }
+.bandera-dunas .tela { transform-origin: 6px 20px; animation: ondea 2.6s ease-in-out infinite alternate; }
+@keyframes ondea { to { transform: skewY(-3deg) scaleX(.94); } }
+.bandera-dunas.iluminada { animation: banderaLuz 3s ease; }
+@keyframes banderaLuz { 0%, 100% { filter: saturate(.85) brightness(.92); } 20%, 70% { filter: saturate(1.2) brightness(1.35) drop-shadow(0 0 8px rgba(255,255,255,.85)) drop-shadow(0 0 22px rgba(255,220,150,.6)); } }
+@media (prefers-reduced-motion: reduce) { .bandera-dunas .tela { animation: none; } }
+/* La bandera del logo, centrada con el texto */
+.acc-patrias { margin-top: -8px !important; }

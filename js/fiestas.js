@@ -301,6 +301,20 @@
     });
   }
 
+  // ---------- Fiestas Patrias: una bandera a lo lejos, sobre las dunas, ondeando; al tocarla se ilumina ----------
+  if (f === 'patrias') {
+    var bandera = boton('<svg viewBox="0 0 60 80"><rect x="4" y="2" width="2.4" height="78" rx="1" fill="#6b5236"/><circle cx="5.2" cy="2.2" r="2.2" fill="#d9b066"/>' +
+      '<g class="tela"><path d="M6.4 6 Q20 2 33 6 T60 6 V36 Q46 32 33 36 T6.4 36 Z" fill="#ffffff"/>' +
+      '<path d="M6.4 6 Q12 4.6 24 4.4 V34.4 Q12 34.6 6.4 36 Z" fill="#0b8a3e"/><path d="M42 4.6 Q51 5.6 60 6 V36 Q51 35.6 42 34.6 Z" fill="#ce1126"/>' +
+      '<ellipse cx="33" cy="20.5" rx="3.6" ry="3" fill="#8a5a2a"/><path d="M29.5 23 Q33 26 36.5 23" stroke="#2f7a3a" stroke-width="1" fill="none"/></g></svg>',
+      'bandera-dunas', T('La bandera de México, a lo lejos', 'The flag of Mexico, in the distance'));
+    bandera.addEventListener('click', function () {
+      bandera.classList.remove('iluminada'); void bandera.offsetWidth; bandera.classList.add('iluminada');
+      var r = bandera.getBoundingClientRect(); C.brasas(r.left + r.width * .6, r.top + r.height * .25, 18, ['#0b8a3e', '#ffffff', '#ce1126']); S.play('patrias');
+      avisar(T('🇲🇽 ¡Viva México!', '🇲🇽 ¡Viva México!'));
+    });
+  }
+
   // ---------- Tocar el cielo lanza fuegos artificiales (Año Nuevo, Feria y Patrias) ----------
   if (f === 'anonuevo' || f === 'feria' || f === 'patrias') {
     document.addEventListener('click', function (e) {
