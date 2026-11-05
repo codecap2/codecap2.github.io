@@ -67,6 +67,7 @@
   // Guitarra de verdad (para el requinto, el vals y los rasgueos): la uña ataca la cuerda (golpecito de ruido),
   // la cuerda vibra con su "posición de pulsado" (filtro de peine) y se apaga como una cuerda real; la caja de madera
   // le da cuerpo (resonancias graves de 100 y 210 Hz) y se le quita el brillo metálico de arriba.
+  var cajaGuitarra = null;
   function guitarra(f, vol, retraso) {
     var clave = 'gt' + Math.round(f), buf = cuerdas[clave];
     if (!buf) {
@@ -78,15 +79,19 @@
       for (var j = 0; j < n; j++) { var sig = (p + 1) % per; var v = (linea[p] * .5 + linea[sig] * .5) * .9935; d[j] = linea[p]; linea[p] = v; p = sig; }
       cuerdas[clave] = buf;
     }
+    // Una sola 'caja de guitarra' (filtros) compartida por todas las notas: así no se satura el audio ni se corta
+    if (!cajaGuitarra) {
+      var c1 = ctx.createBiquadFilter(), c2 = ctx.createBiquadFilter(), c3 = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(); cajaGuitarra = ctx.createGain(); cajaGuitarra.gain.value = 1;
+      c1.type = 'peaking'; c1.frequency.value = 100; c1.Q.value = 1; c1.gain.value = 6;
+      c2.type = 'peaking'; c2.frequency.value = 210; c2.Q.value = 1.3; c2.gain.value = 5;
+      c3.type = 'peaking'; c3.frequency.value = 2600; c3.Q.value = 1; c3.gain.value = 2.5;
+      lp.type = 'lowpass'; lp.frequency.value = 4200; lp.Q.value = .5;
+      cajaGuitarra.connect(c1); c1.connect(c2); c2.connect(c3); c3.connect(lp); salida(lp);
+    }
     var t = ctx.currentTime + (retraso || 0), s = ctx.createBufferSource(), g = ctx.createGain();
-    var c1 = ctx.createBiquadFilter(), c2 = ctx.createBiquadFilter(), c3 = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter();
-    c1.type = 'peaking'; c1.frequency.value = 100; c1.Q.value = 1; c1.gain.value = 6;
-    c2.type = 'peaking'; c2.frequency.value = 210; c2.Q.value = 1.3; c2.gain.value = 5;
-    c3.type = 'peaking'; c3.frequency.value = 2600; c3.Q.value = 1; c3.gain.value = 2.5;
-    lp.type = 'lowpass'; lp.frequency.value = 4200; lp.Q.value = .5;
     s.buffer = buf; g.gain.setValueAtTime(vol, t); g.gain.setTargetAtTime(.0001, t + .9, .35);
-    s.connect(c1); c1.connect(c2); c2.connect(c3); c3.connect(lp); lp.connect(g); salida(g); s.start(t); s.stop(t + 1.75);
-    siseo(3200, 2000, vol * .07, .02, retraso || 0, 1.2, .001);   // el toque de la uña
+    s.connect(g); g.connect(cajaGuitarra); s.start(t); s.stop(t + 1.75);
+    if (!LIGERO) siseo(3200, 2000, vol * .07, .02, retraso || 0, 1.2, .001);   // el toque de la uña (en celular se omite, para no saturar)
   }
   // Rasgueo de guitarra: las cuerdas suenan una tras otra, muy rápido, como con la mano
   function rasgueo(notas, vol, retraso, haciaArriba) {

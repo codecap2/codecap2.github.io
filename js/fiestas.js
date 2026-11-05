@@ -262,12 +262,24 @@
 
   // ---------- Feria de San Marcos: rueda de la fortuna gigante detrás de las dunas ----------
   if (f === 'feria') {
-    var rueda = '<svg viewBox="0 0 200 220"><path d="M70 220 L100 100 L130 220" stroke="#5a4030" stroke-width="6" fill="none"/><g class="giro-rueda"><circle cx="100" cy="100" r="88" fill="none" stroke="#c9b48a" stroke-width="4"/><circle cx="100" cy="100" r="70" fill="none" stroke="#c9b48a" stroke-width="2"/>';
-    for (var g = 0; g < 12; g++) { var a = g * 30 * Math.PI / 180, gx = 100 + Math.cos(a) * 88, gy = 100 + Math.sin(a) * 88; rueda += '<line x1="100" y1="100" x2="' + gx.toFixed(1) + '" y2="' + gy.toFixed(1) + '" stroke="#c9b48a" stroke-width="1.6"/><circle class="foquito" cx="' + gx.toFixed(1) + '" cy="' + gy.toFixed(1) + '" r="5" fill="' + ['#ff4fa3', '#ffd34d', '#4fd1ff', '#9bff6a'][g % 4] + '"/><rect x="' + (gx - 7).toFixed(1) + '" y="' + (gy + 4).toFixed(1) + '" width="14" height="10" rx="2" fill="#d8342c"/>'; }
-    rueda += '<circle cx="100" cy="100" r="8" fill="#f1d48a"/></g></svg>';
+    // La rueda gira con JS (no con CSS) para poder acelerar sin saltos, y cada canastita cuelga siempre derecha,
+    // como en una rueda de verdad: gira la estructura, pero las canastas no se voltean.
+    var rueda = '<svg viewBox="-12 -12 224 244" style="overflow:visible"><path d="M70 228 L100 100 L130 228" stroke="#5a4030" stroke-width="6" fill="none"/><g class="giro-rueda"><circle cx="100" cy="100" r="88" fill="none" stroke="#c9b48a" stroke-width="4"/><circle cx="100" cy="100" r="70" fill="none" stroke="#c9b48a" stroke-width="2"/>';
+    for (var g = 0; g < 12; g++) { var a = g * 30 * Math.PI / 180, gx = 100 + Math.cos(a) * 88, gy = 100 + Math.sin(a) * 88; rueda += '<line x1="100" y1="100" x2="' + gx.toFixed(1) + '" y2="' + gy.toFixed(1) + '" stroke="#c9b48a" stroke-width="1.6"/><circle class="foquito" cx="' + gx.toFixed(1) + '" cy="' + gy.toFixed(1) + '" r="5" fill="' + ['#ff4fa3', '#ffd34d', '#4fd1ff', '#9bff6a'][g % 4] + '"/>'; }
+    rueda += '<circle cx="100" cy="100" r="8" fill="#f1d48a"/></g><g class="canastas">';
+    for (var g2 = 0; g2 < 12; g2++) rueda += '<g class="canasta"><path d="M0 0 V4" stroke="#c9b48a" stroke-width="1.2"/><rect x="-7" y="4" width="14" height="10" rx="2" fill="#d8342c"/><rect x="-7" y="4" width="14" height="3" rx="1.5" fill="#ff6a4a"/></g>';
+    rueda += '</g></svg>';
     var rb = boton(rueda, 'rueda', T('La rueda de la fortuna de la Feria', 'The fair’s Ferris wheel'), astros);
+    var giro = rb.querySelector('.giro-rueda'), canastas = [].slice.call(rb.querySelectorAll('.canasta')), angulo = 0, vel = 9, velMeta = 9, tAnt = 0;   // grados por segundo
+    (function girar(t) {
+      var dt = tAnt ? Math.min(.05, (t - tAnt) / 1000) : 0; tAnt = t;
+      vel += (velMeta - vel) * .04; if (!suave) angulo = (angulo + vel * dt) % 360;
+      giro.setAttribute('transform', 'rotate(' + angulo.toFixed(2) + ' 100 100)');
+      canastas.forEach(function (c, i) { var a2 = (i * 30 + angulo) * Math.PI / 180; c.setAttribute('transform', 'translate(' + (100 + Math.cos(a2) * 88).toFixed(1) + ' ' + (100 + Math.sin(a2) * 88).toFixed(1) + ')'); });
+      requestAnimationFrame(girar);
+    })(0);
     rb.addEventListener('click', function () {
-      rb.classList.add('rapida'); setTimeout(function () { rb.classList.remove('rapida'); }, 3000); S.play('feria');
+      velMeta = 110; setTimeout(function () { velMeta = 9; }, 2600); S.play('feria');
       for (var n = 0; n < 4; n++) setTimeout(function () { C.cohete(innerWidth * (.15 + Math.random() * .7), innerHeight * (.12 + Math.random() * .25)); }, n * 280);
       avisar(T('🎡 ¡La Feria Nacional de San Marcos, la más grande de México, aquí en Aguascalientes!', '🎡 The San Marcos National Fair, the biggest in Mexico, right here in Aguascalientes!'));
     });

@@ -437,9 +437,10 @@ body.noche .altar .velas { filter: drop-shadow(0 0 4px #ffd34d) drop-shadow(0 0 
 .altar.vivo { animation: altarVivo 2.4s ease; }
 @keyframes altarVivo { 30% { filter: drop-shadow(0 0 18px #ffb02e) brightness(1.2); } }
 /* Feria: rueda de la fortuna gigante a lo lejos, detrás de la duna del frente */
-.rueda { left: 9vw; bottom: 14vh; width: clamp(130px, 18vw, 265px); aspect-ratio: 200 / 220; }
-.giro-rueda { transform-box: view-box; transform-origin: 100px 100px; animation: girarRueda 40s linear infinite; }
-.rueda.rapida .giro-rueda { animation-duration: 3.5s; }
+.rueda { left: 9vw; bottom: 14vh; width: clamp(130px, 18vw, 265px); aspect-ratio: 224 / 244; }
+.rueda svg { overflow: visible; }
+/* la rueda la gira JS (fiestas.js), con las canastas siempre derechas */
+
 body.noche .giro-rueda { filter: drop-shadow(0 0 5px rgba(255,211,77,.9)); }
 body.noche .foquito { animation: foquito 1.2s steps(2) infinite; }
 @keyframes girarRueda { to { transform: rotate(360deg); } }
@@ -689,3 +690,7 @@ html.ahorro .fenix-amigo, html.ahorro .estrella-camino, html.ahorro .murcielago,
 html.ahorro .cempasuchil svg, html.ahorro .cempasuchil .petalo-c, html.ahorro .papel-picado svg, html.ahorro #paisaje .aves, html.ahorro #paisaje .fuego-templo { animation: none !important; }
 html.ahorro2 #paisaje .capa-p, html.ahorro2 #escenaFiesta, html.ahorro2 #astros { transform: none !important; }
 html.ahorro2 .altar .humo, html.ahorro2 .altar .humo-forma, html.ahorro2 .altar .llamita, html.ahorro2 .trineo .nariz { animation: none !important; }
+.creditos { font-size: .72rem; opacity: .6; margin-top: 4px; text-align: center; }
+
+/* En celular el altar y el xolo suben un poco y se achican, para que el recuadro de los 15 dioses no los tape */
+@media (max-width: 520px) { .altar { left: 2vw; bottom: 19vh; width: 84px; } .xolo { left: calc(2vw + 80px); bottom: 18.6vh; width: 26px; } }

@@ -178,7 +178,7 @@
   var W, H, estrellas = [], parts = [], reyesX = .2 + Math.random() * .45, fugaz = null, ultimoFuego = 0;
   // El sol y la luna se esconden DETRÁS de las dunas: se recorta su capa con la forma de la duna del frente
   function recortarAstros() {
-    var duna = document.querySelector('.dunas .d1'), capa = document.getElementById('astros');
+    var duna = document.querySelector('.p-medio .d2') || document.querySelector('.dunas .d1'), capa = document.getElementById('astros');   // se esconden detrás de la duna del medio, la que se ve de verdad
     if (!duna || !capa || !duna.getScreenCTM) return;
     var m = duna.getScreenCTM(), largo = duna.getTotalLength(), pts = [], svgp = duna.ownerSVGElement.createSVGPoint();
     for (var i = 0; i <= 48; i++) {
