@@ -220,15 +220,17 @@
   C.paletaFuegos = function () {
     return C.fiesta === 'patrias' ? ['#0b8a3e', '#ffffff', '#ce1126'] : C.fiesta === 'feria' ? ['#ff4fa3', '#ffd34d', '#4fd1ff', '#9bff6a', '#ff7a3d'] : ['#f1d48a', '#ff5a4a', '#ffffff', '#ffb347', '#8fd3ff'];
   };
-  // Todos los cohetes suenan: los que lanza el visitante (con un toque en el último segundo y medio) suenan cerca y claros;
-  // los que salen solos, lejanos y suaves. El sonido sale del lado de la pantalla donde está el cohete.
-  var ultimoToque = -9999;
+  // Los que lanza el visitante (con un toque en el último segundo y medio) SIEMPRE suenan, cerca y claros.
+  // De los que salen solos, solo suenan los primeros 4 (lejanos y suaves); después se ven en silencio, para no cansar.
+  // El sonido sale del lado de la pantalla donde está el cohete.
+  var ultimoToque = -9999, solosSonados = 0;
   addEventListener('pointerdown', function () { ultimoToque = performance.now(); }, true);
   function lado(x) { return Math.max(-.7, Math.min(.7, (x / (W || innerWidth)) * 1.4 - .7)); }
   C.cohete = function (x, ty, colores) {
-    var dist = Math.max(80, H - ty), v = Math.sqrt(2 * .05 * dist), cerca = performance.now() - ultimoToque < 1500;
-    agregar({ t: 'cohete', x: x, y: H + 10, vx: azar(-.4, .4), vy: -v, ty: ty, vida: 400, c: colores || C.paletaFuegos(), suena: { cerca: cerca } });
-    if (window.Sonido) Sonido.play('cohete', { cerca: cerca, pan: lado(x) });
+    var dist = Math.max(80, H - ty), v = Math.sqrt(2 * .05 * dist), cerca = performance.now() - ultimoToque < 1500,
+      suena = cerca || solosSonados++ < 4;
+    agregar({ t: 'cohete', x: x, y: H + 10, vx: azar(-.4, .4), vy: -v, ty: ty, vida: 400, c: colores || C.paletaFuegos(), suena: suena ? { cerca: cerca } : null });
+    if (window.Sonido && suena) Sonido.play('cohete', { cerca: cerca, pan: lado(x) });
   };
   function estallar(x, y, cols, sonar) {
     var n = Math.round(80 * F), forma = Math.random();
