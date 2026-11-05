@@ -85,10 +85,15 @@
     };
     var orden = f === 'muertos' ? ['calavera', 'flor', 'pajaro', 'corazon', 'calavera', 'estrella', 'rayo'] : f === 'patrias' ? ['estrella', 'flor', 'pajaro', 'corazon', 'rayo'] : ['estrella', 'flor', 'corazon', 'pajaro', 'rayo'];
     var s = '<svg viewBox="0 0 1200 70" preserveAspectRatio="none"><path d="M0 4 Q600 26 1200 4" stroke="#c9b48a" stroke-width="2" fill="none"/>';
+    // En Fiestas Patrias, las banderitas del centro dicen ¡VIVA MÉXICO! (una letra en cada una)
+    var letras = f === 'patrias' ? '¡VIVA  MÉXICO!'.split('') : null;
     for (var i = 0; i < 16; i++) {
       var x = 20 + i * 74, y = 5 + Math.sin(i / 15 * Math.PI) * 11, c = COL_PAPEL[f][i % COL_PAPEL[f].length], celo = '';
       for (var e2 = 0; e2 < 6; e2++) celo += '<path d="M' + (6 + e2 * 9) + ' 3.5 l2.5 2.5 l-2.5 2.5 l-2.5 -2.5 Z" ' + H + '/>';   // greca de rombitos arriba
-      s += '<g transform="translate(' + x + ' ' + y + ')"><path d="M0 0 H56 V40 L48 48 L40 40 L32 48 L24 40 L16 48 L8 40 L0 48 Z" fill="' + c + '" opacity=".94"/>' + celo + CALADOS[orden[i % orden.length]](c) +
+      var letra = letras && i >= 1 && i <= 14 ? letras[i - 1] : '', dibujo;
+      if (letra && letra !== ' ') dibujo = '<text x="28" y="31" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-weight="700" font-size="25" fill="' + (c === '#ffffff' ? '#0b8a3e' : '#ffffff') + '">' + letra + '</text>';
+      else dibujo = CALADOS[orden[i % orden.length]](c);
+      s += '<g transform="translate(' + x + ' ' + y + ')"><path d="M0 0 H56 V40 L48 48 L40 40 L32 48 L24 40 L16 48 L8 40 L0 48 Z" fill="' + c + '" opacity=".94"/>' + celo + dibujo +
         '<path d="M4 37 H52" stroke="#0b0d12" stroke-opacity=".4" stroke-width="1.4" stroke-dasharray="3 3"/></g>';
     }
     tira.innerHTML = s + '</svg>'; $('.portada').appendChild(tira);
@@ -271,7 +276,8 @@
     // Silueta de Santa y sus renos (Openclipart, dominio público). La nariz de Rodolfo brilla roja al frente.
     var trineo = boton('<span class="silueta"></span><span class="nariz"></span>', 'trineo', T('El trineo de Santa', 'Santa’s sleigh'), astros);
     var vuelos = 0;
-    function pasar() { if (suave) return; trineo.classList.remove('vuela-trineo'); void trineo.offsetWidth; trineo.classList.add('vuela-trineo'); vuelos++; }   // pasa en silencio: la melodía suena solo si lo tocan
+    function pasar() { if (suave || C.modo === 'dia') return;   // Santa solo vuela de noche
+      trineo.classList.remove('vuela-trineo'); void trineo.offsetWidth; trineo.classList.add('vuela-trineo'); vuelos++; }   // pasa en silencio: la melodía suena solo si lo tocan
     setTimeout(pasar, 2500); setInterval(pasar, C.pico ? 14000 : 26000);
     trineo.addEventListener('click', function () {
       var r = trineo.getBoundingClientRect(); C.lluviaDe(['🎁', '⭐', '🎁'], 22); S.play('trineo');
@@ -281,16 +287,17 @@
 
   // ---------- Reyes Magos: la caravana cruza las dunas ----------
   if (f === 'reyes') {
-    // Siluetas de los tres Reyes en camello y la estrella que marca el camino (Openclipart, dominio público)
-    var car = boton('<span class="silueta"></span>', 'caravana', T('Los Reyes Magos', 'The Three Kings'));
-    var estrella = boton('<span class="silueta"></span>', 'estrella-camino', T('La estrella que guía a los Reyes', 'The star guiding the Kings'));
-    estrella.addEventListener('click', function () {
-      var r = estrella.getBoundingClientRect(); C.brasas(r.left + r.width / 2, r.top + r.height * .15, 22, ['#fff6c8', '#f1d48a', '#ffffff']);
-      avisar(T('⭐ La estrella de Belén guía a los Reyes Magos. Ellos la siguen a lo lejos por las dunas… y tú, ¿ya viste por dónde van?', '⭐ The Star of Bethlehem guides the Three Kings. They follow it across the dunes… can you spot them?'));
-    });
-    car.addEventListener('click', function () {
-      var r = car.getBoundingClientRect(); C.brasas(r.left + r.width / 2, r.top, 18, ['#fff6c8', '#f1d48a', '#ffffff']); S.play('reyes');
-      avisar(T('👑 Melchor, Gaspar y Baltasar siguen la estrella. ¿Ya partiste la rosca?', '👑 Melchior, Caspar and Balthazar follow the star. Have you cut the rosca yet?'));
+    // Los Reyes Magos son las tres estrellas del cielo de noche (como las conoce la gente: el cinturón de Orión)
+    // La estrella más grande del cielo (se dibuja en el cielo de noche); este botón invisible la sigue para poder tocarla
+    var guia = boton('', 'toque-estrella', T('La estrella que guía a los Reyes', 'The star guiding the Kings'), document.body);
+    (function seguir() {
+      var e = C.estrellaReyes;
+      if (e && e.visible) { guia.style.display = 'block'; guia.style.transform = 'translate(' + (e.x - 26) + 'px,' + (e.y - 26) + 'px)'; } else guia.style.display = 'none';
+      requestAnimationFrame(seguir);
+    })();
+    guia.addEventListener('click', function () {
+      var e = C.estrellaReyes; if (e) C.brasas(e.x, e.y, 22, ['#fff6c8', '#f1d48a', '#ffffff']); S.play('reyes');
+      avisar(T('⭐ Melchor, Gaspar y Baltasar brillan en el cielo de noche. ¿Ya partiste la rosca?', '⭐ Melchior, Caspar and Balthazar shine in the night sky. Have you cut the rosca yet?'));
     });
   }
 

@@ -437,7 +437,7 @@ body.noche .altar .velas { filter: drop-shadow(0 0 4px #ffd34d) drop-shadow(0 0 
 .altar.vivo { animation: altarVivo 2.4s ease; }
 @keyframes altarVivo { 30% { filter: drop-shadow(0 0 18px #ffb02e) brightness(1.2); } }
 /* Feria: rueda de la fortuna gigante a lo lejos, detrás de la duna del frente */
-.rueda { left: 9vw; bottom: 14vh; width: clamp(150px, 22vw, 320px); aspect-ratio: 200 / 220; }
+.rueda { left: 9vw; bottom: 14vh; width: clamp(130px, 18vw, 265px); aspect-ratio: 200 / 220; }
 .giro-rueda { transform-box: view-box; transform-origin: 100px 100px; animation: girarRueda 40s linear infinite; }
 .rueda.rapida .giro-rueda { animation-duration: 3.5s; }
 body.noche .giro-rueda { filter: drop-shadow(0 0 5px rgba(255,211,77,.9)); }
@@ -602,7 +602,12 @@ html.con-previa #aviso { top: calc(var(--nav) + 10px); bottom: auto; }
 @media (prefers-reduced-motion: reduce) { #previa, #previa .lista-fiestas { transition: none; animation: none; } }
 /* Reyes: los tres Reyes en camello (silueta) y la estrella que marca el camino, a lo lejos */
 .caravana .silueta, .estrella-camino .silueta { position: absolute; inset: 0; }
-.caravana .silueta { background: #4a2c14; -webkit-mask: url(../img/fiestas/reyes-camellos.svg) no-repeat center bottom / contain; mask: url(../img/fiestas/reyes-camellos.svg) no-repeat center bottom / contain; }
+.caravana .silueta { background: #4a2c14;
+  /* la silueta se desvanece en las orillas y abajo, para que no se vea como un recorte cuadrado */
+  -webkit-mask: url(../img/fiestas/reyes-camellos.svg) no-repeat center bottom / contain, linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%), linear-gradient(to top, transparent 0, #000 16%);
+  -webkit-mask-composite: source-in, source-in;
+  mask: url(../img/fiestas/reyes-camellos.svg) no-repeat center bottom / contain, linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%), linear-gradient(to top, transparent 0, #000 16%);
+  mask-composite: intersect, intersect; }
 body.noche .caravana .silueta, body.atardecer .caravana .silueta { background: rgba(230,220,200,.45); }
 .estrella-camino { right: 9vw; bottom: 30vh; width: clamp(46px, 5.5vw, 80px); aspect-ratio: 166 / 236; z-index: 2; filter: drop-shadow(0 0 6px rgba(255,236,170,.75)) drop-shadow(0 0 18px rgba(255,220,130,.35)); }
 .estrella-camino .silueta { background: linear-gradient(#fff8d8, #f1d48a 55%, rgba(241,212,138,.15)); -webkit-mask: url(../img/fiestas/estrella-camino.svg) no-repeat center top / contain; mask: url(../img/fiestas/estrella-camino.svg) no-repeat center top / contain; animation: latidoEstrella 3.2s ease-in-out infinite alternate; }
@@ -632,3 +637,6 @@ body.noche .murcielago { filter: drop-shadow(0 0 3px rgba(255,140,40,.5)); }
   filter: drop-shadow(0 0 6px rgba(255,120,30,.8)) drop-shadow(0 0 16px rgba(255,60,10,.45)); }
 .fenix-amigo .sil { animation: aleteo .55s ease-in-out infinite alternate; transform-origin: 50% 42%; }
 @media (max-width: 760px) { .fenix-amigo { width: 38px; height: 38px; } }
+/* El toque de la estrella grande de los Reyes (invisible, sigue a la estrella del cielo) */
+.toque-estrella { position: fixed; left: 0; top: 0; width: 52px; height: 52px; border-radius: 50%; z-index: 30; }
+.toque-estrella:focus-visible { outline: 2px solid var(--oro2); outline-offset: 2px; }

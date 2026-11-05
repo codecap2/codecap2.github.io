@@ -51,9 +51,9 @@
 
   C.saludos = {
     muertos: '🌼 Temporada de Día de Muertos: el Olimpo también recuerda a los que se fueron. Sigue el camino de cempasúchil… brilla más de noche.',
-    navidad: '🎄 ¡Navidad en el Olimpo! Atento al cielo: alguien pasa repartiendo regalos.',
+    navidad: '🎄 ¡Navidad en el Olimpo! Atento al cielo nocturno: alguien pasa repartiendo regalos.',
     anonuevo: '🎆 ¡Año Nuevo en el Olimpo! Toca el cielo y lanza tus propios fuegos artificiales.',
-    reyes: '👑 Los Reyes Magos cruzan las dunas siguiendo su estrella…',
+    reyes: '👑 Temporada de Reyes: de noche, busca las tres estrellas de los Reyes Magos en el cielo.',
     sanvalentin: '💘 Afrodita anda suelta: el Olimpo está enamorado.',
     feria: '🎡 ¡Temporada de la Feria Nacional de San Marcos! Toca el cielo y lanza fuegos artificiales.',
     patrias: '🇲🇽 ¡Viva México! Toca el cielo y lanza fuegos artificiales tricolor.'
@@ -285,11 +285,17 @@
     }
     if (C.fiesta === 'reyes') {
       reyesX += calma ? 0 : .0004; if (reyesX > 1.2) reyesX = -0.2;
-      // Las tres estrellas de los Reyes: grandes, con su destello en cruz que late
-      for (var k = 0; k < 3; k++) {
-        var rx = (reyesX - k * .06) * W, ry = H * (.13 + k * .035), late = calma ? 1 : .85 + .15 * Math.sin(t / 300 + k), tam = (k === 0 ? 9 : 6.5) * late;
-        ctx.globalAlpha = .35; ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.arc(rx, ry, tam * 3.2, 0, 6.28); ctx.fill();
-        ctx.globalAlpha = 1; ctx.fillStyle = k === 0 ? '#fffbe6' : '#f6dc95';
+      // Las tres estrellas de los Reyes: solo de noche, parte del cielo (brillo que se difumina, no un disco),
+      // con su destello en cruz que late. La más grande se puede tocar (fiestas.js sigue su posición).
+      var luz = dia ? 0 : (C.fase === 'atardecer' || C.fase === 'amanecer' ? .45 : 1);
+      var techo = (C._navH || (C._navH = (document.querySelector('nav') || {}).offsetHeight || 80)) + H * .1;   // debajo del menú, para que se vea y se pueda tocar
+      C.estrellaReyes = { x: reyesX * W, y: techo, visible: luz > .4 };
+      for (var k = 0; k < 3 && luz; k++) {
+        var rx = (reyesX - k * .06) * W, ry = techo + H * k * .035, late = calma ? 1 : .85 + .15 * Math.sin(t / 300 + k), tam = (k === 0 ? 9 : 6.5) * late;
+        var halo = ctx.createRadialGradient(rx, ry, 0, rx, ry, tam * 4.5);
+        halo.addColorStop(0, 'rgba(255,236,170,.55)'); halo.addColorStop(.35, 'rgba(255,224,138,.18)'); halo.addColorStop(1, 'rgba(255,224,138,0)');
+        ctx.globalAlpha = luz; ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(rx, ry, tam * 4.5, 0, 6.28); ctx.fill();
+        ctx.fillStyle = k === 0 ? '#fffbe6' : '#f6dc95';
         ctx.beginPath(); ctx.moveTo(rx, ry - tam * 3); ctx.lineTo(rx + tam * .35, ry - tam * .35); ctx.lineTo(rx + tam * 3, ry); ctx.lineTo(rx + tam * .35, ry + tam * .35);
         ctx.lineTo(rx, ry + tam * 3); ctx.lineTo(rx - tam * .35, ry + tam * .35); ctx.lineTo(rx - tam * 3, ry); ctx.lineTo(rx - tam * .35, ry - tam * .35); ctx.closePath(); ctx.fill();
         ctx.beginPath(); ctx.arc(rx, ry, tam * .7, 0, 6.28); ctx.fill();
@@ -353,9 +359,9 @@
     };
     // Un mini recorrido: qué tiene cada fiesta y qué tocar
     var QUE = {
-      navidad: [['Toca a Santa cuando cruce el cielo 🎅 (suena su melodía)', 'Tap Santa when he crosses the sky 🎅 (his melody plays)'], ['Toca el gorrito del logo', 'Tap the hat on the logo'], ['Mira la nieve y los foquitos del menú', 'Watch the snow and the menu lights']],
+      navidad: [['De noche, toca a Santa cuando cruce el cielo 🎅 (suena su melodía)', 'At night, tap Santa when he crosses the sky 🎅 (his melody plays)'], ['Toca el gorrito del logo', 'Tap the hat on the logo'], ['Mira la nieve y los foquitos del menú', 'Watch the snow and the menu lights']],
       anonuevo: [['Toca el cielo para lanzar fuegos artificiales 🎆', 'Tap the sky to launch fireworks 🎆']],
-      reyes: [['Toca a los Reyes Magos en las dunas 👑 (suena "Noche de paz")', 'Tap the Three Kings on the dunes 👑 ("Silent Night" plays)'], ['Toca la corona del logo', 'Tap the crown on the logo'], ['Toca la estrella que les marca el camino ⭐', 'Tap the star that shows them the way ⭐']],
+      reyes: [['De noche, toca la estrella más grande del cielo ⭐ (suena "Noche de paz")', 'At night, tap the biggest star in the sky ⭐ ("Silent Night" plays)'], ['Toca la corona del logo', 'Tap the crown on the logo']],
       sanvalentin: [['Toca el corazón del logo 💘', 'Tap the heart on the logo 💘']],
       feria: [['Toca la rueda de la fortuna 🎡 (suena el Son de la Feria, hecho para Olimpo)', 'Tap the Ferris wheel 🎡 (the Fair Song plays, made for Olympus)'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],
       patrias: [['Toca la bandera del logo 🇲🇽 (suena el mariachi)', 'Tap the flag on the logo 🇲🇽 (mariachi plays)'], ['Toca el cielo para lanzar fuegos', 'Tap the sky for fireworks']],

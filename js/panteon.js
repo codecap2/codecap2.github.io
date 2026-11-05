@@ -375,13 +375,13 @@
   };
 
   // ---------- Guiños para los fans (no cuentan como dioses) ----------
-  // El hacha de hielo: la lanzas, regresa, choca en su lugar y todo se congela
+  // La lanza de hielo: la lanzas, regresa, choca en su lugar y todo se congela
   $('#hacha').onclick = function () {
     var b = this, r = b.getBoundingClientRect(); b.style.visibility = 'hidden';
     var h = document.createElement('div'); h.innerHTML = '<svg width="64" height="64"><use href="#iHacha"/></svg>';
     h.style.cssText = 'position:fixed;z-index:56;pointer-events:none;left:' + (r.left - 16) + 'px;top:' + (r.top - 16) + 'px;filter:drop-shadow(0 0 12px #8fd3ff)';
     body.appendChild(h); S.play('zumbido'); setTimeout(function () { S.play('zumbido'); }, 950);
-    decir(T('🪓❄️ Lánzala sin miedo… siempre regresa a tu mano.', '🪓❄️ Throw it without fear… it always comes back to your hand.'), 3400);
+    decir(T('❄️ Lánzala sin miedo… esta lanza siempre regresa a tu mano.', '❄️ Throw it without fear… this spear always comes back to your hand.'), 3400);
     var fin = function () {
       h.remove(); b.style.visibility = ''; S.play('impacto'); setTimeout(function () { S.play('hielo'); }, 120);
       reiniciar($('#tarjetaExtras'), 'sacude');

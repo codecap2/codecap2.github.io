@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/estilo.css?v=20261104q">
+<link rel="stylesheet" href="css/estilo.css?v=20261105c">
 </head>
 <body class="noche">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -27,12 +27,15 @@
     <linearGradient id="gHielo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2fbff"/><stop offset=".45" stop-color="#9edcff"/><stop offset="1" stop-color="#2f7fc1"/></linearGradient>
     <linearGradient id="gMango" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a3519"/><stop offset=".5" stop-color="#8a5a2e"/><stop offset="1" stop-color="#4a2a12"/></linearGradient>
     <symbol id="iHacha" viewBox="0 0 64 64">
-      <rect x="35" y="4" width="6" height="57" rx="2.5" fill="url(#gMango)" stroke="#2e1a0a" stroke-width="1"/>
-      <rect x="34" y="40" width="8" height="2" fill="#2e1a0a" opacity=".6"/><rect x="34" y="45" width="8" height="2" fill="#2e1a0a" opacity=".6"/>
-      <path d="M35 8 L14 4 Q 9 17 11 33 L35 22 Z" fill="url(#gHielo)" stroke="#e6f7ff" stroke-width="1.2" stroke-linejoin="miter"/>
-      <path d="M14 4 Q 9 17 11 33" stroke="#ffffff" stroke-width="2" fill="none"/>
-      <path d="M41 9 L46 10 L46 20 L41 21 Z" fill="#6fa9cf" stroke="#e6f7ff" stroke-width="1"/>
-      <path d="M20 9 L26 19 M26 8 L31 16" stroke="#ffffff" stroke-width="1" opacity=".55"/>
+      <!-- Lanza de hielo: asta de madera con agarre, guarda y una punta de hielo afilada (termina en pico) -->
+      <g transform="rotate(35 32 32)">
+        <rect x="30" y="22" width="4" height="40" rx="1.6" fill="url(#gMango)" stroke="#2e1a0a" stroke-width=".8"/>
+        <path d="M29.6 44 h4.8 M29.6 47 h4.8 M29.6 50 h4.8 M29.6 53 h4.8" stroke="#2e1a0a" stroke-width="1.1" opacity=".55"/>
+        <path d="M26 22.5 Q32 20 38 22.5 L36.5 25 Q32 23.5 27.5 25 Z" fill="#6fa9cf" stroke="#e6f7ff" stroke-width=".8"/>
+        <path d="M32 1 L39 15 Q36 19 32 22 Q28 19 25 15 Z" fill="url(#gHielo)" stroke="#e6f7ff" stroke-width="1" stroke-linejoin="miter"/>
+        <path d="M32 2.5 L32 21" stroke="#ffffff" stroke-width="1.1" opacity=".75"/>
+        <path d="M28 13 L31 16 M36 13 L33 16" stroke="#ffffff" stroke-width=".8" opacity=".55"/>
+      </g>
     </symbol>
   </defs>
 </svg>
@@ -105,7 +108,7 @@
       <div class="servicio vidrio aparece"><div class="icono">📇</div><h3 data-en="Simple page">Página sencilla</h3><p data-en="One page with who you are, your services, photos, map, hours and a WhatsApp button, so customers find you and message you.">Una sola página con quién eres, tus servicios, fotos, mapa, horario y botón de WhatsApp, para que te encuentren y te escriban.</p></div>
       <div class="servicio vidrio aparece"><div class="icono">✨</div><h3 data-en="Full site with magic">Página completa con magia</h3><p data-en="Several sections, animations, a gallery and a hidden secret designed just for your business, so people talk about it.">Varias secciones, animaciones, galería y un secreto escondido pensado solo para tu negocio, para que la gente hable de él.</p></div>
       <div class="servicio vidrio aparece"><div class="icono">🛠️</div><h3 data-en="Monthly care">Mantenimiento mensual</h3><p data-en="I update your prices, photos or hours and make sure everything keeps working, so you don’t have to worry.">Cambio tus precios, fotos u horarios y reviso que todo siga funcionando, para que tú no te preocupes.</p></div>
-      <div class="servicio vidrio aparece" id="tarjetaExtras"><div class="icono">📍</div><h3 data-en="Extras">Extras</h3><p data-en="Google Maps listing, QR codes, business cards and your own domain (yourbusiness.com).">Ficha de Google Maps, códigos QR, tarjetas de presentación y dominio propio (tunegocio.com).</p><button class="secreto esquina" id="hacha" type="button" aria-label="Un hacha de hielo" data-en-aria="An ice axe"><svg><use href="#iHacha"/></svg></button></div>
+      <div class="servicio vidrio aparece" id="tarjetaExtras"><div class="icono">📍</div><h3 data-en="Extras">Extras</h3><p data-en="Google Maps listing, QR codes, business cards and your own domain (yourbusiness.com).">Ficha de Google Maps, códigos QR, tarjetas de presentación y dominio propio (tunegocio.com).</p><button class="secreto esquina" id="hacha" type="button" aria-label="Una lanza de hielo" data-en-aria="An ice spear"><svg><use href="#iHacha"/></svg></button></div>
     </div>
     <div class="detalles vidrio aparece" id="detalles">
       <h3 data-en="Details you can ask for">Detalles que puedes pedir</h3>
@@ -248,11 +251,11 @@
   </div>
 </div>
 
-<script src="js/idioma.js?v=20261104q"></script>
-<script src="js/sonido.js?v=20261104q"></script>
-<script src="js/cielo.js?v=20261104q"></script>
-<script src="js/panteon.js?v=20261104q"></script>
-<script src="js/fiestas.js?v=20261104q"></script>
-<script src="js/detalles.js?v=20261104q"></script>
+<script src="js/idioma.js?v=20261105c"></script>
+<script src="js/sonido.js?v=20261105c"></script>
+<script src="js/cielo.js?v=20261105c"></script>
+<script src="js/panteon.js?v=20261105c"></script>
+<script src="js/fiestas.js?v=20261105c"></script>
+<script src="js/detalles.js?v=20261105c"></script>
 </body>
 </html>
