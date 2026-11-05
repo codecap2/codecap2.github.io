@@ -279,10 +279,11 @@
       var t2 = t1.map(function (n) { return [n[0] ? (baja[n[0]] || n[0] * .8) : 0, n[1]]; });
       // Requinto: una octava arriba, cuerda brillante; las notas largas se "trémolo" (punteo rápido), como lo hacen los requintistas
       var requinto = function (vol) { return function (f, d, t) {
-        var veces = d >= 2 * q ? Math.round(d / (q / 2)) : 1;
-        for (var k = 0; k < veces; k++) cuerda(f * 2, vol * (k ? .7 : 1), t + k * (d / veces), .95);
+        // cuerda pulsada sobre caja de madera (como guitarra); solo las notas largas llevan trémolo
+        var veces = d >= 3 * q ? Math.round(d / (q / 2)) : 1;
+        for (var k = 0; k < veces; k++) lira(f, vol * (k ? .65 : 1), t + k * (d / veces));
       }; };
-      tocar(t1, q, requinto(.42)); tocar(t2, q, requinto(.26));
+      tocar(t1, q, requinto(.5)); tocar(t2, q, requinto(.3));
       // Guitarrón y vihuela: "um-pa" en Do y en Sol, como lleva el son
       var C = [N.C4, N.E4, N.G4], G = [N.B3, N.D4, N.G4];
       for (var b = 0; b < 8; b++) { var ac = b < 4 ? C : G, raiz = b < 4 ? N.C3 : N.G2, r = b * 4 * q; cuerda(raiz, .6, r, .25); rasgueo(ac, .18, r + 2 * q); }

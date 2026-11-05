@@ -375,10 +375,10 @@
   };
 
   // ---------- Guiños para los fans (no cuentan como dioses) ----------
-  // El hacha de piedra: la lanzas, regresa, choca en su lugar… y se congela, junto con toda la pantalla
+  // El hacha de acero: la lanzas, regresa, choca en su lugar… y se congela, junto con toda la pantalla
   $('#hacha').onclick = function () {
     var b = this, r = b.getBoundingClientRect(); b.style.visibility = 'hidden';
-    var h = document.createElement('div'); h.innerHTML = '<svg width="64" height="64"><use href="#iHacha"/></svg>';
+    var h = document.createElement('div'); h.innerHTML = '<img src="img/hacha-metal.png" alt="" width="64" height="64" style="display:block">';
     h.style.cssText = 'position:fixed;z-index:56;pointer-events:none;left:' + (r.left - 16) + 'px;top:' + (r.top - 16) + 'px;filter:drop-shadow(0 0 12px #8fd3ff)';
     body.appendChild(h); S.play('zumbido'); setTimeout(function () { S.play('zumbido'); }, 950);
     decir(T('🪓 Lánzala sin miedo… esta hacha siempre regresa a tu mano.', '🪓 Throw it without fear… this axe always comes back to your hand.'), 3400);
@@ -387,7 +387,7 @@
       reiniciar($('#tarjetaExtras'), 'sacude');
       C.fuegos(r.left + r.width / 2, r.top + r.height / 2, ['#e9f8ff', '#8fd3ff', '#ffffff', '#5fb4f0']);
       $('#escarcha').classList.add('activo'); body.classList.add('hielo-tinte');
-      var uso = b.querySelector('use'); if (uso) { uso.setAttribute('href', '#iHachaHielo'); setTimeout(function () { uso.setAttribute('href', '#iHacha'); }, 4500); }   // la piedra se vuelve hielo
+      var img = b.querySelector('img'); if (img) { img.src = 'img/hacha-hielo.png'; setTimeout(function () { img.src = 'img/hacha-metal.png'; }, 4500); }   // el acero se congela
       setTimeout(function () { $('#escarcha').classList.remove('activo'); body.classList.remove('hielo-tinte'); }, 2600);
     };
     if (suave || !h.animate) { fin(); return; }

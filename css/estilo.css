@@ -651,3 +651,5 @@ body.noche .bandera-dunas { filter: saturate(.7) brightness(.55); }
 @media (prefers-reduced-motion: reduce) { .bandera-dunas .tela { animation: none; } }
 /* La bandera del logo, centrada con el texto */
 .acc-patrias { margin-top: -8px !important; }
+.secreto img { width: 1.7em; height: 1.7em; display: block; }
+#escudo svg { overflow: visible; }
