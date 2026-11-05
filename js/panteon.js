@@ -399,53 +399,41 @@
       { transform: 'translate(0,0) rotate(-2160deg)' }
     ], { duration: 1900, easing: 'ease-in-out' }).onfinish = fin;
   };
-  // Las cadenas caen en U, sueltan chispas y se encienden en llamas
+  // Las cadenas (ilustración de upklyak, Magnific): caen con peso, se balancean, sueltan chispas y se encienden en llamas
   $('#cadenas').onclick = function () {
     S.play('cadena'); decir(T('⛓️ Unas cadenas viejas caen… y empiezan a arder.', '⛓️ Some old chains fall… and start to burn.'), 3600);
     if (suave) return;
-    var W = innerWidth, H = innerHeight, svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('class', 'capa-cadena'); svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    function capa(color, ancho, dash, offset, filtro) {
-      var p = document.createElementNS(NS, 'path'); p.setAttribute('fill', 'none'); p.setAttribute('stroke', color);
-      p.setAttribute('stroke-width', ancho); p.setAttribute('stroke-linecap', 'round');
-      if (dash) { p.setAttribute('stroke-dasharray', dash); p.setAttribute('stroke-dashoffset', offset || 0); }
-      if (filtro) p.style.filter = filtro; svg.appendChild(p); return p;
-    }
-    // Dos cadenas que caen y cuelgan en vertical; se balancean, sueltan chispas y se encienden
-    body.appendChild(svg);
+    var W = innerWidth, H = innerHeight, capa = document.createElement('div');
+    capa.className = 'capa-cadena'; body.appendChild(capa);
+    var ALTO = 490;   // alto de la imagen a 24 px de ancho
     var cadenas = [W * .33, W * .67].map(function (x, i) {
-      var fuego = capa('#ff6a1f', 16, '', 0, 'blur(3px) drop-shadow(0 0 14px #ff3a00)');
-      var a = capa('#5d5d63', 8, '14 6'), b = capa('#b9b9c2', 3, '14 6', 7), nucleo = capa('#ffd36b', 5, '', 0, 'blur(1px)');
-      fuego.style.opacity = 0; nucleo.style.opacity = 0;
-      return { x: x, largo: -40, vel: 0, meta: H * (.5 + i * .06), ang: 0, vang: (i ? -1 : 1) * .02, capas: [fuego, a, b, nucleo], a: a, b: b, fuego: fuego, nucleo: nucleo };
+      var eje = document.createElement('div'), img = document.createElement('img');
+      eje.className = 'cadena-eje'; eje.style.left = x + 'px';
+      img.src = 'img/cadena.webp'; img.alt = ''; img.width = 24; img.height = ALTO; img.decoding = 'async';
+      eje.appendChild(img); capa.appendChild(eje);
+      return { x: x, largo: -40, vel: 0, meta: Math.min(H * (.5 + i * .06), ALTO - 20), ang: 0, vang: (i ? -1 : 1) * .02, eje: eje, img: img };
     });
+    // Un punto al azar a lo largo de la cadena (para las chispas y el fuego)
+    function punto(k) { var s = Math.random() * Math.max(0, k.largo); return { x: k.x + Math.sin(k.ang) * s, y: Math.cos(k.ang) * s }; }
     var t0 = performance.now(), chispeo = false, ardiendo = false;
     function paso(t) {
       var e = t - t0;
       cadenas.forEach(function (k) {
         k.vel += (k.meta - k.largo) * .05; k.vel *= .85; k.largo += k.vel;              // cae con peso y rebota al tensarse
         k.vang += -k.ang * .02; k.vang *= .985; k.ang += k.vang;                        // se balancea como péndulo
-        var px = k.x + Math.sin(k.ang) * k.largo, py = Math.cos(k.ang) * k.largo, cx = k.x + Math.sin(k.ang) * k.largo * .5 + k.vang * 300;
-        var d = 'M' + k.x + ',-10 Q' + cx + ',' + (py * .5) + ' ' + px + ',' + py;
-        k.capas.forEach(function (p) { p.setAttribute('d', d); });
-        k.px = px; k.py = py;
+        k.eje.style.transform = 'rotate(' + (-k.ang * 57.3).toFixed(2) + 'deg)';
+        k.img.style.transform = 'translate3d(-50%,' + (k.largo - ALTO).toFixed(1) + 'px,0)';
+        k.px = k.x + Math.sin(k.ang) * k.largo; k.py = Math.cos(k.ang) * k.largo;
       });
       if (e > 650 && !chispeo) { chispeo = true; S.play('chispas'); }
-      if (chispeo && !ardiendo) cadenas.forEach(function (k) { var q = k.a.getPointAtLength(Math.random() * k.a.getTotalLength()); C.brasas(q.x, q.y, 2, ['#ffffff', '#ffe08a']); });
-      if (e > 1100 && !ardiendo) { ardiendo = true; S.play('fuego'); body.classList.add('furia'); }
-      if (ardiendo) {
-        var al = Math.min(1, (e - 1100) / 300);
-        cadenas.forEach(function (k) {
-          k.fuego.style.opacity = al * (.75 + Math.random() * .25); k.nucleo.style.opacity = al * (.6 + Math.random() * .4);
-          k.fuego.setAttribute('stroke-width', 13 + Math.random() * 8);
-          k.b.setAttribute('stroke', 'rgb(255,' + Math.round(200 - al * 80) + ',' + Math.round(150 - al * 120) + ')');
-          var largo = k.a.getTotalLength();
-          for (var j = 0; j < 3; j++) { var p = k.a.getPointAtLength(Math.random() * largo); C.brasas(p.x, p.y, 1); }
-          C.brasas(k.px, k.py, 3);
-        });
-      }
-      if (e > 3400) { cadenas.forEach(function (k) { k.meta = -200; }); svg.style.transition = 'opacity .7s'; svg.style.opacity = 0; body.classList.remove('furia'); }
-      if (e < 4300) requestAnimationFrame(paso); else svg.remove();
+      if (chispeo && !ardiendo) cadenas.forEach(function (k) { var q = punto(k); C.brasas(q.x, q.y, 2, ['#ffffff', '#ffe08a']); });
+      if (e > 1100 && !ardiendo) { ardiendo = true; S.play('fuego'); body.classList.add('furia'); capa.classList.add('arde'); }
+      if (ardiendo) cadenas.forEach(function (k) {
+        for (var j = 0; j < 3; j++) { var p = punto(k); C.brasas(p.x, p.y, 1); }
+        C.brasas(k.px, k.py, 3);
+      });
+      if (e > 3400 && !capa.classList.contains('se-va')) { cadenas.forEach(function (k) { k.meta = -ALTO; }); capa.classList.add('se-va'); body.classList.remove('furia'); }
+      if (e < 4300) requestAnimationFrame(paso); else capa.remove();
     }
     requestAnimationFrame(paso);
   };

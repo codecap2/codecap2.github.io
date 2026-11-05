@@ -184,8 +184,11 @@
   function crujido(n, dura, retraso, vol) { if (LIGERO) n = Math.ceil(n / 3); for (var i = 0; i < n; i++) siseo(1500 + Math.random() * 4000, 1200, (vol || .2) * Math.random(), .02 + Math.random() * .03, (retraso || 0) + Math.random() * dura, 2, .001); }
 
   var EF = {
-    // Zeus: el rayo es un latigazo grave; el trueno retumba y rueda a lo lejos
-    trueno: function () {
+    // Zeus: un rayo GRABADO de verdad (Mixkit), que el oído de IA reconoce como tormenta y trueno.
+    // Si el archivo no llega a cargar, suena el trueno hecho con código como respaldo.
+    trueno: function () { sonar('dioses/trueno', { vol: .95, sale: 1.2 }).then(function (s) { if (!s) EF.truenoCodigo(); }); },
+    // Respaldo: el rayo es un latigazo grave; el trueno retumba y rueda a lo lejos
+    truenoCodigo: function () {
       enElCielo = true;   // todo lo del trueno pasa por el eco del cielo
       try {
         var t = ctx.currentTime;
@@ -371,7 +374,7 @@
     if (despertado) return; despertado = true;
     ['pointerdown', 'keydown', 'touchstart', 'touchend', 'click'].forEach(function (t) { removeEventListener(t, despertar, true); });
     if (e && btn && btn.contains(e.target)) return;   // si su primer toque fue para apagarlo, no suena nada
-    if (S.on && iniciar()) { ambiente(); var fi = window.Cielo && Cielo.fiesta; if (fi === 'patrias' || fi === 'muertos' || fi === 'feria') S.precargar(['musica/' + fi]); if (fi === 'patrias' || fi === 'feria' || fi === 'anonuevo') S.precargar(['fuegos/cohete', 'fuegos/estallido-silbido', 'fuegos/estallido-2', 'fuegos/estallido-eco']); }
+    if (S.on && iniciar()) { ambiente(); S.precargar(['dioses/trueno']); var fi = window.Cielo && Cielo.fiesta; if (fi === 'patrias' || fi === 'muertos' || fi === 'feria') S.precargar(['musica/' + fi]); if (fi === 'patrias' || fi === 'feria' || fi === 'anonuevo') S.precargar(['fuegos/cohete', 'fuegos/estallido-silbido', 'fuegos/estallido-2', 'fuegos/estallido-eco']); }
   }
   // Si la página deja de verse (otra pestaña, ventana minimizada, pantalla bloqueada con Windows + L) o se cierra,
   // el sonido se pausa al instante; al volver, regresa solo donde iba.
