@@ -399,8 +399,8 @@
       { transform: 'translate(0,0) rotate(-2160deg)' }
     ], { duration: 1900, easing: 'ease-in-out' }).onfinish = fin;
   };
-  // Las cadenas (ilustración de upklyak, Magnific): una sola cadena larga cae en "U" desde arriba de la pantalla,
-  // como si alguien la sostuviera con las dos manos fuera de cuadro. Se balancea con peso, suelta chispas y arde al rojo vivo.
+  // Las cadenas (ilustración de upklyak, Magnific): DOS cadenas caen y quedan colgando, cada una en su propia "U",
+  // sujetas de sus dos puntas fuera de cuadro. Se mecen con peso, sueltan chispas y arden al rojo vivo.
   // Se dibuja en un lienzo: la foto de la cadena recta se "teje" eslabón por eslabón a lo largo de la curva.
   $('#cadenas').onclick = function () {
     S.play('cadena'); decir(T('⛓️ Unas cadenas viejas caen… y empiezan a arder.', '⛓️ Some old chains fall… and start to burn.'), 3600);
@@ -409,18 +409,21 @@
     cv.className = 'capa-cadena'; cv.width = W * dpr; cv.height = H * dpr; body.appendChild(cv); g.scale(dpr, dpr);
     var img = new Image(); img.src = 'img/cadena.webp';
     var ANCHO = Math.max(16, Math.min(24, W / 40)), ESC = ANCHO / 64, PER = 170, Y0 = 300, PASO = PER * ESC;   // el eslabón se repite cada 170 px de la imagen
-    var A = { x: W * .16, y: -30 }, B = { x: W * .84, y: -30 }, cayo = { s: -80, v: 0, meta: Math.min(H * .62, W * .55) }, vaiven = { x: (Math.random() < .5 ? -1 : 1) * W * .12, v: 0 };
-    function punto(t) {   // curva de Bézier: el punto de control baja para que el centro llegue a "s"
-      var cx = (A.x + B.x) / 2 + vaiven.x, cy = 2 * cayo.s + 30, u = 1 - t;
-      return { x: u * u * A.x + 2 * u * t * cx + t * t * B.x, y: u * u * A.y + 2 * u * t * cy + t * t * B.y };
+    // Cada cadena: sus dos puntas (fuera de cuadro, arriba), qué tanto cuelga (s) y su vaivén de lado
+    var cadenas = [[.04, .44, .5], [.56, .96, .58]].map(function (c, i) {
+      return { A: { x: W * c[0], y: -30 }, B: { x: W * c[1], y: -30 }, cayo: { s: -80 - i * 40, v: 0, meta: Math.min(H * c[2], W * .42) }, vaiven: { x: (i ? -1 : 1) * W * .05, v: 0 } };
+    });
+    function punto(k, t) {   // curva de Bézier: el punto de control baja para que el centro llegue a "s"
+      var cx = (k.A.x + k.B.x) / 2 + k.vaiven.x, cy = 2 * k.cayo.s + 30, u = 1 - t;
+      return { x: u * u * k.A.x + 2 * u * t * cx + t * t * k.B.x, y: u * u * k.A.y + 2 * u * t * cy + t * t * k.B.y };
     }
-    function trazo() {   // la curva en 160 puntos, con su largo acumulado
-      var pts = [], L = 0, ant = punto(0); pts.push({ p: ant, L: 0 });
-      for (var i = 1; i <= 160; i++) { var q = punto(i / 160); L += Math.hypot(q.x - ant.x, q.y - ant.y); pts.push({ p: q, L: L }); ant = q; }
+    function trazo(k) {   // la curva en 120 puntos, con su largo acumulado
+      var pts = [], L = 0, ant = punto(k, 0); pts.push({ p: ant, L: 0 });
+      for (var i = 1; i <= 120; i++) { var q = punto(k, i / 120); L += Math.hypot(q.x - ant.x, q.y - ant.y); pts.push({ p: q, L: L }); ant = q; }
       return pts;
     }
     function pintar(pts) {
-      g.clearRect(0, 0, W, H); if (!img.complete || !img.naturalWidth) return;
+      if (!img.complete || !img.naturalWidth) return;
       var total = pts[pts.length - 1].L, j = 0;
       for (var d = 0; d < total; d += PASO) {
         while (j < pts.length - 2 && pts[j + 1].L < d) j++;
@@ -436,14 +439,18 @@
     var t0 = performance.now(), chispeo = false, ardiendo = false, seVa = false;
     function paso(t) {
       var e = t - t0;
-      cayo.v += (cayo.meta - cayo.s) * .045; cayo.v *= .86; cayo.s += cayo.v;      // cae con peso y rebota al tensarse
-      vaiven.v += -vaiven.x * .018; vaiven.v *= .975; vaiven.x += vaiven.v;          // se mece de lado a lado y se va calmando
-      var pts = trazo(); pintar(pts);
+      g.clearRect(0, 0, W, H);
+      var pts = [];
+      cadenas.forEach(function (k) {
+        k.cayo.v += (k.cayo.meta - k.cayo.s) * .045; k.cayo.v *= .86; k.cayo.s += k.cayo.v;      // cae con peso y rebota al tensarse
+        k.vaiven.v += -k.vaiven.x * .02; k.vaiven.v *= .975; k.vaiven.x += k.vaiven.v;            // se mece de lado a lado y se va calmando
+        var t = trazo(k); pintar(t); pts = pts.concat(t);
+      });
       if (e > 650 && !chispeo) { chispeo = true; S.play('chispas'); }
       if (chispeo && !ardiendo) for (var c = 0; c < 3; c++) { var q = alAzar(pts); C.brasas(q.x, q.y, 1, ['#ffffff', '#ffe08a']); }
       if (e > 1100 && !ardiendo) { ardiendo = true; S.play('fuego'); body.classList.add('furia'); cv.classList.add('arde'); }
       if (ardiendo && !seVa) for (var f2 = 0; f2 < 5; f2++) { var q2 = alAzar(pts); C.brasas(q2.x, q2.y, 1); }
-      if (e > 3400 && !seVa) { seVa = true; cayo.meta = -260; cv.classList.add('se-va'); body.classList.remove('furia'); }
+      if (e > 3400 && !seVa) { seVa = true; cadenas.forEach(function (k) { k.cayo.meta = -260; }); cv.classList.add('se-va'); body.classList.remove('furia'); }
       if (e < 4300) requestAnimationFrame(paso); else cv.remove();
     }
     requestAnimationFrame(paso);
