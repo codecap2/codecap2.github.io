@@ -280,7 +280,23 @@
     if (C.modo === 'noche' && !fugaz && Math.random() < .002) C.fugaz();
   }
 
+  // Modo ahorro automático: si el equipo no alcanza a dibujar fluido (cuadros de más de 24 ms seguidos),
+  // la página se aligera sola: menos partículas y estrellas, sin brillos pesados y, si hace falta, sin paralaje.
+  var ultimoT = 0, lentos = 0, nivelAhorro = 0;
+  function vigilarFluidez(t) {
+    if (ultimoT) {
+      var dt = t - ultimoT;
+      if (dt > 24 && dt < 250) lentos++; else if (lentos > 0) lentos -= .5;
+      if (lentos > 90 && nivelAhorro < 2) {
+        nivelAhorro++; lentos = 0; F *= .5; estrellas.length = Math.round(estrellas.length * .6);
+        parts.splice(0, Math.max(0, parts.length - Math.round(700 * F)));
+        document.documentElement.classList.add(nivelAhorro === 1 ? 'ahorro' : 'ahorro2');
+      }
+    }
+    ultimoT = t;
+  }
   function pintar(t) {
+    vigilarFluidez(t);
     ctx.clearRect(0, 0, W, H);
     var dia = C.modo === 'dia';
     if (!dia) {
@@ -433,7 +449,7 @@
       capasP.forEach(function (c) { c[0].style.transform = 'translate3d(' + (-px * 18 * c[1]).toFixed(2) + 'px,' + (-py * 8 * c[1] + bajada * .06 * c[1]).toFixed(2) + 'px,0)'; });
       if (Math.abs(mx - px) > .002 || Math.abs(my - py) > .002) pedir();
     };
-    var pedir = function () { if (!pendiente) { pendiente = true; requestAnimationFrame(mover); } };
+    var pedir = function () { if (!pendiente && !document.documentElement.classList.contains('ahorro2')) { pendiente = true; requestAnimationFrame(mover); } };
     if (matchMedia('(hover: hover)').matches) addEventListener('pointermove', function (e) { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; pedir(); }, { passive: true });
     addEventListener('scroll', pedir, { passive: true }); pedir();
   }

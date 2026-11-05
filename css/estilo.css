@@ -683,3 +683,9 @@ body[data-fase="atardecer"] { --montes: #5a3049; --nieve: #8a5a72; --templo: #4a
 body[data-fase="dia"] #paisaje .aves, body[data-fase="amanecer"] #paisaje .aves { opacity: .55; animation: aves 46s linear infinite; }
 @keyframes aves { from { transform: translate(0, 0); } 50% { transform: translate(60vw, -4vh); } to { transform: translate(125vw, 2vh); } }
 @media (prefers-reduced-motion: reduce) { #paisaje .cipres, #paisaje .aves, #paisaje .fuego-templo { animation: none; } }
+/* Modo ahorro (lo activa la página sola si el equipo no alcanza a ir fluido): fuera brillos y animaciones caros */
+html.ahorro .cempasuchil svg, html.ahorro .altar .velas, html.ahorro .altar .humo, html.ahorro .altar .humo-forma, html.ahorro .xolo svg,
+html.ahorro .fenix-amigo, html.ahorro .estrella-camino, html.ahorro .murcielago, html.ahorro .nube, html.ahorro .bandera-dunas { filter: none !important; }
+html.ahorro .cempasuchil svg, html.ahorro .cempasuchil .petalo-c, html.ahorro .papel-picado svg, html.ahorro #paisaje .aves, html.ahorro #paisaje .fuego-templo { animation: none !important; }
+html.ahorro2 #paisaje .capa-p, html.ahorro2 #escenaFiesta, html.ahorro2 #astros { transform: none !important; }
+html.ahorro2 .altar .humo, html.ahorro2 .altar .humo-forma, html.ahorro2 .altar .llamita, html.ahorro2 .trineo .nariz { animation: none !important; }
