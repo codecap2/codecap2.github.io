@@ -469,3 +469,19 @@
     }, { rootMargin: '-50% 0px 0px 0px' }).observe(botones);
   }
 })();
+
+/* 🌙 Fase real de la luna: la misma que allá afuera, sobre Aguascalientes */
+(function () {
+  var luna = document.getElementById('luna');
+  if (!luna) return;
+  function desplazo() {
+    var sinodico = 29.530588853 * 86400000;     // un mes lunar, en ms
+    var nueva = Date.UTC(2000, 0, 6, 18, 14);    // luna nueva de referencia
+    var p = ((Date.now() - nueva) % sinodico) / sinodico;
+    if (p < 0) p += 1;                           // 0 = nueva · .5 = llena
+    return (p <= 0.5 ? -(p / 0.5) : (1 - p) / 0.5) * 145;
+  }
+  function pintar() { luna.style.setProperty('--luna-desplazo', desplazo().toFixed(1) + '%'); }
+  pintar();
+  setInterval(pintar, 3600000);                  // la revisa cada hora
+})();

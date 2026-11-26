@@ -36,12 +36,13 @@ body.invierno .c-noche { background: linear-gradient(#03060c, #0a1426 55%, #1820
 body.otono .c-noche { background: linear-gradient(#07070d, #161322 55%, #241a22); }
 body[data-fase="noche"] .c-noche, body[data-fase="amanecer"] .c-amanecer, body[data-fase="dia"] .c-dia, body[data-fase="atardecer"] .c-atardecer { opacity: 1; }
 #particulas { position: absolute; inset: 0; width: 100%; height: 100%; }
-#astros { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+#astros { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 #frente { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 66; pointer-events: none; }
-.astro { pointer-events: auto; position: absolute; top: clamp(150px, 21vh, 230px); right: 10vw; width: 90px; height: 90px; border-radius: 50%; border: 0; cursor: pointer; z-index: 1; transition: opacity 1.8s ease, transform 2.8s cubic-bezier(.45,.05,.55,.95), filter .3s; will-change: transform; }
+.astro { pointer-events: auto; position: absolute; top: clamp(150px, 21vh, 230px); right: 13vw; width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer; z-index: 1; transition: opacity 1.8s ease, transform 2.8s cubic-bezier(.45,.05,.55,.95), filter .3s; will-change: transform; }
 .astro:hover { filter: brightness(1.15); }
-#sol { background: radial-gradient(circle, #fff6d5 0%, #ffd36b 45%, #f6a73b 70%); box-shadow: 0 0 60px 20px rgba(255,200,90,.55); }
-#luna { background: radial-gradient(circle at 38% 38%, #fbf7ea, #d9d3c2 60%, #b8b09c); box-shadow: 0 0 40px 8px rgba(240,235,215,.25); width: 70px; height: 70px; }
+#sol { background: radial-gradient(circle, #fff6d5 0%, #ffd36b 45%, #f6a73b 70%); box-shadow: 0 0 22px 7px rgba(255,200,90,.34); }
+#luna { background: radial-gradient(circle at 38% 38%, #fbf7ea, #d9d3c2 60%, #b8b09c); box-shadow: 0 0 16px 4px rgba(240,235,215,.3); width: 30px; height: 30px; overflow: hidden; }
+#luna::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: #0c1119; transform: translateX(var(--luna-desplazo, 120%)); pointer-events: none; transition: transform 2s ease; }
 body.amanecer #sol { box-shadow: 0 0 80px 30px rgba(255,150,80,.5); }
 body.atardecer #sol { transform: translateY(42vh); box-shadow: 0 0 80px 30px rgba(255,120,60,.5); }
 /* Se ponen detrás de las dunas y regresan desde arriba, por detrás del menú, como si le dieran la vuelta al mundo */
@@ -321,7 +322,8 @@ body.ebrio main, body.ebrio .templo .interior { animation: ebrio 1s ease-in-out 
 
 /* Textos balanceados: nada de una palabra sola en el último renglón */
 h1, h2, h3, h4, .sub, .portada p, .nota, .gloria { text-wrap: balance; }
-#aviso, .dios p { text-wrap: pretty; }   /* el aviso aprovecha cada renglón; el enlace al códice baja completo si no cabe */
+#aviso { text-wrap: pretty; }   /* el aviso aprovecha cada renglón; el enlace al códice baja completo si no cabe */
+h2, h3, .sub, .vidrio p, .dios p { text-wrap: balance; }   /* líneas equilibradas y simétricas, sin palabras sueltas en cualquier pantalla */
 p { text-wrap: pretty; }
 .vuelvan { color: #ff3b30; font-weight: 700; text-shadow: 0 0 18px rgba(255,59,48,.55); }
 body.dia .vuelvan { color: #b3120c; text-shadow: 0 0 14px rgba(255,255,255,.6); }

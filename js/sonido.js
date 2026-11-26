@@ -335,7 +335,7 @@
   }
   var vientoVivo = null, grillosVivos = null, tSigue = 0;
   // Grillos lejanos: más bajitos y sin su chirrido más agudo, para que acompañen la noche sin invadirla
-  function grillosLejos() { var f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 5200; f.connect(maestro); return f; }
+  function grillosLejos() { var f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 3400; f.connect(maestro); return f; }
   function ambiente() {
     pararAmbiente(); if (!S.on || !iniciar()) return;
     var cl = (window.Cielo && Cielo.clima) || 'despejado', noche = window.Cielo && Cielo.modo === 'noche';
@@ -356,7 +356,7 @@
     })();
     if (cl === 'lluvia' || cl === 'tormenta') lazo('bandpass', 2400, .4, .05, blanco);
     // Grillos de verdad en las noches tranquilas
-    if (noche && cl !== 'lluvia' && cl !== 'tormenta' && cl !== 'arena') grillosVivos = bucle('ambiente/grillos', .16, 3, grillosLejos());
+    if (noche && cl !== 'lluvia' && cl !== 'tormenta' && cl !== 'arena') grillosVivos = bucle('ambiente/grillos', .08, 3.5, grillosLejos());
   }
   function pararAmbiente() {
     amb.forEach(function (n) { try { n.stop(); } catch (e) {} }); amb = []; clearTimeout(tSigue);
