@@ -13,6 +13,8 @@ html::-webkit-scrollbar, .templo::-webkit-scrollbar, .pergamino::-webkit-scrollb
 body { margin: 0; background: var(--piedra); color: var(--marmol); font-family: Inter, "Segoe UI", sans-serif; line-height: 1.6; overflow-x: clip; }
 a { color: var(--oro2); }
 button { font: inherit; }
+/* Accesibilidad: aro de foco dorado y visible para quien navega con teclado (el contorno respeta los bordes redondeados) */
+nav ul a:focus-visible, .chip:focus-visible, .boton:focus-visible, .astro:focus-visible, .dios.hallada:focus-visible, .salir:focus-visible, .cerrar:focus-visible, #irInicio:focus-visible, .reto button:focus-visible, #aviso .ver:focus-visible, .gracias a:focus-visible, .recompensa a:focus-visible { outline: 2px solid var(--oro2); outline-offset: 3px; }
 .envoltura { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
 h1, h2, h3, .logo, .cinzel { font-family: Cinzel, Georgia, serif; letter-spacing: .04em; }
 h2 { font-size: clamp(1.6rem, 4vw, 2.3rem); margin: 0 0 .3em; color: var(--oro2); line-height: 1.2; text-shadow: 0 2px 18px rgba(0,0,0,.55); }
