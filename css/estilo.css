@@ -222,6 +222,8 @@ body.impacto nav, body.impacto .puerta { animation: temblor .35s; }
 .medallon { width: 220px; height: 220px; margin: 0 auto; border-radius: 50%; border: 3px solid var(--oro); box-shadow: 0 0 0 6px rgba(163,32,29,.35), 0 0 50px rgba(212,175,90,.25); position: relative; }
 .medallon .foto { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; position: relative; background: #111; }
 .medallon .foto img { position: absolute; width: 300px; left: -32px; top: -36px; }
+.medallon .foto.emblema { display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 42%, #191c24, #0b0d12 72%); }
+.medallon .foto.emblema img { position: static; width: 44%; height: auto; filter: drop-shadow(0 0 10px rgba(228,8,10,.45)); }
 .medallon .secreto { position: absolute; right: 2px; bottom: 6px; font-size: 1.6rem; z-index: 2; }
 .datos { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 1rem; }
 @media (max-width: 760px) { .datos { justify-content: center; } }
